@@ -511,10 +511,12 @@ package cheshire_pkg;
     ret.NrCachedRegionRules   = 3;   // CachedSPM, LLCOut, ExtCI;
     ret.CachedRegionAddrBase  = {AmSpm,   cfg.LlcOutRegionStart,  CieBase};
     ret.CachedRegionLength    = {SizeSpm, SizeLlcOut,             cfg.Cva6ExtCieLength};
+`ifdef TARGET_PULP
     ret.DebugEn               = 1;
     ret.RVSCLIC               = cfg.Clic;
     ret.RVXHCLIC              = cfg.ClicVsclic;
     ret.CLICNumInterruptSrc   = NumCoreIrqs + NumIntIntrs + cfg.NumExtClicIntrs;
+`endif
     // TODO: Should some things be removed from the main config?
     // TODO: Should other things be added to the main config?
     // TODO: Tune missing parameters of interest (esp. cache and interconnect) properly
@@ -522,6 +524,9 @@ package cheshire_pkg;
     ret.BTBEntries            = cfg.Cva6BTBEntries;
     ret.BHTEntries            = cfg.Cva6BHTEntries;
     ret.NrPMPEntries          = cfg.Cva6NrPMPEntries;
+    ret.SuperscalarEn         = 1'b1;
+    ret.BPType                = config_pkg::PH_BHT;
+    ret.ALUBypass             = 1'b1;
     // Return modified config
     return ret;
   endfunction
