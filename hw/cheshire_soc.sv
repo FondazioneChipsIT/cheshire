@@ -587,6 +587,12 @@ module cheshire_soc import cheshire_pkg::*; #(
 
   assign intr.intn.bus_err.cores = core_bus_err_intr_comb;
 
+  riscv::priv_lvl_t [NumIntHarts-1:0] priv_lvl;
+  riscv::ctrtarget_rv_t [NumIntHarts-1:0] emitter_target;
+  riscv::ctrsource_rv_t [NumIntHarts-1:0] emitter_source;
+  riscv::ctr_type_t [NumIntHarts-1:0] emitter_data;
+  logic [NumIntHarts-1:0][31:0] emitter_instr;
+
   for (genvar i = 0; i < NumIntHarts; i++) begin : gen_cva6_cores
     axi_cva6_req_t core_out_req, core_ur_req;
     axi_cva6_rsp_t core_out_rsp, core_ur_rsp;
@@ -635,7 +641,12 @@ module cheshire_soc import cheshire_pkg::*; #(
       .cvxif_req_o      ( ),
       .cvxif_resp_i     ( '0 ),
       .noc_req_o        ( core_out_req ),
-      .noc_resp_i       ( core_out_rsp )
+      .noc_resp_i       ( core_out_rsp ),
+      .emitter_source_o ( emitter_source[i] ),
+      .emitter_target_o ( emitter_target[i] ),
+      .emitter_data_o   ( emitter_data[i]   ),
+      .emitter_instr_o  ( emitter_instr[i]  ),
+      .priv_lvl_o       ( priv_lvl[i]       )
     );
 
     if (Cfg.BusErr) begin : gen_cva6_bus_err
@@ -1105,6 +1116,85 @@ module cheshire_soc import cheshire_pkg::*; #(
     .timer_irq_o  ( mtip ),
     .ipi_o        ( msip )
   );
+
+  ///////////////
+  //  Snooper  //
+  ///////////////
+
+  if (Cfg.Snooper) begin : gen_snooper
+
+    logic snoop_core_select, snoop_trigger_irq_o, snoop_watermark_irq_o;
+
+    snooper_pkg::trace_t cva6_traces;
+
+    assign cva6_traces.priv_lvl = snoop_core_select ? priv_lvl[1] : priv_lvl[0];
+    assign cva6_traces.pc_src_h = snoop_core_select ? { 1'b0, emitter_source[1].pc[62:32] } : { 1'b0, emitter_source[0].pc[62:32] };
+    assign cva6_traces.pc_src_l = snoop_core_select ? { emitter_source[1].pc[31:1], 1'b0  } : { emitter_source[0].pc[31:1], 1'b0  };
+    assign cva6_traces.pc_dst_h = snoop_core_select ? { 1'b0, emitter_target[1].pc[62:32] } : { 1'b0, emitter_target[0].pc[62:32] };
+    assign cva6_traces.pc_dst_l = snoop_core_select ? { emitter_target[1].pc[31:1], 1'b0  } : { emitter_target[0].pc[31:1], 1'b0  };
+    assign cva6_traces.metadata = snoop_core_select ? { 28'b0, emitter_data[1]            } : { 28'b0, emitter_data[0]            };
+    assign cva6_traces.opcode   = snoop_core_select ? emitter_instr[1] : emitter_instr[0];
+    assign cva6_traces.pc_v     = snoop_core_select ? emitter_source[1].v : emitter_source[0].v;
+
+    axi_lite_req_t cfi_snooper_lite_cfg_req;
+    axi_lite_rsp_t cfi_snooper_lite_cfg_rsp;
+
+    axi_to_axi_lite #(
+      .AxiAddrWidth     ( Cfg.AddrWidth     ),
+      .AxiDataWidth     ( Cfg.AxiDataWidth  ),
+      .AxiIdWidth       ( AxiSlvIdWidth     ),
+      .AxiUserWidth     ( Cfg.AxiUserWidth  ),
+      .AxiMaxWriteTxns  ( Cfg.DmaConfMaxWriteTxns ), // same as DMA is ok ???
+      .AxiMaxReadTxns   ( Cfg.DmaConfMaxReadTxns  ), // same as DMA is ok ???
+      .FullBW           (0),  // ID Queue in Full BW mode in axi_burst_splitter
+      .FallThrough      (0),  // FIFOs in Fall through mode in ID reflect (it was 1 before)
+      .full_req_t       ( axi_slv_req_t ),
+      .full_resp_t      ( axi_slv_rsp_t ),
+      .lite_req_t       ( axi_lite_req_t ),
+      .lite_resp_t      ( axi_lite_rsp_t )
+    ) i_axi_to_axi_lite (
+      .clk_i  ( clk_i       ),   
+      .rst_ni ( rst_ni      ),   
+      .test_i ( test_mode_i ),   
+      // slave port full AXI4+ATOP
+      .slv_req_i  ( axi_out_req[AxiOut.snoopercfg] ),
+      .slv_resp_o ( axi_out_rsp[AxiOut.snoopercfg] ),
+      // master port AXI4-Lite
+      .mst_req_o  ( cfi_snooper_lite_cfg_req ),
+      .mst_resp_i ( cfi_snooper_lite_cfg_rsp )
+    );
+
+    snooper #(
+      .AXI_ID_WIDTH   ( Cfg.AxiUserWidth   ),
+      .axi_ar_chan_t  ( axi_slv_ar_chan_t  ),
+      .axi_aw_chan_t  ( axi_slv_aw_chan_t  ),
+      .axi_b_chan_t   ( axi_slv_b_chan_t   ),
+      .axi_r_chan_t   ( axi_slv_r_chan_t   ),
+      .axi_w_chan_t   ( axi_slv_w_chan_t   ),
+      .axi_req_t      ( axi_slv_req_t      ),
+      .axi_rsp_t      ( axi_slv_rsp_t      ),
+      .axi_lite_req_t ( axi_lite_req_t ),
+      .axi_lite_rsp_t ( axi_lite_rsp_t )
+    ) i_snooper (
+      .clk_i              ( clk_i                       ),
+      .rst_ni             ( rst_ni                      ),
+      .axi_lite_cfg_req_i ( cfi_snooper_lite_cfg_req    ),
+      .axi_lite_cfg_rsp_o ( cfi_snooper_lite_cfg_rsp    ),
+      .axi_sw_req_i       ( axi_out_req[AxiOut.snooper] ),
+      .axi_sw_rsp_o       ( axi_out_rsp[AxiOut.snooper] ),
+      .traces_i           ( cva6_traces                 ),
+      .trigger_o          ( intr.intn.snooper_trigger   ),
+      .watermark_irq_o    ( intr.intn.snooper_watermark ),
+      .core_select_o      ( snoop_core_select           )
+    );
+
+  end else begin : gen_no_snooper
+
+    assign intr.intn.snooper_trigger   = 1'b0;
+    assign intr.intn.snooper_watermark = 1'b0;
+
+  end
+
 
   //////////////
   //  AXI RT  //

@@ -138,6 +138,7 @@ package cheshire_pkg;
     bit     Clic;
     bit     IrqRouter;
     bit     BusErr;
+    bit     Snooper;
     // Parameters for Debug Module
     jtag_idcode_t DbgIdCode;
     dw_bt   DbgMaxReqs;
@@ -242,6 +243,8 @@ package cheshire_pkg;
     logic i2c_rx_threshold;
     logic i2c_fmt_threshold;
     logic uart;
+    logic snooper_trigger;
+    logic snooper_watermark;
     logic zero;
   } cheshire_int_intr_t;
 
@@ -287,6 +290,8 @@ package cheshire_pkg;
   localparam doub_bt AmSpm    = 'h1000_0000;  // Cached region at bottom, uncached on top
   localparam doub_bt AmSpmUnc = 'h1400_0000;
   localparam doub_bt AmClic   = 'h0800_0000;
+  localparam doub_bt Snooper = 'h1500_0000;
+  localparam doub_bt SnooperCfg = 'h1600_0000;
 
   // Static masks
   localparam doub_bt AmSpmRegionMask = 'h03FF_FFFF;
@@ -338,6 +343,8 @@ package cheshire_pkg;
     aw_bt spm;
     aw_bt dma;
     aw_bt slink;
+    aw_bt snooper;
+    aw_bt snoopercfg;
     aw_bt ext_base;
     aw_bt num_out;
     aw_bt num_rules;
@@ -363,6 +370,10 @@ package cheshire_pkg;
       r++; ret.map[r] = '{i, AmSpmUnc, AmSpmUnc + SizeSpm};
     end
     if (cfg.Dma)          begin i++; r++; ret.dma = i; ret.map[r] = '{i, 'h0100_0000, 'h0100_1000}; end
+    if (cfg.Snooper) begin 
+      i++; r++; ret.snooper = i; ret.map[r] = '{i, Snooper, Snooper + 'h1000}; 
+      i++; r++; ret.snoopercfg = i; ret.map[r] = '{i, SnooperCfg, SnooperCfg + 'h1000}; 
+    end
     if (cfg.SerialLink)   begin i++; r++; ret.slink = i;
         ret.map[r] = '{i, cfg.SlinkRegionStart, cfg.SlinkRegionEnd}; end
     // External port indices start after internal ones
@@ -593,6 +604,7 @@ package cheshire_pkg;
     Clic              : 0,
     IrqRouter         : 0,
     BusErr            : 1,
+    Snooper           : 1,
     // Debug
     DbgIdCode         : CheshireIdCode,
     DbgMaxReqs        : 4,
