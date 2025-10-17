@@ -14,6 +14,10 @@
   `AXI_TYPEDEF_ALL_CT(__name, __name``_req_t, __name``_rsp_t, \
       __addr_t, __id_t, __data_t, __strb_t, __user_t)
 
+`define CHESHIRE_TYPEDEF_AXI_LITE_CT(__name, __addr_t, __data_t, __strb_t) \
+  `AXI_LITE_TYPEDEF_ALL_CT(__name, __name``_req_t, __name``_rsp_t, \
+      __addr_t, __data_t, __strb_t)
+
 `define CHESHIRE_TYPEDEF_AXI(__name, __name_llc, __addr_t, __cfg) \
   localparam cheshire_pkg::axi_in_t __name``__AxiIn = cheshire_pkg::gen_axi_in(__cfg); \
   localparam type __name``_data_t    = logic [__cfg.AxiDataWidth   -1:0]; \
@@ -30,6 +34,11 @@
   `CHESHIRE_TYPEDEF_AXI_CT(__name``_llc, __addr_t, \
       __name``_llc_id_t, __name``_data_t, __name``_strb_t, __name``_user_t) \
 
+`define CHESHIRE_TYPEDEF_AXI_LITE(__name, __addr_t, __cfg) \
+  localparam type __name``_data_t    = logic [__cfg.AxiDataWidth   -1:0]; \
+  localparam type __name``_strb_t    = logic [__cfg.AxiDataWidth/8 -1:0]; \
+  `CHESHIRE_TYPEDEF_AXI_LITE_CT(__name, __addr_t, __name``_data_t, __name``_strb_t) \
+
 `define CHESHIRE_TYPEDEF_REG(__name, __addr_t) \
   `REG_BUS_TYPEDEF_ALL(__name, __addr_t, logic [31:0], logic [3:0])
 
@@ -37,6 +46,7 @@
 `define CHESHIRE_TYPEDEF_ALL(__prefix, __cfg) \
   localparam type __prefix``addr_t = logic [__cfg.AddrWidth-1:0]; \
   `CHESHIRE_TYPEDEF_AXI(__prefix``axi, __prefix``axi_llc, __prefix``addr_t, __cfg) \
+  `CHESHIRE_TYPEDEF_AXI_LITE(__prefix``axi_lite, __prefix``addr_t, __cfg) \
   `CHESHIRE_TYPEDEF_REG(__prefix``reg, __prefix``addr_t)
 
 `endif
