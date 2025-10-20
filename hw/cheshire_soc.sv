@@ -1123,7 +1123,7 @@ module cheshire_soc import cheshire_pkg::*; #(
 
   if (Cfg.Snooper) begin : gen_snooper
 
-    logic snoop_core_select, snoop_trigger_irq_o, snoop_watermark_irq_o;
+    logic snoop_core_select;
 
     snooper_pkg::trace_t cva6_traces;
 
