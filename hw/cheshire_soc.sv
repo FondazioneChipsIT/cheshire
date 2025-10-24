@@ -1148,8 +1148,8 @@ module cheshire_soc import cheshire_pkg::*; #(
       .AxiMaxReadTxns   ( Cfg.DmaConfMaxReadTxns  ), // same as DMA is ok ???
       .FullBW           (0),  // ID Queue in Full BW mode in axi_burst_splitter
       .FallThrough      (0),  // FIFOs in Fall through mode in ID reflect (it was 1 before)
-      .full_req_t       ( axi_slv_req_t ),
-      .full_resp_t      ( axi_slv_rsp_t ),
+      .full_req_t       ( axi_slv_req_t  ),
+      .full_resp_t      ( axi_slv_rsp_t  ),
       .lite_req_t       ( axi_lite_req_t ),
       .lite_resp_t      ( axi_lite_rsp_t )
     ) i_axi_to_axi_lite (
@@ -1165,16 +1165,18 @@ module cheshire_soc import cheshire_pkg::*; #(
     );
 
     snooper #(
-      .AXI_ID_WIDTH   ( Cfg.AxiUserWidth   ),
-      .axi_ar_chan_t  ( axi_slv_ar_chan_t  ),
-      .axi_aw_chan_t  ( axi_slv_aw_chan_t  ),
-      .axi_b_chan_t   ( axi_slv_b_chan_t   ),
-      .axi_r_chan_t   ( axi_slv_r_chan_t   ),
-      .axi_w_chan_t   ( axi_slv_w_chan_t   ),
-      .axi_req_t      ( axi_slv_req_t      ),
-      .axi_rsp_t      ( axi_slv_rsp_t      ),
-      .axi_lite_req_t ( axi_lite_req_t ),
-      .axi_lite_rsp_t ( axi_lite_rsp_t )
+      .AXI_ID_WIDTH        ( AxiSlvIdWidth      ),
+      .AXI_ADDR_WIDTH      ( Cfg.AddrWidth      ),
+      .AXI_DATA_WIDTH      ( Cfg.AxiDataWidth   ),
+      .axi_ar_chan_t       ( axi_slv_ar_chan_t  ),
+      .axi_aw_chan_t       ( axi_slv_aw_chan_t  ),
+      .axi_b_chan_t        ( axi_slv_b_chan_t   ),
+      .axi_r_chan_t        ( axi_slv_r_chan_t   ),
+      .axi_w_chan_t        ( axi_slv_w_chan_t   ),
+      .axi_req_t           ( axi_slv_req_t      ),
+      .axi_rsp_t           ( axi_slv_rsp_t      ),
+      .axi_lite_req_t      ( axi_lite_req_t     ),
+      .axi_lite_rsp_t      ( axi_lite_rsp_t     )
     ) i_snooper (
       .clk_i              ( clk_i                       ),
       .rst_ni             ( rst_ni                      ),
