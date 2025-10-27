@@ -23,7 +23,7 @@ dependencies:
   common_cells:             { git: "https://github.com/pulp-platform/common_cells.git",           version: 1.38.0 }
   common_verification:      { git: "https://github.com/pulp-platform/common_verification.git",    version: 0.2.3  }
   cva6:                     { git: "https://github.com/FondazioneChipsIT/cva6.git",               rev: c831d8492a1afb052d8dba94b65402b78d4fb524 }
-  snooper:                  { git: "https://github.com/FondazioneChipsIT/cfi-snooper.git",        rev: 5980d2c4033e8963a75017d2dd138710a34113cb }
+  snooper:                  { git: "https://github.com/FondazioneChipsIT/cfi-snooper.git",        rev: 9acbfe6b0e29148100aea08a9f052486d5e74033 }
   iDMA:                     { git: "https://github.com/pulp-platform/iDMA.git",                   version: 0.6.4  }
   irq_router:               { git: "https://github.com/pulp-platform/irq_router.git",             version: 0.0.1-beta.1 }
   opentitan_peripherals:    { git: "https://github.com/pulp-platform/opentitan_peripherals.git",  version: 0.4.0  }

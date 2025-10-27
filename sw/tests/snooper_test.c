@@ -63,9 +63,8 @@ int main(void) {
     base = *reg32(&__base_snprcfg, CFG_REGS_BASE_REG_OFFSET);
     last = *reg32(&__base_snprcfg, CFG_REGS_LAST_REG_OFFSET);
 
-    
     #ifndef INSTR
-    for(int i=base;i<last;i=i+20) {
+    for(int i=base;i<=last;i=i+20) {
         *reg32(&__base_regs, CHESHIRE_SCRATCH_4_REG_OFFSET) = *reg32(&__base_snpr, i + 0x00); // read lsb 32bit of src PC
         *reg32(&__base_regs, CHESHIRE_SCRATCH_4_REG_OFFSET) = *reg32(&__base_snpr, i + 0x08); // read lsb 32bit of dst PC
         *reg32(&__base_regs, CHESHIRE_SCRATCH_4_REG_OFFSET) = *reg32(&__base_snpr, i + 0x10); // read ctr_type 32bit

@@ -290,8 +290,8 @@ package cheshire_pkg;
   localparam doub_bt AmSpm    = 'h1000_0000;  // Cached region at bottom, uncached on top
   localparam doub_bt AmSpmUnc = 'h1400_0000;
   localparam doub_bt AmClic   = 'h0800_0000;
-  localparam doub_bt Snooper = 'h1500_0000;
-  localparam doub_bt SnooperCfg = 'h1600_0000;
+  localparam doub_bt SnooperCfg = 'h1500_0000;
+  localparam doub_bt Snooper = 'h1600_0000;
 
   // Static masks
   localparam doub_bt AmSpmRegionMask = 'h03FF_FFFF;
@@ -371,8 +371,8 @@ package cheshire_pkg;
     end
     if (cfg.Dma)          begin i++; r++; ret.dma = i; ret.map[r] = '{i, 'h0100_0000, 'h0100_1000}; end
     if (cfg.Snooper) begin 
-      i++; r++; ret.snooper = i; ret.map[r] = '{i, Snooper, Snooper + 'h1000}; 
       i++; r++; ret.snoopercfg = i; ret.map[r] = '{i, SnooperCfg, SnooperCfg + 'h1000}; 
+      i++; r++; ret.snooper = i; ret.map[r] = '{i, Snooper, Snooper + 'h5000}; 
     end
     if (cfg.SerialLink)   begin i++; r++; ret.slink = i;
         ret.map[r] = '{i, cfg.SlinkRegionStart, cfg.SlinkRegionEnd}; end
