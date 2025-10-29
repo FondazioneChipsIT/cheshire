@@ -22,6 +22,14 @@ module tb_cheshire_soc #(
   logic [1:0] preload_mode;
   bit [31:0]  exit_code;
 
+  // Axi request capture for fast printf
+  always_ff @(posedge fix.dut.clk_i)
+  begin
+    if ((fix.dut.axi_llc_mst_req_o.aw.addr == 48'h000080500000 ) && (fix.dut.axi_llc_mst_req_o.w_valid)) begin
+      $write("%c", fix.dut.axi_llc_mst_req_o.w.data);
+    end
+  end
+
   initial begin
     // Fetch plusargs or use safe (fail-fast) defaults
     if (!$value$plusargs("BOOTMODE=%d", boot_mode))     boot_mode     = 0;

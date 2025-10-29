@@ -65,10 +65,16 @@ void uart_read_str(void *uart_base, void *dst, uint64_t len) {
 
 // Default UART provides console
 void _putchar(char byte) {
+#ifdef FAST_PRINTF
+    asm volatile("csrrwi x0, 0x7C1, 0x0 \n\t" : : : "memory");
+    *reg8(&__base_dram, 0x00500000) = byte;
+    asm volatile("csrrwi x0, 0x7C1, 0x1 \n\t" : : : "memory");
+#else
     // Add carriage return if newline character is detected
     if (byte == '\n') uart_write(&__base_uart, '\r');
     uart_write(&__base_uart, byte);
     uart_write_flush(&__base_uart);
+#endif
 }
 
 char _getchar() {
