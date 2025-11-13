@@ -210,15 +210,17 @@ module cheshire_soc import cheshire_pkg::*; #(
   } addr_rule_t;
 
   // Generate address map
-  function automatic addr_rule_t [AxiOut.num_rules-1:0] gen_axi_map();
-    addr_rule_t [AxiOut.num_rules-1:0] ret;
-    for (int i = 0; i < AxiOut.num_rules; ++i)
-      ret[i] = '{idx: AxiOut.map[i].idx,
-          start_addr: AxiOut.map[i].start, end_addr: AxiOut.map[i].pte};
-    return ret;
-  endfunction
 
-  localparam addr_rule_t [AxiOut.num_rules-1:0] AxiMap = gen_axi_map();
+  addr_rule_t [AxiOut.num_rules-1:0] AxiMap;
+
+
+    
+    for (genvar i = 0; i < AxiOut.num_rules; ++i)
+      assign AxiMap[i] = '{idx: AxiOut.map[i].idx,
+          start_addr: AxiOut.map[i].start, end_addr: AxiOut.map[i].pte};
+    
+
+
 
   // Connectivity of Xbar
   axi_mst_req_t [AxiIn.num_in-1:0]    axi_in_req, axi_rt_in_req;
@@ -299,15 +301,12 @@ module cheshire_soc import cheshire_pkg::*; #(
   localparam reg_out_t  RegOut = gen_reg_out(Cfg);
 
   // Generate Reg address map
-  function automatic addr_rule_t [RegOut.num_rules-1:0] gen_reg_map();
-    addr_rule_t [RegOut.num_rules-1:0] ret;
-    for (int i = 0; i < RegOut.num_rules; ++i)
-      ret[i] = '{idx: RegOut.map[i].idx,
-          start_addr: RegOut.map[i].start, end_addr: RegOut.map[i].pte};
-    return ret;
-  endfunction
+  addr_rule_t [RegOut.num_rules-1:0] RegMap;
+  
+  for (genvar i = 0; i < RegOut.num_rules; ++i)
+    assign RegMap[i] = '{idx: RegOut.map[i].idx,
+        start_addr: RegOut.map[i].start, end_addr: RegOut.map[i].pte};
 
-  localparam addr_rule_t [RegOut.num_rules-1:0] RegMap = gen_reg_map();
 
   logic [cf_math_pkg::idx_width(RegOut.num_out)-1:0] reg_select;
 
