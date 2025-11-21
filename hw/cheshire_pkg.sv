@@ -527,6 +527,7 @@ package cheshire_pkg;
     ret.SuperscalarEn         = 1'b1;
     ret.BPType                = config_pkg::PH_BHT;
     ret.ALUBypass             = 1'b1;
+    ret.RVF                   = 1'b1;
     // Return modified config
     return ret;
   endfunction
