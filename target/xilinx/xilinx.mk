@@ -64,7 +64,7 @@ $$(CHS_XILINX_DIR)/out/%.$(1).bit: \
 		$$(CHS_HW_ALL) \
 		| $$(CHS_XILINX_DIR)/build/$(1).%/
 	@rm -f $$(CHS_XILINX_DIR)/build/$$*.$(1)*.log $$(CHS_XILINX_DIR)/build/$$*.$(1)*.jou
-	cd $$| && $$(VIVADO) -mode batch -log ../$$*.$(1).log -jou ../$$*.$(1).jou -source $$< \
+	cd $$| && $$(VIVADO) -mode gui -log ../$$*.$(1).log -jou ../$$*.$(1).jou -source $$< \
 		-tclargs $(1) $$* $$(CHS_XILINX_IPS_$(1):%=$$(CHS_XILINX_DIR)/build/$(1).%/out.xci)
 
 CHS_PHONY += chs-xilinx-$(1)
