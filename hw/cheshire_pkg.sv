@@ -138,6 +138,7 @@ package cheshire_pkg;
     bit     Clic;
     bit     IrqRouter;
     bit     BusErr;
+    bit     Snooper;
     // Parameters for Debug Module
     jtag_idcode_t DbgIdCode;
     dw_bt   DbgMaxReqs;
@@ -221,6 +222,8 @@ package cheshire_pkg;
 
   // Defined interrupts
   typedef struct packed {
+    logic snooper_trigger;
+    logic snooper_watermark;
     cheshire_bus_err_intr_t bus_err;
     logic [31:0] gpio;
     logic usb;
@@ -287,6 +290,8 @@ package cheshire_pkg;
   localparam doub_bt AmSpm    = 'h1000_0000;  // Cached region at bottom, uncached on top
   localparam doub_bt AmSpmUnc = 'h1400_0000;
   localparam doub_bt AmClic   = 'h0800_0000;
+  localparam doub_bt SnooperCfg = 'h1500_0000;
+  localparam doub_bt Snooper = 'h1600_0000;
 
   // Static masks
   localparam doub_bt AmSpmRegionMask = 'h03FF_FFFF;
@@ -338,6 +343,8 @@ package cheshire_pkg;
     aw_bt spm;
     aw_bt dma;
     aw_bt slink;
+    aw_bt snooper;
+    aw_bt snoopercfg;
     aw_bt ext_base;
     aw_bt num_out;
     aw_bt num_rules;
@@ -363,6 +370,10 @@ package cheshire_pkg;
       r++; ret.map[r] = '{i, AmSpmUnc, AmSpmUnc + SizeSpm};
     end
     if (cfg.Dma)          begin i++; r++; ret.dma = i; ret.map[r] = '{i, 'h0100_0000, 'h0100_1000}; end
+    if (cfg.Snooper) begin 
+      i++; r++; ret.snoopercfg = i; ret.map[r] = '{i, SnooperCfg, SnooperCfg + 'h1000}; 
+      i++; r++; ret.snooper = i; ret.map[r] = '{i, Snooper, Snooper + 'h5000}; 
+    end
     if (cfg.SerialLink)   begin i++; r++; ret.slink = i;
         ret.map[r] = '{i, cfg.SlinkRegionStart, cfg.SlinkRegionEnd}; end
     // External port indices start after internal ones
@@ -511,10 +522,12 @@ package cheshire_pkg;
     ret.NrCachedRegionRules   = 3;   // CachedSPM, LLCOut, ExtCI;
     ret.CachedRegionAddrBase  = {AmSpm,   cfg.LlcOutRegionStart,  CieBase};
     ret.CachedRegionLength    = {SizeSpm, SizeLlcOut,             cfg.Cva6ExtCieLength};
+`ifdef TARGET_PULP
     ret.DebugEn               = 1;
     ret.RVSCLIC               = cfg.Clic;
     ret.RVXHCLIC              = cfg.ClicVsclic;
     ret.CLICNumInterruptSrc   = NumCoreIrqs + NumIntIntrs + cfg.NumExtClicIntrs;
+`endif
     // TODO: Should some things be removed from the main config?
     // TODO: Should other things be added to the main config?
     // TODO: Tune missing parameters of interest (esp. cache and interconnect) properly
@@ -522,6 +535,9 @@ package cheshire_pkg;
     ret.BTBEntries            = cfg.Cva6BTBEntries;
     ret.BHTEntries            = cfg.Cva6BHTEntries;
     ret.NrPMPEntries          = cfg.Cva6NrPMPEntries;
+    ret.SuperscalarEn         = 1'b1;
+    ret.BPType                = config_pkg::PH_BHT;
+    ret.ALUBypass             = 1'b1;
     // Return modified config
     return ret;
   endfunction
@@ -588,6 +604,7 @@ package cheshire_pkg;
     Clic              : 0,
     IrqRouter         : 0,
     BusErr            : 1,
+    Snooper           : 1,
     // Debug
     DbgIdCode         : CheshireIdCode,
     DbgMaxReqs        : 4,
