@@ -22,7 +22,7 @@ dependencies:
   clint:                    { git: "https://github.com/pulp-platform/clint.git",                  version: =0.2.0  }
   common_cells:             { git: "https://github.com/pulp-platform/common_cells.git",           version: =1.38.0 }
   common_verification:      { git: "https://github.com/pulp-platform/common_verification.git",    version: =0.2.5  }
-  cva6:                     { git: "https://github.com/FondazioneChipsIT/cva6.git",               rev: af67ea1fbcda0a1da2eb8d1347f6f63c6ace389d }
+  cva6:                     { git: "https://github.com/FondazioneChipsIT/cva6.git",               rev: scarv-v0.0.1 }
   snooper:                  { git: "https://github.com/FondazioneChipsIT/cfi-snooper.git",        rev: 9acbfe6b0e29148100aea08a9f052486d5e74033 }
   iDMA:                     { git: "https://github.com/pulp-platform/iDMA.git",                   version: =0.6.5  }
   irq_router:               { git: "https://github.com/pulp-platform/irq_router.git",             version: =0.0.1-beta.1 }
