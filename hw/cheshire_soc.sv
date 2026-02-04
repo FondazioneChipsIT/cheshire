@@ -499,6 +499,11 @@ module cheshire_soc import cheshire_pkg::*; #(
 
     axi_slv_req_t axi_llc_remap_req;
     axi_slv_rsp_t axi_llc_remap_rsp;
+`ifndef SYNTHESIS
+    // When the llc works as a spm, there can be X in part of the axi burst
+    // because uninitialized data, just a simluation work around here
+    axi_slv_rsp_t axi_llc_remap_rsp_tmp;
+`endif
 
     // Remap both cached and uncached accesses to single base.
     // This is necessary for routing in the LLC-internal interconnect.
@@ -531,7 +536,11 @@ module cheshire_soc import cheshire_pkg::*; #(
       .rst_ni,
       .test_i              ( test_mode_i ),
       .slv_req_i           ( axi_llc_remap_req ),
+`ifndef SYNTHESIS
+      .slv_resp_o          ( axi_llc_remap_rsp_tmp ),
+`else
       .slv_resp_o          ( axi_llc_remap_rsp ),
+`endif
       .mst_req_o           ( axi_llc_mst_req_o ),
       .mst_resp_i          ( axi_llc_mst_rsp_i ),
       .conf_req_i          ( reg_out_req[RegOut.llc] ),
@@ -542,6 +551,16 @@ module cheshire_soc import cheshire_pkg::*; #(
       .axi_llc_events_o    ( /* TODO: connect me to regs? */ )
     );
 
+`ifndef SYNTHESIS
+    always_comb begin
+      axi_llc_remap_rsp = axi_llc_remap_rsp_tmp;
+      for (int i = 0; i < $bits(axi_llc_remap_rsp_tmp.r.data); i++) begin
+        if (axi_llc_remap_rsp_tmp.r.data[i] === 1'bx) begin
+            axi_llc_remap_rsp.r.data[i] = 1'b0; // Change X to 0
+        end
+      end
+    end
+`endif
   end else if (Cfg.LlcOutConnect) begin : gen_llc_bypass
 
     assign axi_llc_mst_req_o  = axi_llc_cut_req;
@@ -559,7 +578,29 @@ module cheshire_soc import cheshire_pkg::*; #(
 
   // TODO: Implement X interface support
 
-  `CHESHIRE_TYPEDEF_AXI_CT(axi_cva6, addr_t, cva6_id_t, axi_data_t, axi_strb_t, axi_user_t)
+  localparam int unsigned C910AxiDataWidth = 128; // for C910 core axi, the data path is 128bit
+
+  // CVA6 axi master
+  `CHESHIRE_TYPEDEF_AXI_CT( axi_cva6,
+                            addr_t,
+                            cva6_id_t,
+                            axi_data_t,
+                            axi_strb_t,
+                            axi_user_t)
+  // C910 64-bit axi master
+  `CHESHIRE_TYPEDEF_AXI_CT( axi_c910_64b,
+                            addr_t,
+                            axi_mst_id_t,
+                            axi_data_t,
+                            axi_strb_t,
+                            axi_user_t)
+  // C910 128-bit axi master
+  `CHESHIRE_TYPEDEF_AXI_CT( axi_c910,
+                            addr_t,
+                            logic[Cfg.AxiMstIdWidth-1:0],
+                            logic[C910AxiDataWidth-1:0],
+                            logic[C910AxiDataWidth/8-1:0],
+                            logic[Cfg.AxiUserWidth-1:0])
 
   localparam config_pkg::cva6_user_cfg_t Cva6Cfg = gen_cva6_cfg(Cfg);
 
@@ -591,8 +632,10 @@ module cheshire_soc import cheshire_pkg::*; #(
   assign intr.intn.bus_err.cores = core_bus_err_intr_comb;
 
   for (genvar i = 0; i < NumIntHarts; i++) begin : gen_cva6_cores
-    axi_cva6_req_t core_out_req, core_ur_req;
-    axi_cva6_rsp_t core_out_rsp, core_ur_rsp;
+    axi_cva6_req_t core_cva6_out_req, core_cva6_ur_req;
+    axi_cva6_rsp_t core_cva6_out_rsp, core_cva6_ur_rsp;
+    axi_c910_64b_req_t core_c910_out_req, core_c910_ur_req;
+    axi_c910_64b_rsp_t core_c910_out_rsp, core_c910_ur_rsp;
 
     // CLIC interface
     logic clic_irq_valid, clic_irq_ready;
@@ -604,66 +647,191 @@ module cheshire_soc import cheshire_pkg::*; #(
     logic              clic_irq_v;
     logic [5:0]        clic_irq_vsid;
 
-    cva6 #(
-      .CVA6Cfg        ( build_config_pkg::build_config(Cva6Cfg) ),
-      .axi_ar_chan_t  ( axi_cva6_ar_chan_t ),
-      .axi_aw_chan_t  ( axi_cva6_aw_chan_t ),
-      .axi_w_chan_t   ( axi_cva6_w_chan_t  ),
-      .b_chan_t       ( axi_cva6_b_chan_t  ),
-      .r_chan_t       ( axi_cva6_r_chan_t  ),
-      .noc_req_t      ( axi_cva6_req_t ),
-      .noc_resp_t     ( axi_cva6_rsp_t )
-    ) i_core_cva6 (
-      .clk_i,
-      .rst_ni,
-      .boot_addr_i      ( BootAddr ),
-      .hart_id_i        ( 64'(i) ),
-      .irq_i            ( xeip[i] ),
-      .ipi_i            ( msip[i] ),
-      .time_irq_i       ( mtip[i] ),
-      .debug_req_i      ( dbg_int_req[i] ),
-`ifdef TARGET_PULP
-      .clic_irq_valid_i ( clic_irq_valid ),
-      .clic_irq_id_i    ( clic_irq_id    ),
-      .clic_irq_level_i ( clic_irq_level ),
-      .clic_irq_priv_i  ( clic_irq_priv  ),
-      .clic_irq_v_i     ( clic_irq_v     ),
-      .clic_irq_vsid_i  ( clic_irq_vsid  ),
-      .clic_irq_shv_i   ( clic_irq_shv   ),
-      .clic_irq_ready_o ( clic_irq_ready ),
-      .clic_kill_req_i  ( clic_irq_kill_req ),
-      .clic_kill_ack_o  ( clic_irq_kill_ack ),
-`endif
-      .rvfi_probes_o    ( ),
-      .cvxif_req_o      ( ),
-      .cvxif_resp_i     ( '0 ),
-      .noc_req_o        ( core_out_req ),
-      .noc_resp_i       ( core_out_rsp )
-    );
-
-    if (Cfg.BusErr) begin : gen_cva6_bus_err
-      axi_err_unit_wrap #(
-        .AddrWidth          ( Cfg.AddrWidth ),
-        .IdWidth            ( Cva6IdWidth   ),
-        .UserErrBits        ( Cfg.AxiUserErrBits ),
-        .UserErrBitsOffset  ( Cfg.AxiUserErrLsb ),
-        .NumOutstanding     ( Cfg.CoreMaxTxns ),
-        .NumStoredErrors    ( 4 ),
-        .DropOldest         ( 1'b0 ),
-        .axi_req_t          ( axi_cva6_req_t ),
-        .axi_rsp_t          ( axi_cva6_rsp_t ),
-        .reg_req_t          ( reg_req_t ),
-        .reg_rsp_t          ( reg_rsp_t )
-      ) i_cva6_bus_err (
+    if (Cfg.Core == CVA6) begin : gen_cva6_core
+      cva6 #(
+        .CVA6Cfg        ( build_config_pkg::build_config(Cva6Cfg) ),
+        .axi_ar_chan_t  ( axi_cva6_ar_chan_t ),
+        .axi_aw_chan_t  ( axi_cva6_aw_chan_t ),
+        .axi_w_chan_t   ( axi_cva6_w_chan_t  ),
+        .b_chan_t       ( axi_cva6_b_chan_t  ),
+        .r_chan_t       ( axi_cva6_r_chan_t  ),
+        .noc_req_t      ( axi_cva6_req_t ),
+        .noc_resp_t     ( axi_cva6_rsp_t )
+      ) i_core_cva6 (
         .clk_i,
         .rst_ni,
-        .testmode_i ( test_mode_i ),
-        .axi_req_i  ( core_out_req ),
-        .axi_rsp_i  ( core_out_rsp ),
-        .err_irq_o  ( core_bus_err_intr[i] ),
-        .reg_req_i  ( reg_out_req[RegOut.bus_err[RegBusErrCoresBase+i]] ),
-        .reg_rsp_o  ( reg_out_rsp[RegOut.bus_err[RegBusErrCoresBase+i]] )
+        .boot_addr_i      ( BootAddr ),
+        .hart_id_i        ( 64'(i) ),
+        .irq_i            ( xeip[i] ),
+        .ipi_i            ( msip[i] ),
+        .time_irq_i       ( mtip[i] ),
+        .debug_req_i      ( dbg_int_req[i] ),
+`ifdef TARGET_PULP
+        .clic_irq_valid_i ( clic_irq_valid ),
+        .clic_irq_id_i    ( clic_irq_id    ),
+        .clic_irq_level_i ( clic_irq_level ),
+        .clic_irq_priv_i  ( clic_irq_priv  ),
+        .clic_irq_v_i     ( clic_irq_v     ),
+        .clic_irq_vsid_i  ( clic_irq_vsid  ),
+        .clic_irq_shv_i   ( clic_irq_shv   ),
+        .clic_irq_ready_o ( clic_irq_ready ),
+        .clic_kill_req_i  ( clic_irq_kill_req ),
+        .clic_kill_ack_o  ( clic_irq_kill_ack ),
+`endif
+        .rvfi_probes_o    ( ),
+        .cvxif_req_o      ( ),
+        .cvxif_resp_i     ( '0 ),
+        .noc_req_o        ( core_cva6_out_req ),
+        .noc_resp_i       ( core_cva6_out_rsp )
       );
+    end else begin : gen_c910_core
+      axi_c910_req_t c910_out_req_s1, c910_out_req_s2;
+      axi_c910_rsp_t c910_out_rsp_s1, c910_out_rsp_s2;
+
+      c910_axi_wrap #(
+        .AxiSetModifiable     ( 1'b1              ),
+        .AxiUnwrapBursts      ( 1'b1              ),
+        .AxiUndecrementBurst  ( 1'b1              ),
+        .AxiZeroMem           ( 1'b1              ),
+        .AddrWidth            ( Cfg.AddrWidth     ),
+        .DataWidth            ( C910AxiDataWidth  ),
+        .IdWidth              ( Cfg.AxiMstIdWidth ),
+        .UserWidth            ( Cfg.AxiUserWidth  ),
+        // AXI channel structs
+        .aw_chan_t          ( axi_c910_aw_chan_t),
+        .w_chan_t           ( axi_c910_w_chan_t ),
+        .b_chan_t           ( axi_c910_b_chan_t ),
+        .ar_chan_t          ( axi_c910_ar_chan_t),
+        .r_chan_t           ( axi_c910_r_chan_t ),
+        // AXI request & response structs
+        .axi_req_t          ( axi_c910_req_t    ),
+        .axi_rsp_t          ( axi_c910_rsp_t    )
+      ) i_c910_axi_wrap (
+        .clk_i,
+        .rst_ni,
+        .rtc_i,
+        // clint
+        .ipi_i            ( msip[i] ),
+        .time_irq_i       ( mtip[i] ),
+        // plic
+        .plic_hartx_mint_req_i ({1'b0, xeip[i].m}),
+        .plic_hartx_sint_req_i ({1'b0, xeip[i].s}),
+        // debug request (async)
+        .debug_req_i      ( dbg_int_req[i] ),
+        // External interrupts to c910 internal plic
+        .ext_int_i        ( '0             ),
+        // JTAG
+        .jtag_tck_i       ( '0             ),
+        .jtag_tdi_i       ( '0             ),
+        .jtag_tms_i       ( '0             ),
+        .jtag_tdo_o       (                ),
+        .jtag_tdo_en_o    (                ),
+        .jtag_trst_ni     ( jtag_trst_ni   ),
+        // AXI interface
+        .axi_req_o        ( c910_out_req_s1),
+        .axi_rsp_i        ( c910_out_rsp_s1)
+      );
+
+      // axi fifo to close timing
+      axi_cut #(
+        .Bypass       ( 0 ),
+      // AXI channel structs
+        .aw_chan_t    ( axi_c910_aw_chan_t ),
+        .w_chan_t     ( axi_c910_w_chan_t  ),
+        .b_chan_t     ( axi_c910_b_chan_t  ),
+        .ar_chan_t    ( axi_c910_ar_chan_t ),
+        .r_chan_t     ( axi_c910_r_chan_t  ),
+      // AXI request & response structs
+        .axi_req_t     ( axi_c910_req_t     ),
+        .axi_resp_t    ( axi_c910_rsp_t     )
+      ) i_c910_timing_axi_cut (
+        .clk_i,  // Clock
+        .rst_ni,  // Asynchronous reset active low
+        // slave port
+        .slv_req_i    (c910_out_req_s1 ),
+        .slv_resp_o   (c910_out_rsp_s1 ),
+        // master port
+        .mst_req_o    (c910_out_req_s2),
+        .mst_resp_i   (c910_out_rsp_s2)
+      );
+
+      axi_dw_converter #(
+        .AxiMaxReads         ( 8                      ), // Number of outstanding reads
+        .AxiSlvPortDataWidth ( C910AxiDataWidth       ), // Data width of the slv port
+        .AxiMstPortDataWidth ( Cfg.AxiDataWidth       ), // Data width of the mst port
+        .AxiAddrWidth        ( Cfg.AddrWidth          ), // Address width
+        .AxiIdWidth          ( Cfg.AxiMstIdWidth      ), // ID width
+        .aw_chan_t           ( axi_c910_64b_aw_chan_t ), // AW Channel Type
+        .mst_w_chan_t        ( axi_c910_64b_w_chan_t  ), //  W Channel Type for the mst port
+        .slv_w_chan_t        ( axi_c910_w_chan_t      ), //  W Channel Type for the slv port
+        .b_chan_t            ( axi_c910_64b_b_chan_t  ), //  B Channel Type
+        .ar_chan_t           ( axi_c910_64b_ar_chan_t ), // AR Channel Type
+        .mst_r_chan_t        ( axi_c910_64b_r_chan_t  ), //  R Channel Type for the mst port
+        .slv_r_chan_t        ( axi_c910_r_chan_t      ), //  R Channel Type for the slv port
+        .axi_mst_req_t       ( axi_c910_64b_req_t     ), // AXI Request Type for mst ports
+        .axi_mst_resp_t      ( axi_c910_64b_rsp_t     ), // AXI Response Type for mst ports
+        .axi_slv_req_t       ( axi_c910_req_t         ), // AXI Request Type for slv ports
+        .axi_slv_resp_t      ( axi_c910_rsp_t         )  // AXI Response Type for slv ports
+      ) i_axi_dw_converter (
+        .clk_i,
+        .rst_ni,
+        // Slave interface
+        .slv_req_i          ( c910_out_req_s2 ),
+        .slv_resp_o         ( c910_out_rsp_s2 ),
+        // Master interface
+        .mst_req_o          ( core_c910_out_req ),
+        .mst_resp_i         ( core_c910_out_rsp )
+      );
+    end
+
+    if (Cfg.BusErr) begin : gen_cva6_bus_err
+      if (Cfg.Core == CVA6) begin: gen_i_cva6_bus_err
+        axi_err_unit_wrap #(
+          .AddrWidth          ( Cfg.AddrWidth ),
+          .IdWidth            ( Cva6IdWidth   ),
+          .UserErrBits        ( Cfg.AxiUserErrBits ),
+          .UserErrBitsOffset  ( Cfg.AxiUserErrLsb ),
+          .NumOutstanding     ( Cfg.CoreMaxTxns ),
+          .NumStoredErrors    ( 4 ),
+          .DropOldest         ( 1'b0 ),
+          .axi_req_t          ( axi_cva6_req_t ),
+          .axi_rsp_t          ( axi_cva6_rsp_t ),
+          .reg_req_t          ( reg_req_t ),
+          .reg_rsp_t          ( reg_rsp_t )
+        ) i_cva6_bus_err (
+          .clk_i,
+          .rst_ni,
+          .testmode_i ( test_mode_i ),
+          .axi_req_i  ( core_cva6_out_req ),
+          .axi_rsp_i  ( core_cva6_out_rsp ),
+          .err_irq_o  ( core_bus_err_intr[i] ),
+          .reg_req_i  ( reg_out_req[RegOut.bus_err[RegBusErrCoresBase+i]] ),
+          .reg_rsp_o  ( reg_out_rsp[RegOut.bus_err[RegBusErrCoresBase+i]] )
+        );
+      end else begin: gen_i_c910_bus_err
+          axi_err_unit_wrap #(
+          .AddrWidth          ( Cfg.AddrWidth       ),
+          .IdWidth            ( Cfg.AxiMstIdWidth   ),
+          .UserErrBits        ( Cfg.AxiUserErrBits  ),
+          .UserErrBitsOffset  ( Cfg.AxiUserErrLsb   ),
+          .NumOutstanding     ( Cfg.CoreMaxTxns     ),
+          .NumStoredErrors    ( 4 ),
+          .DropOldest         ( 1'b0 ),
+          .axi_req_t          ( axi_c910_64b_req_t ),
+          .axi_rsp_t          ( axi_c910_64b_rsp_t ),
+          .reg_req_t          ( reg_req_t ),
+          .reg_rsp_t          ( reg_rsp_t )
+        ) i_cva6_bus_err (
+          .clk_i,
+          .rst_ni,
+          .testmode_i ( test_mode_i ),
+          .axi_req_i  ( core_c910_out_req ),
+          .axi_rsp_i  ( core_c910_out_rsp ),
+          .err_irq_o  ( core_bus_err_intr[i] ),
+          .reg_req_i  ( reg_out_req[RegOut.bus_err[RegBusErrCoresBase+i]] ),
+          .reg_rsp_o  ( reg_out_rsp[RegOut.bus_err[RegBusErrCoresBase+i]] )
+        );
+      end
     end
 
     // Generate CLIC for core if enabled
@@ -728,42 +896,56 @@ module cheshire_soc import cheshire_pkg::*; #(
     // Map user to AMO domain as we are an atomics-capable master.
     // Within the provided AMO user range, we count up from the provided core AMO offset.
     always_comb begin
-      core_ur_req         = core_out_req;
-      core_ur_req.aw.user = Cfg.AxiUserDefault;
-      core_ur_req.ar.user = Cfg.AxiUserDefault;
-      core_ur_req.w.user  = Cfg.AxiUserDefault;
-      core_ur_req.aw.user [Cfg.AxiUserAmoMsb:Cfg.AxiUserAmoLsb] = Cfg.CoreUserAmoOffs + i;
-      core_ur_req.ar.user [Cfg.AxiUserAmoMsb:Cfg.AxiUserAmoLsb] = Cfg.CoreUserAmoOffs + i;
-      core_ur_req.w.user  [Cfg.AxiUserAmoMsb:Cfg.AxiUserAmoLsb] = Cfg.CoreUserAmoOffs + i;
-      core_out_rsp        = core_ur_rsp;
+      core_cva6_ur_req = core_cva6_out_req;
+      core_cva6_ur_req.aw.user = Cfg.AxiUserDefault;
+      core_cva6_ur_req.ar.user = Cfg.AxiUserDefault;
+      core_cva6_ur_req.w.user  = Cfg.AxiUserDefault;
+      core_cva6_ur_req.aw.user [Cfg.AxiUserAmoMsb:Cfg.AxiUserAmoLsb] = Cfg.CoreUserAmoOffs + i;
+      core_cva6_ur_req.ar.user [Cfg.AxiUserAmoMsb:Cfg.AxiUserAmoLsb] = Cfg.CoreUserAmoOffs + i;
+      core_cva6_ur_req.w.user  [Cfg.AxiUserAmoMsb:Cfg.AxiUserAmoLsb] = Cfg.CoreUserAmoOffs + i;
+      core_cva6_out_rsp        = core_cva6_ur_rsp;
+
+      core_c910_ur_req = core_c910_out_req;
+      core_c910_ur_req.aw.user = Cfg.AxiUserDefault;
+      core_c910_ur_req.ar.user = Cfg.AxiUserDefault;
+      core_c910_ur_req.w.user  = Cfg.AxiUserDefault;
+      core_c910_ur_req.aw.user [Cfg.AxiUserAmoMsb:Cfg.AxiUserAmoLsb] = Cfg.CoreUserAmoOffs + i;
+      core_c910_ur_req.ar.user [Cfg.AxiUserAmoMsb:Cfg.AxiUserAmoLsb] = Cfg.CoreUserAmoOffs + i;
+      core_c910_ur_req.w.user  [Cfg.AxiUserAmoMsb:Cfg.AxiUserAmoLsb] = Cfg.CoreUserAmoOffs + i;
+      core_c910_out_rsp        = core_c910_ur_rsp;
     end
 
     // CVA6's ID encoding is wasteful; remap it statically pack into available bits
-    axi_id_serialize #(
-      .AxiSlvPortIdWidth      ( Cva6IdWidth     ),
-      .AxiSlvPortMaxTxns      ( Cfg.CoreMaxTxns ),
-      .AxiMstPortIdWidth      ( Cfg.AxiMstIdWidth      ),
-      .AxiMstPortMaxUniqIds   ( 2 ** Cfg.AxiMstIdWidth ),
-      .AxiMstPortMaxTxnsPerId ( Cfg.CoreMaxTxnsPerId   ),
-      .AxiAddrWidth           ( Cfg.AddrWidth    ),
-      .AxiDataWidth           ( Cfg.AxiDataWidth ),
-      .AxiUserWidth           ( Cfg.AxiUserWidth ),
-      .AtopSupport            ( 1 ),
-      .slv_req_t              ( axi_cva6_req_t ),
-      .slv_resp_t             ( axi_cva6_rsp_t ),
-      .mst_req_t              ( axi_mst_req_t  ),
-      .mst_resp_t             ( axi_mst_rsp_t  ),
-      .MstIdBaseOffset        ( '0 ),
-      .IdMapNumEntries        ( Cva6IdsUsed ),
-      .IdMap                  ( gen_cva6_id_map(Cfg) )
-    ) i_axi_id_serialize (
-      .clk_i,
-      .rst_ni,
-      .slv_req_i  ( core_ur_req ),
-      .slv_resp_o ( core_ur_rsp ),
-      .mst_req_o  ( axi_in_req[AxiIn.cores[i]] ),
-      .mst_resp_i ( axi_in_rsp[AxiIn.cores[i]] )
-    );
+    if (Cfg.Core == CVA6) begin : gen_cva6_axi_id_serialize
+      axi_id_serialize #(
+        .AxiSlvPortIdWidth      ( Cva6IdWidth     ),
+        .AxiSlvPortMaxTxns      ( Cfg.CoreMaxTxns ),
+        .AxiMstPortIdWidth      ( Cfg.AxiMstIdWidth      ),
+        .AxiMstPortMaxUniqIds   ( 2 ** Cfg.AxiMstIdWidth ),
+        .AxiMstPortMaxTxnsPerId ( Cfg.CoreMaxTxnsPerId   ),
+        .AxiAddrWidth           ( Cfg.AddrWidth    ),
+        .AxiDataWidth           ( Cfg.AxiDataWidth ),
+        .AxiUserWidth           ( Cfg.AxiUserWidth ),
+        .AtopSupport            ( 1 ),
+        .slv_req_t              ( axi_cva6_req_t ),
+        .slv_resp_t             ( axi_cva6_rsp_t ),
+        .mst_req_t              ( axi_mst_req_t  ),
+        .mst_resp_t             ( axi_mst_rsp_t  ),
+        .MstIdBaseOffset        ( '0 ),
+        .IdMapNumEntries        ( Cva6IdsUsed ),
+        .IdMap                  ( gen_cva6_id_map(Cfg) )
+      ) i_axi_id_serialize (
+        .clk_i,
+        .rst_ni,
+        .slv_req_i  ( core_cva6_ur_req ),
+        .slv_resp_o ( core_cva6_ur_rsp ),
+        .mst_req_o  ( axi_in_req[AxiIn.cores[i]] ),
+        .mst_resp_i ( axi_in_rsp[AxiIn.cores[i]] )
+      );
+    end else begin : gen_c910_axi_id_serialize
+      assign axi_in_req[AxiIn.cores[i]] = core_c910_ur_req;
+      assign core_c910_ur_rsp           = axi_in_rsp[AxiIn.cores[i]];
+    end
   end
 
   /////////////////////////
@@ -1022,7 +1204,8 @@ module cheshire_soc import cheshire_pkg::*; #(
       axirt       : Cfg.AxiRt,
       clic        : Cfg.Clic,
       irq_router  : Cfg.IrqRouter,
-      bus_err     : Cfg.BusErr
+      bus_err     : Cfg.BusErr,
+      core_type   : Cfg.Core
     },
     llc_size      : get_llc_size(Cfg),
     vga_params    : '{
@@ -1086,7 +1269,7 @@ module cheshire_soc import cheshire_pkg::*; #(
     .reg_req_i  ( reg_out_req[RegOut.plic] ),
     .reg_rsp_o  ( reg_out_rsp[RegOut.plic] ),
     .intr_src_i ( intr_routed[IntrRtdPlic][rv_plic_reg_pkg::NumSrc-1:0] ),
-    .irq_o      ( xeip ),
+    .irq_o      ( xeip[0] ),
     .irq_id_o   ( ),
     .msip_o     ( )
   );
@@ -1105,8 +1288,8 @@ module cheshire_soc import cheshire_pkg::*; #(
     .reg_req_i    ( reg_out_req[RegOut.clint] ),
     .reg_rsp_o    ( reg_out_rsp[RegOut.clint] ),
     .rtc_i,
-    .timer_irq_o  ( mtip ),
-    .ipi_o        ( msip )
+    .timer_irq_o  ( mtip[0] ),
+    .ipi_o        ( msip[0] )
   );
 
   //////////////

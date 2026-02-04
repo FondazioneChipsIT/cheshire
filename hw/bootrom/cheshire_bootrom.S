@@ -18,6 +18,8 @@
 _start:
     // Reset all integer GPRs; we do *not* assume FP in the boot ROM.
     li x1, 0
+    li x2, 0
+    li x3, 0
     li x4, 0
     li x5, 0
     li x6, 0
@@ -57,6 +59,37 @@ _start:
     la gp, __global_pointer$
     .option pop
 
+    // Set C910 CSRs if C910 is present
+    la t0, __base_regs
+    lw t0, 80(t0)   // regs.HW_FEATURES
+    li t1, 0x4000
+    and t0, t0, t1  // regs.HW_FEATURES.core_type
+    beqz t0, _skip_c910_config
+
+    // C910 functions enable
+    # invalid all memory for IBP,BTB,BHT,DCACHE,ICACHE
+    li t0, 0x70013
+    csrs 0x7c2,t0  # mcor
+
+    # enable ICACHE,DCACHE,BHT,BTB,IBP,RAS,WA
+    # li t0, 0x10f7
+    # csrs 0x7c1,t0  # mhcr
+    # enable write allocate
+    # li t0, 0x4
+    # csrs 0x7c1,t0  # mhcr
+
+    li t0, 0x11ff
+    csrs 0x7c1,t0  # mhcr
+
+    # enable lbuf,way_pred,data_cache_prefetch, amr
+    # li t0, 0x7e30c
+    # csrs 0x7c5,t0  # mhint
+    # li t0, 0x6e30c
+    li t0, 0x4630c  # disable L2 prefetch
+    # li t0, 0x46308  # disable L2, L1d prefetch
+    csrs 0x7c5,t0  # mhint
+
+_skip_c910_config:
     // If LLC present: Wait for end of BIST, then extend stack and set to all SPM
     la t0, __base_regs
     lw t0, 80(t0)   // regs.HW_FEATURES
@@ -115,6 +148,19 @@ boot_next_stage:
     sw a0, 16(t0)   // regs.SCRATCH[4]
     srli a0, a0, 32
     sw a0, 20(t0)   // regs.SCRATCH[5]
+
+    // Set C910 CSRs if C910 is present
+    la t0, __base_regs
+    lw t0, 80(t0)   // regs.HW_FEATURES
+    li t1, 0x4000
+    and t0, t0, t1  // regs.HW_FEATURES.core_type
+    beqz t0, _skip_c910_config2
+
+    // dcache write back dirty entries
+    li t3, 0x20
+    csrs 0x7c2,t3  # mcor
+
+_skip_c910_config2:
     fence
     // Resume SMP harts
     smp_resume(t0, t1, t2)

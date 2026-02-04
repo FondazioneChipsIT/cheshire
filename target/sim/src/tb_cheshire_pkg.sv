@@ -34,11 +34,25 @@ package tb_cheshire_pkg;
       return ret;
     endfunction
 
+    // C910 config
+    function automatic cheshire_cfg_t gen_cheshire_c910_cfg();
+      cheshire_cfg_t ret  = DefaultCfg;
+      ret.Core            = C910;
+      ret.AddrWidth       = 40;
+      ret.AxiDataWidth    = 64; // for SoC, the data path remain 64bit
+      // 8n(Non-cacheable/Device) + 28(cacheable) read + 8n(Non-cacheable/Device) + 32(cacheable) write
+      ret.AxiMaxMstTrans  = 76;
+      ret.AxiMstIdWidth   = 8;
+      ret.AxiUserWidth    = 2;
+      return ret;
+    endfunction
+
     // Number of Cheshire configurations
-    localparam int unsigned NumCheshireConfigs = 32'd4;
+    localparam int unsigned NumCheshireConfigs = 32'd5;
 
     // Assemble a configuration array indexed by a numeric parameter
     localparam cheshire_cfg_t [NumCheshireConfigs-1:0] TbCheshireConfigs = {
+        gen_cheshire_c910_cfg(),  // 4: c910 configuration
         gen_cheshire_vclic_cfg(), // 3: vCLIC-enabled configuration
         gen_cheshire_clic_cfg(),  // 2: CLIC-enabled configuration
         gen_cheshire_rt_cfg(),    // 1: RT-enabled configuration

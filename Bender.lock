@@ -26,10 +26,10 @@ packages:
     - common_verification
     - tech_cells_generic
   axi_llc:
-    revision: 59bb8a681347e1133f11a82190fbf4bc11900d9e
-    version: 0.2.2
+    revision: edae802164fc453a59006e9170a18407b5e01e22
+    version: null
     source:
-      Git: https://github.com/pulp-platform/axi_llc.git
+      Git: https://github.com/Aquaticfuller/axi_llc.git
     dependencies:
     - axi
     - common_cells
@@ -153,6 +153,14 @@ packages:
     - axi
     - common_cells
     - register_interface
+  pulp-c910:
+    revision: dae1a7f35de382db8432ebb520b742a24c518606
+    version: null
+    source:
+      Git: https://github.com/Simonzhu04/pulp-c910.git
+    dependencies:
+    - axi
+    - common_cells
   obi:
     revision: 0155fc34e900c7c884e081c0a1114a247937ff69
     version: 0.1.7
@@ -179,8 +187,8 @@ packages:
     - register_interface
     - tech_cells_generic
   register_interface:
-    revision: 8e8c209ea559d3b54f45cf30fcce95ce70ff5e49
-    version: 0.4.6
+    revision: 5daa85d164cf6b54ad061ea1e4c6f3624556e467
+    version: 0.4.5
     source:
       Git: https://github.com/pulp-platform/register_interface.git
     dependencies:
@@ -189,8 +197,8 @@ packages:
     - common_cells
     - common_verification
   riscv-dbg:
-    revision: 358f90110220adf7a083f8b65d157e836d706236
-    version: 0.8.1
+    revision: f69f6342f69fff28655e1394ec889c0360bcca8b
+    version: null
     source:
       Git: https://github.com/pulp-platform/riscv-dbg.git
     dependencies:

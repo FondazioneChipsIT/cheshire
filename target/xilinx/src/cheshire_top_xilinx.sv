@@ -145,6 +145,15 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
     ret.ClicNumVsctxts = 4;
     ret.ClicPrioWidth = 1;
   `endif
+
+    ret.Core            = C910;
+    ret.AddrWidth       = 40;
+    ret.AxiDataWidth    = 64; // for SoC, the data path remain 64bit
+    // 8n(Non-cacheable/Device) + 28(cacheable) read + 8n(Non-cacheable/Device) + 32(cacheable) write
+    ret.AxiMaxMstTrans  = 76;
+    ret.AxiMstIdWidth   = 8;
+    ret.AxiUserWidth    = 2;
+
     return ret;
   endfunction
 
