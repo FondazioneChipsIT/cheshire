@@ -13,6 +13,12 @@ VIVADO ?= vitis-2022.1 vivado
 
 CHS_XILINX_DIR ?= $(CHS_ROOT)/target/xilinx
 
+# CORE_TYPE can be either CVA6 or C910
+CORE_TYPE ?= CVA6
+ifeq ($(CORE_TYPE), "C910")
+CHS_BENDER_RTL_FLAGS += -t c910
+endif
+
 # Required to split stems
 .SECONDEXPANSION:
 
@@ -57,6 +63,11 @@ $(CHS_XILINX_DIR)/scripts/add_sources.%.tcl: $(CHS_ROOT)/Bender.yml $(CHS_XILINX
 	$(BENDER) script vivado -t fpga -t $* $(CHS_BENDER_RTL_FLAGS) > $@
 
 define chs_xilinx_bit_rule
+ifeq ($(CORE_TYPE), "C910")
+ifeq ($(1),genesys2)
+$(error CORE_TYPE=C910 is not supported on board genesys2)
+endif
+endif
 $$(CHS_XILINX_DIR)/out/%.$(1).bit: \
 		$$(CHS_XILINX_DIR)/scripts/impl_sys.tcl \
 		$$(CHS_XILINX_DIR)/scripts/add_sources.$(1).tcl \

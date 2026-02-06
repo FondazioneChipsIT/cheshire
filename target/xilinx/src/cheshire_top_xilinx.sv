@@ -146,6 +146,7 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
     ret.ClicPrioWidth = 1;
   `endif
 
+  `ifdef TARGET_C910
     ret.Core            = C910;
     ret.AddrWidth       = 40;
     ret.AxiDataWidth    = 64; // for SoC, the data path remain 64bit
@@ -153,6 +154,7 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
     ret.AxiMaxMstTrans  = 76;
     ret.AxiMstIdWidth   = 8;
     ret.AxiUserWidth    = 2;
+  `endif
 
     return ret;
   endfunction
