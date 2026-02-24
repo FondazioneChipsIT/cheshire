@@ -43,7 +43,7 @@ extern "C" {
 #define CFG_REGS_CTRL_DIRLJMPINH_BIT 27
 #define CFG_REGS_CTRL_CORE_SELECT_BIT 28
 #define CFG_REGS_CTRL_UNUSED_MASK 0x7
-#define CFG_REGS_CTRL_UNUSED_OFFSET 29
+#define CFG_REGS_CTRL_WATERMARK_EN_BIT 29
 #define CFG_REGS_CTRL_UNUSED_FIELD \
   ((bitfield_field32_t) { .mask = CFG_REGS_CTRL_UNUSED_MASK, .index = CFG_REGS_CTRL_UNUSED_OFFSET })
 
@@ -124,6 +124,9 @@ extern "C" {
 
 // PC trigger 3 LSB
 #define CFG_REGS_TRIG_PC3_L_REG_OFFSET 0x68
+
+// Watermark level
+#define CFG_REGS_WATERMARK_LEVEL_REG_OFFSET 0x6c
 
 #ifdef __cplusplus
 }  // extern "C"
