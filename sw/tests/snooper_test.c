@@ -29,7 +29,7 @@ int main(void) {
                                 0xf3000017, 0xf3000017, 
                                 0xd8270013, 0xf3000017,  
                                 0xd7278013, 0xf3000017, 
-                                0xd6678013, 0x05000797};
+                                0xd6678013};
 
 
     //---------------------------------------------------------------------------------------------//
@@ -59,9 +59,8 @@ int main(void) {
 
     fence();
 
-    asm volatile ("dummy1_code_start:");
-
     asm volatile (
+        "dummy1_code_start: \n\r"
         "auipc	zero,0xf3000 \n\r"
         "auipc	zero,0xf3000 \n\r"
         "li	zero,1 \n\r"
@@ -78,10 +77,9 @@ int main(void) {
         "auipc	zero,0xf3000 \n\r"
         "addi	zero,a5,-654 \n\r"
         "auipc	zero,0xf3000 \n\r"
+        "dummy1_code_end: \n\r"
         "addi	zero,a5,-666 \n\r"
     );
-
-    asm volatile ("dummy1_code_end:");
 
     // Stop snooper logging
     clear_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_PC_RANGE_0_BIT);
