@@ -101,7 +101,7 @@ packages:
       Git: https://github.com/pulp-platform/common_verification.git
     dependencies: []
   cva6:
-    revision: 9a942d846de5120527263357e31e6d14c9985cb0
+    revision: 85f24e84533280908d551c21be6add4e69282641
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cva6.git
@@ -118,10 +118,10 @@ packages:
     dependencies:
     - axi
   fpnew:
-    revision: 1ff6b1bfb35cdad8f619c50afc7bd6bbe5833d72
+    revision: 58ca3c376beb914b2b80b811d4b270c063d4e6f7
     version: null
     source:
-      Git: https://github.com/ricted98/cvfpu.git
+      Git: https://github.com/openhwgroup/cvfpu.git
     dependencies:
     - common_cells
     - fpu_div_sqrt_mvp

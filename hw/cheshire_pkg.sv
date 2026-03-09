@@ -528,6 +528,11 @@ package cheshire_pkg;
     ret.BPType                = config_pkg::PH_BHT;
     ret.ALUBypass             = 1'b1;
     ret.RVF                   = 1'b1;
+    ret.SoftwareInterruptEn   = 1'b1;
+    ret.NrLoadPipeRegs        = 0;
+    ret.PerfCounterEn         = 1'b1;
+    ret.NrLoadBufEntries      = 8;
+    ret.RVZCB                 = 1'b1;
     // Return modified config
     return ret;
   endfunction
