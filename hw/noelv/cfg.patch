@@ -1,0 +1,40 @@
+diff --git a/./../../grlib-gpl-2025.2-b4298/lib/gaisler/noelv/pkg/noelv_cpu_cfg.vhd b/./hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/pkg/noelv_cpu_cfg.vhd
+index ab55b79..0e2494c 100644
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/pkg/noelv_cpu_cfg.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/pkg/noelv_cpu_cfg.vhd
+@@ -375,7 +375,7 @@ package noelv_cpu_cfg is
+       pmp_no_tor    => 0,
+       pmp_entries   => 8,
+       pmp_g         => 10,
+-      pma_entries   => 8,
++      pma_entries   => 0,
+       pma_masked    => 1,
+       asidlen       => 8,
+       vmidlen       => 4,
+@@ -417,7 +417,7 @@ package noelv_cpu_cfg is
+ --      btbsets       => 4),
+       dmen          => 1,
+       pbaddr        => 16#90000#,
+-      rstaddr       => 16#C0000#
++      rstaddr       => 16#02000#
+     ),
+ 
+     -- GP
+@@ -474,7 +474,7 @@ package noelv_cpu_cfg is
+       pmp_no_tor    => 0,
+       pmp_entries   => 8,
+       pmp_g         => 10,
+-      pma_entries   => 8,
++      pma_entries   => 0,
+       pma_masked    => 1,
+       asidlen       => 8,
+       vmidlen       => 4,
+@@ -511,7 +511,7 @@ package noelv_cpu_cfg is
+       btbsets       => 2,
+       dmen          => 1,
+       pbaddr        => 16#90000#,
+-      rstaddr       => 16#C0000#
++      rstaddr       => 16#02000#
+     ),
+     -- GP-lite
+     2 => (

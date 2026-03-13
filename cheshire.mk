@@ -14,6 +14,7 @@ CXX_PATH := $(shell which $(CXX))
 
 VLOG_ARGS   ?= -suppress 2583 -suppress 13314 -timescale 1ns/1ps
 VLOGAN_ARGS ?= -kdb -nc -assert svaext +v2k -timescale=1ns/1ps
+VCOM_ARGS   ?= -quiet -explicit -O0 -93
 
 # Common Bender flags for Cheshire RTL
 CHS_BENDER_RTL_FLAGS ?= -t rtl -t cva6
@@ -133,6 +134,13 @@ CHS_HW_ALL += $(AXIRTROOT)/.generated
 CHS_HW_ALL += $(AXI_VGA_ROOT)/.generated
 CHS_HW_ALL += $(CHS_SLINK_DIR)/.generated
 
+# Download and patch NOEL-V
+$(CHS_ROOT)/hw/noelv/grlib-gpl-2025.2-b4298: $(CHS_ROOT)/Bender.yml
+	wget https://download.gaisler.com/products/GRLIB/bin/grlib-gpl-2025.2-b4298.tar.gz
+	tar -xvf grlib-gpl-2025.2-b4298.tar.gz -C $(CHS_ROOT)/hw/noelv
+	rm grlib-gpl-2025.2-b4298.tar.gz
+	cd $(CHS_ROOT)/hw/noelv && git apply cfg.patch noelv.patch axi.patch
+
 #####################
 # Generate Boot ROM #
 #####################
@@ -156,8 +164,9 @@ CHS_BOOTROM_ALL += $(CHS_ROOT)/hw/bootrom/cheshire_bootrom.sv $(CHS_ROOT)/hw/boo
 ##############
 
 $(CHS_ROOT)/target/sim/vsim/compile.cheshire_soc.tcl: $(CHS_ROOT)/Bender.yml
-	$(BENDER) script vsim -t sim -t test $(CHS_BENDER_RTL_FLAGS) --vlog-arg="$(VLOG_ARGS)" > $@
+	$(BENDER) script vsim -t sim -t test $(CHS_BENDER_RTL_FLAGS) --vlog-arg="$(VLOG_ARGS)" --vcom-arg="$(VCOM_ARGS)"> $@
 	echo 'vlog "$(realpath $(CHS_ROOT))/target/sim/src/elfloader.cpp" -ccflags "-std=c++11" -cpppath "$(CXX_PATH)"' >> $@
+	$(CHS_ROOT)/target/sim/vsim/add_libraries.sh
 
 $(CHS_ROOT)/target/sim/vcs/compile.cheshire_soc.sh: $(CHS_ROOT)/Bender.yml
 	$(BENDER) script vcs -t sim -t test $(CHS_BENDER_RTL_FLAGS) --vlog-arg="$(VLOGAN_ARGS)" --vlogan-bin="$(VLOGAN)" > $@
