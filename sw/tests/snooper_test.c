@@ -117,6 +117,9 @@ int main(void) {
     // allowing to read the execution trace without the risk of new instructions 
     // overwriting the instructions already stored in the buffer
 
+    // Enable level triggered behaviour for trigger interrupt (default behaviour is edge triggered)
+    set_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_LEVEL_TRIGGER_EN_BIT);
+
     // Configure LSBs and MSBs of TRIGGER_PC0
     *reg32(&__base_snprcfg, CFG_REGS_TRIG_PC0_H_REG_OFFSET) = 0x00000000;
     *reg32(&__base_snprcfg, CFG_REGS_TRIG_PC0_L_REG_OFFSET) = (uintptr_t)&dummy2_code_end;
@@ -160,6 +163,9 @@ int main(void) {
         if ((*reg32(&__base_snpr, i + 0x00) <= (uintptr_t)&dummy2_code_start) || (*reg32(&__base_snpr, i + 0x00) >= (uintptr_t)&dummy2_code_end))
             return 1; // return error in case the buffer contains a PC outside of the logging region
     }
+
+    // Clear level triggered trigger interrupt
+    clear_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_TRIGGER_IRQ_BIT);
 
     return 0;
 }
