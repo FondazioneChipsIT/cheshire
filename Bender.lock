@@ -206,7 +206,7 @@ packages:
     - common_cells
     - register_interface
   snooper:
-    revision: 4834337501410acc95aa572f61e65ab0dcbaa241
+    revision: 5b5c4cd2037ef6a34b4c3248ab3fcce698aa3936
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cfi-snooper.git
