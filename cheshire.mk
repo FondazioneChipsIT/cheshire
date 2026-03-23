@@ -39,6 +39,7 @@ AXIRTROOT         := $(shell $(BENDER) path axi_rt)
 AXI_VGA_ROOT      := $(shell $(BENDER) path axi_vga)
 IDMA_ROOT         := $(shell $(BENDER) path idma)
 DRAM_RTL_SIM_ROOT := $(shell $(BENDER) path dram_rtl_sim)
+PULP_C910_ROOT    := $(shell $(BENDER) path pulp-c910)
 
 REGTOOL ?= $(CHS_REG_DIR)/vendor/lowrisc_opentitan/util/regtool.py
 
@@ -125,6 +126,10 @@ $(CHS_SLINK_DIR)/.generated: $(CHS_ROOT)/hw/serial_link.hjson
 # iDMA
 include $(IDMA_ROOT)/idma.mk
 
+# Patch C910 with JTAG fix
+$(PULP_C910_ROOT)/hw/c910_axi_wrap.sv : $(CHS_ROOT)/Bender.yml
+	cd $(PULP_C910_ROOT) && git apply $(CHS_ROOT)/hw/c910_jtag_fix.patch
+
 CHS_HW_ALL += $(IDMA_FULL_RTL)
 CHS_HW_ALL += $(CHS_ROOT)/hw/regs/cheshire_reg_pkg.sv $(CHS_ROOT)/hw/regs/cheshire_reg_top.sv
 CHS_HW_ALL += $(CLINTROOT)/.generated
@@ -132,6 +137,7 @@ CHS_HW_ALL += $(OTPROOT)/.generated
 CHS_HW_ALL += $(AXIRTROOT)/.generated
 CHS_HW_ALL += $(AXI_VGA_ROOT)/.generated
 CHS_HW_ALL += $(CHS_SLINK_DIR)/.generated
+CHS_HW_ALL += $(PULP_C910_ROOT)/hw/c910_axi_wrap.sv
 
 #####################
 # Generate Boot ROM #

@@ -1,0 +1,28 @@
+diff --git a/.bender/git/checkouts/pulp-c910-f7479e82489da398/hw/c910_axi_wrap.sv b/../../cheshire_c910/cheshire/.bender/git/checkouts/pulp-c910-f7479e82489da398/hw/c910_axi_wrap.sv
+index 9b604b3..a28676e 100644
+--- a/hw/c910_axi_wrap.sv
++++ b/hw/c910_axi_wrap.sv
+@@ -136,7 +136,8 @@ module c910_axi_wrap #(
+     .time_irq_i           ( time_irq_i                  ),
+     // plic
+     .plic_hartx_mint_req_i( plic_hartx_mint_req_i       ),
+-    .plic_hartx_sint_req_i( plic_hartx_sint_req_i       )
++    .plic_hartx_sint_req_i( plic_hartx_sint_req_i       ),
++    .debug_req_i          ( debug_req_i                 )
+   );
+ 
+   assign c910_axi_req.aw.qos    = '0;
+diff --git a/.bender/git/checkouts/pulp-c910-f7479e82489da398/vendor/thead_openc910/C910_RTL_FACTORY/gen_rtl/cpu/rtl/openC910.v b/../../cheshire_c910/cheshire/.bender/git/checkouts/pulp-c910-f7479e82489da398/vendor/thead_openc910/C910_RTL_FACTORY/gen_rtl/cpu/rtl/openC910.v
+index d70c13d..ed4e47b 100644
+--- a/vendor/thead_openc910/C910_RTL_FACTORY/gen_rtl/cpu/rtl/openC910.v
++++ b/vendor/thead_openc910/C910_RTL_FACTORY/gen_rtl/cpu/rtl/openC910.v
+@@ -994,7 +994,8 @@ ct_top  x_ct_top_0 (
+   .x_exit_dbg_req_i        (1'b0    ),
+   .x_exit_dbg_req_o        (        ),
+   .x_had_dbg_mask          (1'b0    ),
+-  .x_regs_serial_data      (        )
++  .x_regs_serial_data      (        ),
++  .debug_req_i             (debug_req_i_q_q        )
+ );
+ 
+ 
