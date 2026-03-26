@@ -21,6 +21,11 @@ import_files -fileset constrs_1 -norecurse ${xilinx_root}/constraints/${board}.x
 
 # Load RTL sources
 source ${xilinx_root}/scripts/add_sources.${board}.tcl
+set_property file_type {VHDL 2008} [get_files *.vhd]
+set_property library grlib [get_files $ROOT/hw/noelv/grlib-gpl-2025.2-b4298/lib/grlib*.vhd]
+set_property library grlib [get_files $ROOT/hw/noelv/grlib-gpl-2025.2-b4298/designs/noelv-generic/grlib_config.vhd]
+set_property library techmap [get_files $ROOT/hw/noelv/grlib-gpl-2025.2-b4298/lib/techmap*.vhd]
+set_property library gaisler [get_files $ROOT/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler*.vhd]
 
 # Set top module
 set_property top ${proj}_top_xilinx [current_fileset]
@@ -28,7 +33,7 @@ update_compile_order -fileset sources_1
 
 # Set synthesis properties
 # TODO: investigate resource-affordable retiming
-set_property XPM_LIBRARIES XPM_MEMORY [current_project]
+set_property XPM_LIBRARIES {XPM_CDC XPM_MEMORY XPM_FIFO} [current_project]
 set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
 
 # Elaborate and open design to explore all clocks

@@ -93,7 +93,7 @@ begin
         shift_o        => tapo_shft,
         tdi_o          => tapo_tdi,
         dtmcs_select_o => dtmcs_select,
-        dtmcs_tdo_i    => tapi_tdo2,
+        dtmcs_tdo_i    => tapi_tdo1,
         dmi_select_o   => dmi_select,
         dmi_tdo_i      => tapi_tdo1
     );

@@ -655,7 +655,8 @@ module cheshire_soc import cheshire_pkg::*; #(
         .r_chan_t       ( axi_cva6_r_chan_t  ),
         .noc_req_t      ( axi_cva6_req_t     ),
         .noc_resp_t     ( axi_cva6_rsp_t     ),
-        .IdcodeValue    ( Cfg.DbgIdCode      )
+        .IdcodeValue    ( Cfg.DbgIdCode      ),
+        .Tech           ( Cfg.Tech           )
       ) i_core_noelv (
         .clk_i,
         .rst_ni,
@@ -665,6 +666,7 @@ module cheshire_soc import cheshire_pkg::*; #(
         .noc_req_o        ( core_out_req ),
         .noc_resp_i       ( core_out_rsp ),
         .jtag_tck_i       ( jtag_tck_i ),
+        .jtag_trst_ni     ( jtag_trst_ni ),
         .jtag_tms_i       ( jtag_tms_i ),
         .jtag_tdi_i       ( jtag_tdi_i ),
         .jtag_tdo_o       ( jtag_tdo_o ),

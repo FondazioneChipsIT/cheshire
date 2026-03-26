@@ -13,6 +13,12 @@ VIVADO ?= vitis-2022.1 vivado
 
 CHS_XILINX_DIR ?= $(CHS_ROOT)/target/xilinx
 
+# CORE_TYPE can be either CVA6 or NOELV
+CORE_TYPE ?= CVA6
+ifeq ($(CORE_TYPE), NOELV)
+CHS_BENDER_RTL_FLAGS += -t noelv
+endif
+
 # Required to split stems
 .SECONDEXPANSION:
 

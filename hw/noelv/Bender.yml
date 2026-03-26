@@ -30,8 +30,6 @@ sources:
       - grlib-gpl-2025.2-b4298/lib/grlib/amba/dma2ahb.vhd
       - grlib-gpl-2025.2-b4298/lib/grlib/amba/ahbmst.vhd
       - grlib-gpl-2025.2-b4298/lib/grlib/amba/ahblitm2ahbm.vhd
-      - grlib-gpl-2025.2-b4298/lib/grlib/amba/dma2ahb_tp.vhd
-      - grlib-gpl-2025.2-b4298/lib/grlib/amba/amba_tp.vhd
       - grlib-gpl-2025.2-b4298/lib/grlib/modgen/multlib.vhd
       - grlib-gpl-2025.2-b4298/lib/grlib/modgen/leaves.vhd
       - grlib-gpl-2025.2-b4298/lib/grlib/sparc/sparc.vhd
@@ -157,7 +155,6 @@ sources:
       - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/interrupt_file.vhd
       - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/imsic_int_files.vhd
       - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/fpsimutilnv.vhd
-      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/kanatalog.vhd
 
       - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/aclint/clint.vhd
       - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/aclint/clint_ahb.vhd
@@ -175,3 +172,8 @@ sources:
       - noelv_chs_wrap.vhd
       - noelv_chs_axi_wrap.sv
 
+  - target: all(fpga, xilinx)
+    files:
+      - grlib-gpl-2025.2-b4298/lib/techmap/unisim/memory_kintex7.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/unisim/memory_ultrascale.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/unisim/memory_unisim.vhd

@@ -23,7 +23,8 @@ entity noelv_chs_wrap is
         UserWidth : integer := 2;
         manf      : integer range 0 to 2047 := 1753;
         part      : integer range 0 to 65535 := 50661;
-        ver       : integer range 0 to 15 := 1
+        ver       : integer range 0 to 15 := 1;
+        tech      : integer range 0 to 69
     );
     port (
         clk_i       : in std_ulogic;
@@ -80,6 +81,7 @@ entity noelv_chs_wrap is
         axi_chs_rsp_r_user : in std_logic_vector(UserWidth-1 downto 0);
 
         jtag_tck_i : in std_ulogic;
+        jtag_trst_ni : in std_ulogic;
         jtag_tms_i : in std_ulogic;
         jtag_tdi_i : in std_ulogic;
         jtag_tdo_o : out std_ulogic;
@@ -115,8 +117,8 @@ begin
     core: noelvcpu
     generic map (
         hindex   => 0,
-        fabtech  => 0,
-        memtech  => 0,
+        fabtech  => tech,
+        memtech  => tech,
         --cached defines cacheability of memory areas, it overrides AMBA PnP configuration and is overridden by the PMA
         --cacheable regions in cheshire_pkg: 1000_0000 len 131072 & 2000_0000 len 2000_0000 & 8000_0000 len 8000_0000
         --cacheable regions in NOELV: 1000_0000-3FFF_FFFF & 8000_0000-FFFF_FFFF
@@ -204,8 +206,8 @@ begin
 
     dm0 : dmnv
     generic map (
-        fabtech   => 0,
-        memtech   => 0,
+        fabtech   => tech,
+        memtech   => tech,
         ncpu      => 1,
         ndbgmst   => 1,
         -- Conventional bus
@@ -276,7 +278,7 @@ begin
         tapo_shft => open,
         tapo_upd  => open,
         tapi_tdo  => '0',
-        trst      => rst_ni,
+        trst      => jtag_trst_ni,
         tdoen     => jtag_tdo_oe_o,
         tckn      => open,
         tapo_tckn => open,

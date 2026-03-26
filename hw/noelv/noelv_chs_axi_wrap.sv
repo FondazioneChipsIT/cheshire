@@ -10,7 +10,8 @@ module noelv_chs_axi_wrap #(
     parameter type                r_chan_t      = logic,
     parameter type                noc_req_t     = logic,
     parameter type                noc_resp_t    = logic,
-    parameter logic        [31:0] IdcodeValue   = 32'h00000DB3
+    parameter logic        [31:0] IdcodeValue   = 32'h00000DB3,
+    parameter int unsigned        Tech          = 0
 ) (
     input  logic            clk_i,
     input  logic            rst_ni,
@@ -20,6 +21,7 @@ module noelv_chs_axi_wrap #(
     output noc_req_t        noc_req_o,
     input  noc_resp_t       noc_resp_i,
     input  logic            jtag_tck_i,
+    input  logic            jtag_trst_ni,
     input  logic            jtag_tms_i,
     input  logic            jtag_tdi_i,
     output logic            jtag_tdo_o,
@@ -33,7 +35,8 @@ module noelv_chs_axi_wrap #(
       .UserWidth(UserWidth),
       .manf     (IdcodeValue[11:1]),
       .part     (IdcodeValue[27:12]),
-      .ver      (IdcodeValue[31:28])
+      .ver      (IdcodeValue[31:28]),
+      .tech     (Tech)
   ) i_noelv_chs_wrap (
       .clk_i,
       .rst_ni,
@@ -94,6 +97,7 @@ module noelv_chs_axi_wrap #(
 
       // jtag interface
       .jtag_tck_i,
+      .jtag_trst_ni,
       .jtag_tms_i,
       .jtag_tdi_i,
       .jtag_tdo_o,

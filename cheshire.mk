@@ -126,6 +126,13 @@ $(CHS_SLINK_DIR)/.generated: $(CHS_ROOT)/hw/serial_link.hjson
 # iDMA
 include $(IDMA_ROOT)/idma.mk
 
+# Download and patch NOEL-V
+$(CHS_ROOT)/hw/noelv/grlib-gpl-2025.2-b4298:
+	wget https://download.gaisler.com/products/GRLIB/bin/grlib-gpl-2025.2-b4298.tar.gz
+	tar -xvf grlib-gpl-2025.2-b4298.tar.gz -C $(CHS_ROOT)/hw/noelv
+	rm grlib-gpl-2025.2-b4298.tar.gz
+	cd $(CHS_ROOT)/hw/noelv && git apply cfg.patch noelv.patch axi.patch ras.patch
+
 CHS_HW_ALL += $(IDMA_FULL_RTL)
 CHS_HW_ALL += $(CHS_ROOT)/hw/regs/cheshire_reg_pkg.sv $(CHS_ROOT)/hw/regs/cheshire_reg_top.sv
 CHS_HW_ALL += $(CLINTROOT)/.generated
@@ -133,13 +140,7 @@ CHS_HW_ALL += $(OTPROOT)/.generated
 CHS_HW_ALL += $(AXIRTROOT)/.generated
 CHS_HW_ALL += $(AXI_VGA_ROOT)/.generated
 CHS_HW_ALL += $(CHS_SLINK_DIR)/.generated
-
-# Download and patch NOEL-V
-$(CHS_ROOT)/hw/noelv/grlib-gpl-2025.2-b4298: $(CHS_ROOT)/Bender.yml
-	wget https://download.gaisler.com/products/GRLIB/bin/grlib-gpl-2025.2-b4298.tar.gz
-	tar -xvf grlib-gpl-2025.2-b4298.tar.gz -C $(CHS_ROOT)/hw/noelv
-	rm grlib-gpl-2025.2-b4298.tar.gz
-	cd $(CHS_ROOT)/hw/noelv && git apply cfg.patch noelv.patch axi.patch
+CHS_HW_ALL += $(CHS_ROOT)/hw/noelv/grlib-gpl-2025.2-b4298
 
 #####################
 # Generate Boot ROM #

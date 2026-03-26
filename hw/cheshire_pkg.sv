@@ -65,6 +65,13 @@ package cheshire_pkg;
     NOELV           = 'b1
   } core_select_e;
 
+  typedef enum int {
+    INFERRED        = 0,
+    GENESYS2        = 49,
+    VCU118          = 65,
+    GF22            = 64
+  } tech_select_e;
+
   // Externally controllable parameters
   typedef struct packed {
     // CVA6 parameters
@@ -79,6 +86,7 @@ package cheshire_pkg;
     bit     Cva6ExtCieOnTop;
     // Hart parameters
     core_select_e Core;
+    tech_select_e Tech;
     bit [MaxCoresWidth-1:0] NumCores;
     doub_bt NumExtIrqHarts;
     doub_bt NumExtDbgHarts;
@@ -555,6 +563,7 @@ package cheshire_pkg;
     Cva6ExtCieOnTop   : 0,
     // Harts
     Core              : CVA6,
+    Tech              : INFERRED,
     NumCores          : 1,
     CoreMaxTxns       : 8,
     CoreMaxTxnsPerId  : 4,
