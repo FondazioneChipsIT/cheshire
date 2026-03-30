@@ -132,7 +132,7 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
       .clk_i      ( clk ),
       .rst_ni     ( rst_n ),
       .axi_req_i  ( axi_llc_mst_req ),
-      .axi_resp_o ( axi_llc_mst_rsp )
+      .axi_resp_o ( axi_llc_mst_rsp_tmp )
     );
 
     // Tie off the AXI sim mem
@@ -142,7 +142,7 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
 
     // Connect the AXI sim mem to the LLC
     assign axi_sim_mem_mst_req = axi_llc_mst_req;
-    assign axi_llc_mst_rsp     = axi_sim_mem_mst_rsp;
+    assign axi_llc_mst_rsp_tmp     = axi_sim_mem_mst_rsp;
 
   end
 
@@ -347,6 +347,23 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
     end
   endtask
 
+
+  // Load section
+  task automatic jtag_load_section(input longint addr, input byte data[], input longint len);
+    jtag_write(dm::SBCS, JtagInitSbcs, 1, 1);
+    // Write address as 64-bit double
+    jtag_write(dm::SBAddress1, addr[63:32]);
+    jtag_write(dm::SBAddress0, addr[31:0]);
+    for (longint i = 0; i <= len ; i += 2**(JTAGAccessWidth)) begin
+      bit checkpoint = (i != 0 && i % 512 == 0);
+      if (checkpoint)
+        $display("[JTAG] - %0d/%0d bytes (%0d%%)", i, len, i*100/(len>1 ? len-1 : 1));
+      jtag_write(dm::SBData1, {data[i+7], data[i+6], data[i+5], data[i+4]});
+      jtag_write(dm::SBData0, {data[i+3], data[i+2], data[i+1], data[i]}, checkpoint, checkpoint);
+    end
+  endtask
+
+
   // Load a binary
   // Note: all sections must be 64b-aligned
   task automatic jtag_elf_preload(input string binary, output doub_bt entry);
@@ -358,17 +375,7 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
       byte bf[] = new [sec_len];
       $display("[JTAG] Preloading section at 0x%h (%0d bytes)", sec_addr, sec_len);
       if (read_section(sec_addr, bf, sec_len)) $fatal(1, "[JTAG] Failed to read ELF section!");
-      jtag_write(dm::SBCS, JtagInitSbcs, 1, 1);
-      // Write address as 64-bit double
-      jtag_write(dm::SBAddress1, sec_addr[63:32]);
-      jtag_write(dm::SBAddress0, sec_addr[31:0]);
-      for (longint i = 0; i <= sec_len ; i += 2**(JTAGAccessWidth)) begin
-        bit checkpoint = (i != 0 && i % 512 == 0);
-        if (checkpoint)
-          $display("[JTAG] - %0d/%0d bytes (%0d%%)", i, sec_len, i*100/(sec_len>1 ? sec_len-1 : 1));
-        jtag_write(dm::SBData1, {bf[i+7], bf[i+6], bf[i+5], bf[i+4]});
-        jtag_write(dm::SBData0, {bf[i+3], bf[i+2], bf[i+1], bf[i]}, checkpoint, checkpoint);
-      end
+      jtag_load_section(sec_addr, bf, sec_len);
     end
     void'(get_entry(entry));
     $display("[JTAG] Preload complete");
@@ -418,41 +425,6 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
       jtag_write(dm::Data0, entry[31:0]);
       jtag_write(dm::Command, 32'h0033_07b1, 0, 1);
     end    // Resume hart 0
-    jtag_write(dm::DMControl, dm::dmcontrol_t'{resumereq: 1, dmactive: 1, default: '0});
-    $display("[JTAG] Resumed hart 0 from 0x%016x", entry);
-  endtask
-
-
-  // Run a binary
-  task automatic jtag_elf_run(input string binary);
-    doub_bt entry;
-    jtag_elf_halt_load(binary, entry);
-    // Repoint execution
-    jtag_write(dm::Data1, entry[63:32]);
-    jtag_write(dm::Data0, entry[31:0]);
-    jtag_write(dm::Command, 32'h0033_07b1, 0, 1);
-    // Resume hart 0
-    jtag_write(dm::DMControl, dm::dmcontrol_t'{resumereq: 1, dmactive: 1, default: '0});
-    $display("[JTAG] Resumed hart 0 from 0x%h", entry);
-  endtask
-
-  // Run a binary that was preloaded with a different method
-  task automatic jtag_elf_run_no_preload(input string binary);
-    doub_bt entry;
-    void'(get_entry(entry));
-
-    if (entry == '0) begin
-      if (read_elf(binary))
-        $fatal(1, "[JTAG] Failed to open ELF: %s!", binary);
-      else
-        void'(get_entry(entry));
-    end
-
-    // Repoint execution
-    jtag_write(dm::Data1, entry[63:32]);
-    jtag_write(dm::Data0, entry[31:0]);
-    jtag_write(dm::Command, 32'h0033_07b1, 0, 1);
-    // Resume hart 0
     jtag_write(dm::DMControl, dm::dmcontrol_t'{resumereq: 1, dmactive: 1, default: '0});
     $display("[JTAG] Resumed hart 0 from 0x%h", entry);
   endtask
@@ -1083,7 +1055,9 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
           end
         end
       end else begin
-        $display("[MEMH] Cannot preload section at 0x%h (%0d bytes). No direct preloadable memory known at this location!", sec_addr, sec_len);
+        $display("[MEMH] Cannot direct preload section at 0x%h (%0d bytes). No direct preloadable memory known at this location!", sec_addr, sec_len);
+        $display("[MEMH] Falling back to JTAG preloading");
+        jtag_load_section(sec_addr, bf, sec_len);
       end
     end
   endtask
