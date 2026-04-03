@@ -539,6 +539,8 @@ package cheshire_pkg;
     ret.BPType                = config_pkg::PH_BHT;
     ret.ALUBypass             = 1'b1;
     ret.RVH                   = 1'b1;
+    ret.RVZiCfiLP             = 1'b1;
+    ret.RVZiCfiSS             = 1'b1;
     // Return modified config
     return ret;
   endfunction

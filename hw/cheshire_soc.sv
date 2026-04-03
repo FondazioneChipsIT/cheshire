@@ -588,6 +588,7 @@ module cheshire_soc import cheshire_pkg::*; #(
   assign intr.intn.bus_err.cores = core_bus_err_intr_comb;
 
   riscv::ctr_port_t [Cva6Cfg.NrCommitPorts-1:0] ctr_commit;
+  logic snooper_halt;
 
   for (genvar i = 0; i < NumIntHarts; i++) begin : gen_cva6_cores
     axi_cva6_req_t core_out_req, core_ur_req;
@@ -638,7 +639,8 @@ module cheshire_soc import cheshire_pkg::*; #(
       .cvxif_resp_i     ( '0 ),
       .noc_req_o        ( core_out_req ),
       .noc_resp_i       ( core_out_rsp ),
-      .ctr_commit_o     ( ctr_commit   )
+      .ctr_commit_o     ( ctr_commit   ),
+      .snooper_halt_i   ( snooper_halt )
     );
 
     if (Cfg.BusErr) begin : gen_cva6_bus_err
@@ -1139,7 +1141,8 @@ module cheshire_soc import cheshire_pkg::*; #(
       .ctr_commit_i       ( ctr_commit                     ),
       .trigger_o          ( intr.intn.snooper_trigger      ),
       .watermark_irq_o    ( intr.intn.snooper_watermark    ),
-      .core_select_o      (                                )
+      .core_select_o      (                                ),
+      .core_halt_o        ( snooper_halt                   )
     );
 
   end else begin : gen_no_snooper
