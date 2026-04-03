@@ -47,9 +47,6 @@ int main(void) {
     // Configure Snooper to log only instructions executed in M mode
     set_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_M_MODE_BIT);
 
-    // Set this bit to snoop from core 1 instead of core 0
-    // set_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_CORE_SELECT_BIT);
-
     // Configure Snooper Logging mode: Instr
     // Instr mode to log the opcode of every instruction
     set_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_TRACE_MODE_OFFSET);
@@ -84,12 +81,14 @@ int main(void) {
     // Stop snooper logging
     clear_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_PC_RANGE_0_BIT);
 
-    int base, last, new_base, new_last;
+    int base, last, new_last, PC_DST_H, PC_DST_L, PC_SRC_L, PC_SRC_H, CTR_TYPE;
 
+    // Base is the index of the first valid element (it is incremented starting from 0 only when the buffer starts overwriting itself)
     base = *reg32(&__base_snprcfg, CFG_REGS_BASE_REG_OFFSET);
+    // In instruction mode, last is the index of the last valid element + 4 (if no elements are valid this returns zero, if 1 element is valid this returns 4)
     last = *reg32(&__base_snprcfg, CFG_REGS_LAST_REG_OFFSET);
 
-    for(int i=base;i<=last;i=i+4) { // Instruction mode
+    for (int i=base;i<last;i=i+4) { // Instruction mode
         if (*reg32(&__base_snpr, i) != instructions[i/4])
             return 1; // return error in case the logged instruction is different from the expected instruction
     }
@@ -128,12 +127,15 @@ int main(void) {
 
 
     //------------------------------------WATERMARK INTERRUPT--------------------------------------//
-    // Watermark interrupt can only be used in instruction mode
-    // This interrupt triggers when the numbers of instructions stored in the buffer minus
-    // the number of instructions previously read through AXI is higher than the watermark lvl
+    // This interrupt triggers when the numbers of elements stored in the buffer minus
+    // the number of elements previously read through AXI is higher than the watermark level
     // The interrupt is high as long as this condition is met and does not stop the snooper operation
+    // In instruction mode each element containts a single 32bit field (the instruction opcode)
+    // thus the watermark level is increased by 1 for every element logged in instruction mode
+    // In address mode each element is composed by 5 32bit fields (PC_SRC_L, PC_SRC_H, PC_DST_L, PC_DST_H, CTR_TYPE)
+    // thus the watermark level is increased by 5 for every element logged in address mode
 
-    // Set watermark level to 10 instructions
+    // Set watermark level to 10 instructions (instruction mode) or 2 instruction addresses (address mode)
     *reg32(&__base_snprcfg, CFG_REGS_WATERMARK_LEVEL_REG_OFFSET) = 0x0000000a; 
     // Enable watermark interrupt
     set_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_WATERMARK_EN_BIT);
@@ -156,11 +158,16 @@ int main(void) {
 
     asm volatile ("dummy2_code_end:");
 
-    new_base = last + 4;
+    // In address mode, last is the index of the last valid element + 20 (if no elements are valid this returns zero, if 1 element is valid this returns 20)
     new_last = *reg32(&__base_snprcfg, CFG_REGS_LAST_REG_OFFSET);
 
-    for(int i=new_base;i<new_last;i=i+20) { // Address mode
-        if ((*reg32(&__base_snpr, i + 0x00) <= (uintptr_t)&dummy2_code_start) || (*reg32(&__base_snpr, i + 0x00) >= (uintptr_t)&dummy2_code_end))
+    for (int i=last;i<new_last;i=i+20) { // Address mode
+        PC_SRC_L = *reg32(&__base_snpr, i + 0x00);
+        PC_SRC_H = *reg32(&__base_snpr, i + 0x04);
+        PC_DST_L = *reg32(&__base_snpr, i + 0x08);
+        PC_DST_H = *reg32(&__base_snpr, i + 0x0C);
+        CTR_TYPE = *reg32(&__base_snpr, i + 0x10);
+        if ((PC_SRC_L <= (uintptr_t)&dummy2_code_start) || (PC_SRC_L >= (uintptr_t)&dummy2_code_end))
             return 1; // return error in case the buffer contains a PC outside of the logging region
     }
 

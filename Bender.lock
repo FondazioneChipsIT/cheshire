@@ -101,7 +101,7 @@ packages:
       Git: https://github.com/pulp-platform/common_verification.git
     dependencies: []
   cva6:
-    revision: 5ea2be4ba9c560b8d2f56c3c9e42ef29e895a578
+    revision: 99dbc469de07f9ee6e4473ce04d0d6900613b339
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cva6.git
@@ -206,7 +206,7 @@ packages:
     - common_cells
     - register_interface
   snooper:
-    revision: 5b5c4cd2037ef6a34b4c3248ab3fcce698aa3936
+    revision: df83a528fe13f5f9aa16767cc5bc21917aacb87d
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cfi-snooper.git
