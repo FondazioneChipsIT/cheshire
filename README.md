@@ -6,7 +6,7 @@ Cheshire is developed as part of the PULP project, a joint effort between ETH Zu
 
 ## Emulator Tender
 
-Detailed information about the prerequisites to execute the benchmarks for the emulator tender can be found [here](https://hackmd.io/@U4uKXvr_RZyd_F2gfOmzlg/rk-XoPrZ-l).
+Detailed information about the prerequisites to execute the benchmarks for the emulator tender can be found [here](https://hackmd.io/@4CAY4XF6QeaNTqZG74cjJQ/Bk_MVEDpWg).
 The evaluation creteria for the emulator tender will be:
 * Execution speed with 0% waveforms logging
 * Execution speed with 100% waveforms logging
