@@ -1,0 +1,479 @@
+
+/data/ytortorella/emulator/tender-release/cheshire/sw/tests/spm_uncached.spm.elf:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000010000000 <__base_spm>:
+// Minimal CRT0
+.global _start
+.align 4
+_start:
+    // Globally disable Machine and Supervisor interrupts
+    csrrc x0, mstatus, 10
+    10000000:	30057073          	csrci	mstatus,10
+
+    // Park SMP harts
+    csrr t0, mhartid
+    10000004:	f14022f3          	csrr	t0,mhartid
+    beqz t0, 2f
+    10000008:	00028563          	beqz	t0,10000012 <__base_spm+0x12>
+1:
+    wfi
+    1000000c:	10500073          	wfi
+    j 1b
+    10000010:	bff5                	j	1000000c <__base_spm+0xc>
+2:
+    // Init stack and global pointer iff linked as nonzero
+    mv t1, sp
+    10000012:	830a                	mv	t1,sp
+    la t0, __stack_pointer$
+    10000014:	00000293          	li	t0,0
+    beqz t0, 1f
+    10000018:	00028363          	beqz	t0,1000001e <__base_spm+0x1e>
+    mv sp, t0
+    1000001c:	8116                	mv	sp,t0
+1:  .option push
+    .option norelax
+    la t0, __global_pointer$
+    1000001e:	00000297          	auipc	t0,0x0
+    10000022:	32228293          	addi	t0,t0,802 # 10000340 <__bss_end>
+    beqz t0, 1f
+    10000026:	00028363          	beqz	t0,1000002c <__base_spm+0x2c>
+    mv gp, t0
+    1000002a:	8196                	mv	gp,t0
+1:  .option pop
+
+    // Store existing stack, global, return pointers on new stack
+    addi sp, sp, -24
+    1000002c:	1121                	addi	sp,sp,-24
+    sd t1, 0(sp)
+    1000002e:	e01a                	sd	t1,0(sp)
+    sd gp, 8(sp)
+    10000030:	e40e                	sd	gp,8(sp)
+    sd ra, 16(sp)
+    10000032:	e806                	sd	ra,16(sp)
+
+    // Set trap vector
+    la t0, _trap_handler_wrap
+    10000034:	00000297          	auipc	t0,0x0
+    10000038:	10c28293          	addi	t0,t0,268 # 10000140 <_trap_handler_wrap>
+    csrrw x0, mtvec, t0
+    1000003c:	30529073          	csrw	mtvec,t0
+
+    // Zero the .bss section
+    la t0, __bss_start      // t0 = bss start address
+    10000040:	00018293          	mv	t0,gp
+    la t1, __bss_end        // t1 = bss end address
+    10000044:	00018313          	mv	t1,gp
+    sub t2, t1, t0          // t2 = #bytes to zero
+    10000048:	405303b3          	sub	t2,t1,t0
+    li a0, 0
+    1000004c:	4501                	li	a0,0
+
+000000001000004e <_zero_bss_loop>:
+
+_zero_bss_loop:
+    addi t4, t2, -32
+    1000004e:	fe038e93          	addi	t4,t2,-32
+    blez t2, _fp_init           // t2 <= 0? => No bss to zero
+    10000052:	02705863          	blez	t2,10000082 <_fp_init>
+    blt t4, x0, _zero_bss_rem   // t4 <  0? => Less than 4 words left
+    10000056:	020ec063          	bltz	t4,10000076 <_zero_bss_rem>
+    sd a0, 0(t0)
+    1000005a:	00a2b023          	sd	a0,0(t0)
+    sd a0, 8(t0)
+    1000005e:	00a2b423          	sd	a0,8(t0)
+    sd a0, 16(t0)
+    10000062:	00a2b823          	sd	a0,16(t0)
+    sd a0, 24(t0)
+    10000066:	00a2bc23          	sd	a0,24(t0)
+    addi t2, t2, -32
+    1000006a:	1381                	addi	t2,t2,-32
+    addi t0, t0, 32
+    1000006c:	02028293          	addi	t0,t0,32
+    bgt t2, x0, _zero_bss_loop  // Still more to go
+    10000070:	fc704fe3          	bgtz	t2,1000004e <_zero_bss_loop>
+    j _fp_init
+    10000074:	a039                	j	10000082 <_fp_init>
+
+0000000010000076 <_zero_bss_rem>:
+
+_zero_bss_rem:
+    sb a0, 0(t0)
+    10000076:	00a28023          	sb	a0,0(t0)
+    addi t2, t2, -1
+    1000007a:	13fd                	addi	t2,t2,-1
+    addi t0, t0, 1
+    1000007c:	0285                	addi	t0,t0,1
+    bgt t2, x0, _zero_bss_rem
+    1000007e:	fe704ce3          	bgtz	t2,10000076 <_zero_bss_rem>
+
+0000000010000082 <_fp_init>:
+
+_fp_init:
+    // Set FS state to "Initial", enabling FP instructions
+    li t1, 1
+    10000082:	4305                	li	t1,1
+    slli t1, t1, 13
+    10000084:	0336                	slli	t1,t1,0xd
+    csrs mstatus, t1
+    10000086:	30032073          	csrs	mstatus,t1
+
+    // Clear all 32 double FP registers
+    fcvt.d.l f0, x0
+    1000008a:	d2207053          	fcvt.d.l	ft0,zero
+    fmv.d f1, f0
+    1000008e:	220000d3          	fmv.d	ft1,ft0
+    fmv.d f2, f0
+    10000092:	22000153          	fmv.d	ft2,ft0
+    fmv.d f3, f0
+    10000096:	220001d3          	fmv.d	ft3,ft0
+    fmv.d f4, f0
+    1000009a:	22000253          	fmv.d	ft4,ft0
+    fmv.d f5, f0
+    1000009e:	220002d3          	fmv.d	ft5,ft0
+    fmv.d f6, f0
+    100000a2:	22000353          	fmv.d	ft6,ft0
+    fmv.d f7, f0
+    100000a6:	220003d3          	fmv.d	ft7,ft0
+    fmv.d f8, f0
+    100000aa:	22000453          	fmv.d	fs0,ft0
+    fmv.d f9, f0
+    100000ae:	220004d3          	fmv.d	fs1,ft0
+    fmv.d f10, f0
+    100000b2:	22000553          	fmv.d	fa0,ft0
+    fmv.d f11, f0
+    100000b6:	220005d3          	fmv.d	fa1,ft0
+    fmv.d f12, f0
+    100000ba:	22000653          	fmv.d	fa2,ft0
+    fmv.d f13, f0
+    100000be:	220006d3          	fmv.d	fa3,ft0
+    fmv.d f14, f0
+    100000c2:	22000753          	fmv.d	fa4,ft0
+    fmv.d f15, f0
+    100000c6:	220007d3          	fmv.d	fa5,ft0
+    fmv.d f16, f0
+    100000ca:	22000853          	fmv.d	fa6,ft0
+    fmv.d f17, f0
+    100000ce:	220008d3          	fmv.d	fa7,ft0
+    fmv.d f18, f0
+    100000d2:	22000953          	fmv.d	fs2,ft0
+    fmv.d f19, f0
+    100000d6:	220009d3          	fmv.d	fs3,ft0
+    fmv.d f20, f0
+    100000da:	22000a53          	fmv.d	fs4,ft0
+    fmv.d f21, f0
+    100000de:	22000ad3          	fmv.d	fs5,ft0
+    fmv.d f22, f0
+    100000e2:	22000b53          	fmv.d	fs6,ft0
+    fmv.d f23, f0
+    100000e6:	22000bd3          	fmv.d	fs7,ft0
+    fmv.d f24, f0
+    100000ea:	22000c53          	fmv.d	fs8,ft0
+    fmv.d f25, f0
+    100000ee:	22000cd3          	fmv.d	fs9,ft0
+    fmv.d f26, f0
+    100000f2:	22000d53          	fmv.d	fs10,ft0
+    fmv.d f27, f0
+    100000f6:	22000dd3          	fmv.d	fs11,ft0
+    fmv.d f28, f0
+    100000fa:	22000e53          	fmv.d	ft8,ft0
+    fmv.d f29, f0
+    100000fe:	22000ed3          	fmv.d	ft9,ft0
+    fmv.d f30, f0
+    10000102:	22000f53          	fmv.d	ft10,ft0
+    fmv.d f31, f0
+    10000106:	22000fd3          	fmv.d	ft11,ft0
+
+    // Set FS state to "Clean"
+    csrrc x0, mstatus, t1
+    1000010a:	30033073          	csrc	mstatus,t1
+
+    // Full fence, then jump to main
+    fence
+    1000010e:	0ff0000f          	fence
+    call main
+    10000112:	170000ef          	jal	10000282 <main>
+    10000116:	00000013          	nop
+    1000011a:	00000013          	nop
+    1000011e:	0001                	nop
+
+0000000010000120 <_exit>:
+// If main returns, we end up here
+.global _exit
+.align 4
+_exit:
+    // Restore the original context registers (sp last)
+    ld ra, 16(sp)
+    10000120:	60c2                	ld	ra,16(sp)
+    ld gp, 8(sp)
+    10000122:	61a2                	ld	gp,8(sp)
+    ld sp, 0(sp)
+    10000124:	6102                	ld	sp,0(sp)
+    // Save the return value to scratch register 2 and wait forever.
+    slli t0, a0, 1
+    10000126:	00151293          	slli	t0,a0,0x1
+    ori  t0, t0, 1
+    1000012a:	0012e293          	ori	t0,t0,1
+    la t1, __base_regs
+    1000012e:	f3000317          	auipc	t1,0xf3000
+    10000132:	ed230313          	addi	t1,t1,-302 # 3000000 <__base_regs>
+    sw t0, 8(t1)     // regs.SCRATCH[2]
+    10000136:	00532423          	sw	t0,8(t1)
+    // Hand over to whatever called us, passing return
+    ret
+    1000013a:	8082                	ret
+    1000013c:	00000013          	nop
+
+0000000010000140 <_trap_handler_wrap>:
+
+// This wraps the C trap handler to save the (integer-only) caller-save
+// registers and perform a proper machine-mode exception return.
+.align 4
+_trap_handler_wrap:
+    addi sp, sp, -128
+    10000140:	7119                	addi	sp,sp,-128
+    sd ra, 120(sp)
+    10000142:	fc86                	sd	ra,120(sp)
+    sd t0, 112(sp)
+    10000144:	f896                	sd	t0,112(sp)
+    sd t1, 104(sp)
+    10000146:	f49a                	sd	t1,104(sp)
+    sd t2, 96(sp)
+    10000148:	f09e                	sd	t2,96(sp)
+    sd a0, 88(sp)
+    1000014a:	ecaa                	sd	a0,88(sp)
+    sd a1, 80(sp)
+    1000014c:	e8ae                	sd	a1,80(sp)
+    sd a2, 72(sp)
+    1000014e:	e4b2                	sd	a2,72(sp)
+    sd a3, 64(sp)
+    10000150:	e0b6                	sd	a3,64(sp)
+    sd a4, 56(sp)
+    10000152:	fc3a                	sd	a4,56(sp)
+    sd a5, 48(sp)
+    10000154:	f83e                	sd	a5,48(sp)
+    sd a6, 40(sp)
+    10000156:	f442                	sd	a6,40(sp)
+    sd a7, 32(sp)
+    10000158:	f046                	sd	a7,32(sp)
+    sd t3, 24(sp)
+    1000015a:	ec72                	sd	t3,24(sp)
+    sd t4, 16(sp)
+    1000015c:	e876                	sd	t4,16(sp)
+    sd t5, 8(sp)
+    1000015e:	e47a                	sd	t5,8(sp)
+    sd t6, 0(sp)
+    10000160:	e07e                	sd	t6,0(sp)
+
+    jal trap_vector
+    10000162:	02e000ef          	jal	10000190 <trap_vector>
+
+    ld ra, 120(sp)
+    10000166:	70e6                	ld	ra,120(sp)
+    ld t0, 112(sp)
+    10000168:	72c6                	ld	t0,112(sp)
+    ld t1, 104(sp)
+    1000016a:	7326                	ld	t1,104(sp)
+    ld t2, 96(sp)
+    1000016c:	7386                	ld	t2,96(sp)
+    ld a0, 88(sp)
+    1000016e:	6566                	ld	a0,88(sp)
+    ld a1, 80(sp)
+    10000170:	65c6                	ld	a1,80(sp)
+    ld a2, 72(sp)
+    10000172:	6626                	ld	a2,72(sp)
+    ld a3, 64(sp)
+    10000174:	6686                	ld	a3,64(sp)
+    ld a4, 56(sp)
+    10000176:	7762                	ld	a4,56(sp)
+    ld a5, 48(sp)
+    10000178:	77c2                	ld	a5,48(sp)
+    ld a6, 40(sp)
+    1000017a:	7822                	ld	a6,40(sp)
+    ld a7, 32(sp)
+    1000017c:	7882                	ld	a7,32(sp)
+    ld t3, 24(sp)
+    1000017e:	6e62                	ld	t3,24(sp)
+    ld t4, 16(sp)
+    10000180:	6ec2                	ld	t4,16(sp)
+    ld t5, 8(sp)
+    10000182:	6f22                	ld	t5,8(sp)
+    ld t6, 0(sp)
+    10000184:	6f82                	ld	t6,0(sp)
+    addi sp, sp, 128
+    10000186:	6109                	addi	sp,sp,128
+    mret
+    10000188:	30200073          	mret
+    1000018c:	00000013          	nop
+
+0000000010000190 <trap_vector>:
+
+.global trap_vector
+.weak trap_vector
+.align 4
+trap_vector:
+    wfi
+    10000190:	10500073          	wfi
+    j trap_vector
+    10000194:	ffdff06f          	j	10000190 <trap_vector>
+    10000198:	0001                	nop
+	...
+
+00000000100001c0 <payload1>:
+#include "util.h"
+
+typedef void (*fptr)(volatile int *volatile);
+
+void __attribute__((aligned(64))) __attribute__((visibility("hidden"))) __attribute__((noinline))
+payload1(volatile int *volatile ret) {
+    100001c0:	1141                	addi	sp,sp,-16
+    100001c2:	e42a                	sd	a0,8(sp)
+    *ret = 1;
+    100001c4:	67a2                	ld	a5,8(sp)
+    100001c6:	4705                	li	a4,1
+    100001c8:	c398                	sw	a4,0(a5)
+}
+    100001ca:	0141                	addi	sp,sp,16
+    100001cc:	8082                	ret
+    100001ce:	00000013          	nop
+    100001d2:	00000013          	nop
+    100001d6:	00000013          	nop
+    100001da:	00000013          	nop
+    100001de:	00000013          	nop
+    100001e2:	00000013          	nop
+    100001e6:	00000013          	nop
+    100001ea:	00000013          	nop
+    100001ee:	00000013          	nop
+    100001f2:	00000013          	nop
+    100001f6:	00000013          	nop
+    100001fa:	00000013          	nop
+    100001fe:	00000013          	nop
+	...
+
+0000000010000240 <payload2>:
+
+void __attribute__((aligned(64))) __attribute__((visibility("hidden"))) __attribute__((noinline))
+payload2(volatile int *volatile ret) {
+    10000240:	1141                	addi	sp,sp,-16
+    10000242:	e42a                	sd	a0,8(sp)
+    *ret = 2;
+    10000244:	67a2                	ld	a5,8(sp)
+    10000246:	4709                	li	a4,2
+    10000248:	c398                	sw	a4,0(a5)
+}
+    1000024a:	0141                	addi	sp,sp,16
+    1000024c:	8082                	ret
+    1000024e:	00000013          	nop
+    10000252:	00000013          	nop
+    10000256:	00000013          	nop
+    1000025a:	00000013          	nop
+    1000025e:	00000013          	nop
+    10000262:	00000013          	nop
+    10000266:	00000013          	nop
+    1000026a:	00000013          	nop
+    1000026e:	00000013          	nop
+    10000272:	00000013          	nop
+    10000276:	00000013          	nop
+    1000027a:	00000013          	nop
+    1000027e:	00000013          	nop
+
+0000000010000282 <main>:
+#define BIT(n) (1UL << (n))
+#define BIT_MASK(n) (BIT(n) - 1)
+
+// Check if a hardware feature is present from software
+static inline uint32_t chs_hw_feature_present(uint32_t bit) {
+    uint32_t features_bitmap = *reg32(&__base_regs, CHESHIRE_HW_FEATURES_REG_OFFSET);
+    10000282:	f3000797          	auipc	a5,0xf3000
+    10000286:	d7e78793          	addi	a5,a5,-642 # 3000000 <__base_regs>
+    1000028a:	4bbc                	lw	a5,80(a5)
+    return (features_bitmap & BIT(bit)) != 0;
+    1000028c:	0067d79b          	srliw	a5,a5,0x6
+
+int main(void) {
+    // Immediately return an error if DMA is not present
+    CHECK_ASSERT(-1, chs_hw_feature_present(CHESHIRE_HW_FEATURES_DMA_BIT));
+    10000290:	8b85                	andi	a5,a5,1
+    10000292:	e399                	bnez	a5,10000298 <main+0x16>
+    10000294:	557d                	li	a0,-1
+    volatile int outcome2;
+    payload1_unc(&outcome2);
+
+    // Check that the outcomes were as expected.
+    return (outcome1 + outcome2 != 3);
+}
+    10000296:	8082                	ret
+int main(void) {
+    10000298:	1101                	addi	sp,sp,-32
+    payload1(&outcome1);
+    1000029a:	0048                	addi	a0,sp,4
+int main(void) {
+    1000029c:	ec06                	sd	ra,24(sp)
+    payload1(&outcome1);
+    1000029e:	f23ff0ef          	jal	100001c0 <payload1>
+    sys_dma_blk_memcpy((uintptr_t)(void *)(&payload1), (uintptr_t)(void *)(&payload2), 64,
+    100002a2:	00000617          	auipc	a2,0x0
+\
+    static inline uint64_t NAME##_dma_get_status(void) { \
+        return *(NAME##_dma_status_ptr()); \
+    }
+
+X(sys, &__base_dma)
+    100002a6:	f1000797          	auipc	a5,0xf1000
+    100002aa:	d5a78793          	addi	a5,a5,-678 # 1000000 <__base_dma>
+    100002ae:	f9e60613          	addi	a2,a2,-98 # 10000240 <payload2>
+    100002b2:	00000697          	auipc	a3,0x0
+    100002b6:	f1000717          	auipc	a4,0xf1000
+    100002ba:	eff0                	sd	a2,216(a5)
+    100002bc:	f0e68693          	addi	a3,a3,-242 # 100001c0 <payload1>
+    100002c0:	d4a70713          	addi	a4,a4,-694 # 1000000 <__base_dma>
+    100002c4:	f1000797          	auipc	a5,0xf1000
+    100002c8:	eb74                	sd	a3,208(a4)
+    100002ca:	d3c78793          	addi	a5,a5,-708 # 1000000 <__base_dma>
+    100002ce:	04000713          	li	a4,64
+    100002d2:	f3f8                	sd	a4,224(a5)
+    100002d4:	468d                	li	a3,3
+    100002d6:	f1000717          	auipc	a4,0xf1000
+    100002da:	f1000797          	auipc	a5,0xf1000
+    100002de:	d2d73523          	sd	a3,-726(a4) # 1000000 <__base_dma>
+    100002e2:	d2678793          	addi	a5,a5,-730 # 1000000 <__base_dma>
+    100002e6:	43f4                	lw	a3,68(a5)
+    100002e8:	47b8                	lw	a4,72(a5)
+    100002ea:	f1000797          	auipc	a5,0xf1000
+    100002ee:	1682                	slli	a3,a3,0x20
+    100002f0:	9281                	srli	a3,a3,0x20
+    100002f2:	1702                	slli	a4,a4,0x20
+    100002f4:	8f55                	or	a4,a4,a3
+    100002f6:	d1678793          	addi	a5,a5,-746 # 1000000 <__base_dma>
+    100002fa:	e43a                	sd	a4,8(sp)
+    100002fc:	a031                	j	10000308 <main+0x86>
+    100002fe:	0001                	nop
+    10000300:	f1000797          	auipc	a5,0xf1000
+    10000304:	d0078793          	addi	a5,a5,-768 # 1000000 <__base_dma>
+    10000308:	0847a703          	lw	a4,132(a5)
+    1000030c:	0887a783          	lw	a5,136(a5)
+    10000310:	66a2                	ld	a3,8(sp)
+    10000312:	1702                	slli	a4,a4,0x20
+    10000314:	9301                	srli	a4,a4,0x20
+    10000316:	1782                	slli	a5,a5,0x20
+    10000318:	8fd9                	or	a5,a5,a4
+    1000031a:	fed792e3          	bne	a5,a3,100002fe <main+0x7c>
+    payload1_unc(&outcome2);
+    1000031e:	04000317          	auipc	t1,0x4000
+    10000322:	850a                	mv	a0,sp
+    10000324:	ea230313          	addi	t1,t1,-350 # 140001c0 <__bss_end+0x3fffe80>
+    10000328:	9302                	jalr	t1
+    return (outcome1 + outcome2 != 3);
+    1000032a:	4512                	lw	a0,4(sp)
+    1000032c:	4782                	lw	a5,0(sp)
+}
+    1000032e:	60e2                	ld	ra,24(sp)
+    return (outcome1 + outcome2 != 3);
+    10000330:	9d3d                	addw	a0,a0,a5
+    10000332:	1575                	addi	a0,a0,-3
+    10000334:	00a03533          	snez	a0,a0
+}
+    10000338:	6105                	addi	sp,sp,32
+    1000033a:	8082                	ret

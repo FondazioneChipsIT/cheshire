@@ -1,0 +1,633 @@
+
+/data/ytortorella/emulator/tender-release/cheshire/sw/tests/clic_basic.spm.elf:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000010000000 <__base_spm>:
+// Minimal CRT0
+.global _start
+.align 4
+_start:
+    // Globally disable Machine and Supervisor interrupts
+    csrrc x0, mstatus, 10
+    10000000:	30057073          	csrci	mstatus,10
+
+    // Park SMP harts
+    csrr t0, mhartid
+    10000004:	f14022f3          	csrr	t0,mhartid
+    beqz t0, 2f
+    10000008:	00028563          	beqz	t0,10000012 <__base_spm+0x12>
+1:
+    wfi
+    1000000c:	10500073          	wfi
+    j 1b
+    10000010:	bff5                	j	1000000c <__base_spm+0xc>
+2:
+    // Init stack and global pointer iff linked as nonzero
+    mv t1, sp
+    10000012:	830a                	mv	t1,sp
+    la t0, __stack_pointer$
+    10000014:	00000293          	li	t0,0
+    beqz t0, 1f
+    10000018:	00028363          	beqz	t0,1000001e <__base_spm+0x1e>
+    mv sp, t0
+    1000001c:	8116                	mv	sp,t0
+1:  .option push
+    .option norelax
+    la t0, __global_pointer$
+    1000001e:	00000297          	auipc	t0,0x0
+    10000022:	45228293          	addi	t0,t0,1106 # 10000470 <__bss_end>
+    beqz t0, 1f
+    10000026:	00028363          	beqz	t0,1000002c <__base_spm+0x2c>
+    mv gp, t0
+    1000002a:	8196                	mv	gp,t0
+1:  .option pop
+
+    // Store existing stack, global, return pointers on new stack
+    addi sp, sp, -24
+    1000002c:	1121                	addi	sp,sp,-24
+    sd t1, 0(sp)
+    1000002e:	e01a                	sd	t1,0(sp)
+    sd gp, 8(sp)
+    10000030:	e40e                	sd	gp,8(sp)
+    sd ra, 16(sp)
+    10000032:	e806                	sd	ra,16(sp)
+
+    // Set trap vector
+    la t0, _trap_handler_wrap
+    10000034:	00000297          	auipc	t0,0x0
+    10000038:	10c28293          	addi	t0,t0,268 # 10000140 <_trap_handler_wrap>
+    csrrw x0, mtvec, t0
+    1000003c:	30529073          	csrw	mtvec,t0
+
+    // Zero the .bss section
+    la t0, __bss_start      // t0 = bss start address
+    10000040:	00018293          	mv	t0,gp
+    la t1, __bss_end        // t1 = bss end address
+    10000044:	00018313          	mv	t1,gp
+    sub t2, t1, t0          // t2 = #bytes to zero
+    10000048:	405303b3          	sub	t2,t1,t0
+    li a0, 0
+    1000004c:	4501                	li	a0,0
+
+000000001000004e <_zero_bss_loop>:
+
+_zero_bss_loop:
+    addi t4, t2, -32
+    1000004e:	fe038e93          	addi	t4,t2,-32
+    blez t2, _fp_init           // t2 <= 0? => No bss to zero
+    10000052:	02705863          	blez	t2,10000082 <_fp_init>
+    blt t4, x0, _zero_bss_rem   // t4 <  0? => Less than 4 words left
+    10000056:	020ec063          	bltz	t4,10000076 <_zero_bss_rem>
+    sd a0, 0(t0)
+    1000005a:	00a2b023          	sd	a0,0(t0)
+    sd a0, 8(t0)
+    1000005e:	00a2b423          	sd	a0,8(t0)
+    sd a0, 16(t0)
+    10000062:	00a2b823          	sd	a0,16(t0)
+    sd a0, 24(t0)
+    10000066:	00a2bc23          	sd	a0,24(t0)
+    addi t2, t2, -32
+    1000006a:	1381                	addi	t2,t2,-32
+    addi t0, t0, 32
+    1000006c:	02028293          	addi	t0,t0,32
+    bgt t2, x0, _zero_bss_loop  // Still more to go
+    10000070:	fc704fe3          	bgtz	t2,1000004e <_zero_bss_loop>
+    j _fp_init
+    10000074:	a039                	j	10000082 <_fp_init>
+
+0000000010000076 <_zero_bss_rem>:
+
+_zero_bss_rem:
+    sb a0, 0(t0)
+    10000076:	00a28023          	sb	a0,0(t0)
+    addi t2, t2, -1
+    1000007a:	13fd                	addi	t2,t2,-1
+    addi t0, t0, 1
+    1000007c:	0285                	addi	t0,t0,1
+    bgt t2, x0, _zero_bss_rem
+    1000007e:	fe704ce3          	bgtz	t2,10000076 <_zero_bss_rem>
+
+0000000010000082 <_fp_init>:
+
+_fp_init:
+    // Set FS state to "Initial", enabling FP instructions
+    li t1, 1
+    10000082:	4305                	li	t1,1
+    slli t1, t1, 13
+    10000084:	0336                	slli	t1,t1,0xd
+    csrs mstatus, t1
+    10000086:	30032073          	csrs	mstatus,t1
+
+    // Clear all 32 double FP registers
+    fcvt.d.l f0, x0
+    1000008a:	d2207053          	fcvt.d.l	ft0,zero
+    fmv.d f1, f0
+    1000008e:	220000d3          	fmv.d	ft1,ft0
+    fmv.d f2, f0
+    10000092:	22000153          	fmv.d	ft2,ft0
+    fmv.d f3, f0
+    10000096:	220001d3          	fmv.d	ft3,ft0
+    fmv.d f4, f0
+    1000009a:	22000253          	fmv.d	ft4,ft0
+    fmv.d f5, f0
+    1000009e:	220002d3          	fmv.d	ft5,ft0
+    fmv.d f6, f0
+    100000a2:	22000353          	fmv.d	ft6,ft0
+    fmv.d f7, f0
+    100000a6:	220003d3          	fmv.d	ft7,ft0
+    fmv.d f8, f0
+    100000aa:	22000453          	fmv.d	fs0,ft0
+    fmv.d f9, f0
+    100000ae:	220004d3          	fmv.d	fs1,ft0
+    fmv.d f10, f0
+    100000b2:	22000553          	fmv.d	fa0,ft0
+    fmv.d f11, f0
+    100000b6:	220005d3          	fmv.d	fa1,ft0
+    fmv.d f12, f0
+    100000ba:	22000653          	fmv.d	fa2,ft0
+    fmv.d f13, f0
+    100000be:	220006d3          	fmv.d	fa3,ft0
+    fmv.d f14, f0
+    100000c2:	22000753          	fmv.d	fa4,ft0
+    fmv.d f15, f0
+    100000c6:	220007d3          	fmv.d	fa5,ft0
+    fmv.d f16, f0
+    100000ca:	22000853          	fmv.d	fa6,ft0
+    fmv.d f17, f0
+    100000ce:	220008d3          	fmv.d	fa7,ft0
+    fmv.d f18, f0
+    100000d2:	22000953          	fmv.d	fs2,ft0
+    fmv.d f19, f0
+    100000d6:	220009d3          	fmv.d	fs3,ft0
+    fmv.d f20, f0
+    100000da:	22000a53          	fmv.d	fs4,ft0
+    fmv.d f21, f0
+    100000de:	22000ad3          	fmv.d	fs5,ft0
+    fmv.d f22, f0
+    100000e2:	22000b53          	fmv.d	fs6,ft0
+    fmv.d f23, f0
+    100000e6:	22000bd3          	fmv.d	fs7,ft0
+    fmv.d f24, f0
+    100000ea:	22000c53          	fmv.d	fs8,ft0
+    fmv.d f25, f0
+    100000ee:	22000cd3          	fmv.d	fs9,ft0
+    fmv.d f26, f0
+    100000f2:	22000d53          	fmv.d	fs10,ft0
+    fmv.d f27, f0
+    100000f6:	22000dd3          	fmv.d	fs11,ft0
+    fmv.d f28, f0
+    100000fa:	22000e53          	fmv.d	ft8,ft0
+    fmv.d f29, f0
+    100000fe:	22000ed3          	fmv.d	ft9,ft0
+    fmv.d f30, f0
+    10000102:	22000f53          	fmv.d	ft10,ft0
+    fmv.d f31, f0
+    10000106:	22000fd3          	fmv.d	ft11,ft0
+
+    // Set FS state to "Clean"
+    csrrc x0, mstatus, t1
+    1000010a:	30033073          	csrc	mstatus,t1
+
+    // Full fence, then jump to main
+    fence
+    1000010e:	0ff0000f          	fence
+    call main
+    10000112:	0ee000ef          	jal	10000200 <main>
+    10000116:	00000013          	nop
+    1000011a:	00000013          	nop
+    1000011e:	0001                	nop
+
+0000000010000120 <_exit>:
+// If main returns, we end up here
+.global _exit
+.align 4
+_exit:
+    // Restore the original context registers (sp last)
+    ld ra, 16(sp)
+    10000120:	60c2                	ld	ra,16(sp)
+    ld gp, 8(sp)
+    10000122:	61a2                	ld	gp,8(sp)
+    ld sp, 0(sp)
+    10000124:	6102                	ld	sp,0(sp)
+    // Save the return value to scratch register 2 and wait forever.
+    slli t0, a0, 1
+    10000126:	00151293          	slli	t0,a0,0x1
+    ori  t0, t0, 1
+    1000012a:	0012e293          	ori	t0,t0,1
+    la t1, __base_regs
+    1000012e:	f3000317          	auipc	t1,0xf3000
+    10000132:	ed230313          	addi	t1,t1,-302 # 3000000 <__base_regs>
+    sw t0, 8(t1)     // regs.SCRATCH[2]
+    10000136:	00532423          	sw	t0,8(t1)
+    // Hand over to whatever called us, passing return
+    ret
+    1000013a:	8082                	ret
+    1000013c:	00000013          	nop
+
+0000000010000140 <_trap_handler_wrap>:
+
+// This wraps the C trap handler to save the (integer-only) caller-save
+// registers and perform a proper machine-mode exception return.
+.align 4
+_trap_handler_wrap:
+    addi sp, sp, -128
+    10000140:	7119                	addi	sp,sp,-128
+    sd ra, 120(sp)
+    10000142:	fc86                	sd	ra,120(sp)
+    sd t0, 112(sp)
+    10000144:	f896                	sd	t0,112(sp)
+    sd t1, 104(sp)
+    10000146:	f49a                	sd	t1,104(sp)
+    sd t2, 96(sp)
+    10000148:	f09e                	sd	t2,96(sp)
+    sd a0, 88(sp)
+    1000014a:	ecaa                	sd	a0,88(sp)
+    sd a1, 80(sp)
+    1000014c:	e8ae                	sd	a1,80(sp)
+    sd a2, 72(sp)
+    1000014e:	e4b2                	sd	a2,72(sp)
+    sd a3, 64(sp)
+    10000150:	e0b6                	sd	a3,64(sp)
+    sd a4, 56(sp)
+    10000152:	fc3a                	sd	a4,56(sp)
+    sd a5, 48(sp)
+    10000154:	f83e                	sd	a5,48(sp)
+    sd a6, 40(sp)
+    10000156:	f442                	sd	a6,40(sp)
+    sd a7, 32(sp)
+    10000158:	f046                	sd	a7,32(sp)
+    sd t3, 24(sp)
+    1000015a:	ec72                	sd	t3,24(sp)
+    sd t4, 16(sp)
+    1000015c:	e876                	sd	t4,16(sp)
+    sd t5, 8(sp)
+    1000015e:	e47a                	sd	t5,8(sp)
+    sd t6, 0(sp)
+    10000160:	e07e                	sd	t6,0(sp)
+
+    jal trap_vector
+    10000162:	02e000ef          	jal	10000190 <trap_vector>
+
+    ld ra, 120(sp)
+    10000166:	70e6                	ld	ra,120(sp)
+    ld t0, 112(sp)
+    10000168:	72c6                	ld	t0,112(sp)
+    ld t1, 104(sp)
+    1000016a:	7326                	ld	t1,104(sp)
+    ld t2, 96(sp)
+    1000016c:	7386                	ld	t2,96(sp)
+    ld a0, 88(sp)
+    1000016e:	6566                	ld	a0,88(sp)
+    ld a1, 80(sp)
+    10000170:	65c6                	ld	a1,80(sp)
+    ld a2, 72(sp)
+    10000172:	6626                	ld	a2,72(sp)
+    ld a3, 64(sp)
+    10000174:	6686                	ld	a3,64(sp)
+    ld a4, 56(sp)
+    10000176:	7762                	ld	a4,56(sp)
+    ld a5, 48(sp)
+    10000178:	77c2                	ld	a5,48(sp)
+    ld a6, 40(sp)
+    1000017a:	7822                	ld	a6,40(sp)
+    ld a7, 32(sp)
+    1000017c:	7882                	ld	a7,32(sp)
+    ld t3, 24(sp)
+    1000017e:	6e62                	ld	t3,24(sp)
+    ld t4, 16(sp)
+    10000180:	6ec2                	ld	t4,16(sp)
+    ld t5, 8(sp)
+    10000182:	6f22                	ld	t5,8(sp)
+    ld t6, 0(sp)
+    10000184:	6f82                	ld	t6,0(sp)
+    addi sp, sp, 128
+    10000186:	6109                	addi	sp,sp,128
+    mret
+    10000188:	30200073          	mret
+    1000018c:	00000013          	nop
+
+0000000010000190 <trap_vector>:
+
+.global trap_vector
+.weak trap_vector
+.align 4
+trap_vector:
+    wfi
+    10000190:	10500073          	wfi
+    j trap_vector
+    10000194:	ffdff06f          	j	10000190 <trap_vector>
+    10000198:	0001                	nop
+	...
+
+0000000010000200 <main>:
+.align
+.option norvc
+.global main
+main:
+  // Enable interrupts (set mstatus.mie)
+  csrsi mstatus, 0x8
+    10000200:	30046073          	csrsi	mstatus,8
+
+  // Activate CLIC mode
+  la t0, mtvec_handler_fail
+    10000204:	00000297          	auipc	t0,0x0
+    10000208:	1fc28293          	addi	t0,t0,508 # 10000400 <mtvec_handler_fail>
+  ori t0, t0, 0x3
+    1000020c:	0032e293          	ori	t0,t0,3
+  csrrw s0, mtvec, t0
+    10000210:	30529473          	csrrw	s0,mtvec,t0
+
+  // Write mtvt base
+  la t0, mtvt_handler
+    10000214:	00000297          	auipc	t0,0x0
+    10000218:	0ec28293          	addi	t0,t0,236 # 10000300 <mtvt_handler>
+  csrw 0x307, t0 // mtvt
+    1000021c:	30729073          	csrw	0x307,t0
+
+  // Set shv of irq 31
+  li   t0, CLIC_CLICINT_REG(31)
+    10000220:	080012b7          	lui	t0,0x8001
+    10000224:	07c2829b          	addiw	t0,t0,124 # 800107c <__base_clic+0x107c>
+  li   t1, 1 << CLIC_CLICINT_ATTR_SHV_OFFSET
+    10000228:	00010337          	lui	t1,0x10
+  sw   t1, 0(t0)
+    1000022c:	0062a023          	sw	t1,0(t0)
+
+  // set trigger type to edge-triggered
+  li   t0, CLIC_CLICINT_REG(31)
+    10000230:	080012b7          	lui	t0,0x8001
+    10000234:	07c2829b          	addiw	t0,t0,124 # 800107c <__base_clic+0x107c>
+  lw   t1, 0(t0)
+    10000238:	0002a303          	lw	t1,0(t0)
+  li   t2, 1 << CLIC_CLICINT_ATTR_TRIG_OFFSET
+    1000023c:	000203b7          	lui	t2,0x20
+  or   t1, t1, t2
+    10000240:	00736333          	or	t1,t1,t2
+  sw   t1, 0(t0)
+    10000244:	0062a023          	sw	t1,0(t0)
+
+  // enable irq31 via SW by writing to clicintip31
+  li   t0, CLIC_CLICINT_REG(31)
+    10000248:	080012b7          	lui	t0,0x8001
+    1000024c:	07c2829b          	addiw	t0,t0,124 # 800107c <__base_clic+0x107c>
+  lw   t1, 0(t0)
+    10000250:	0002a303          	lw	t1,0(t0)
+  li   t2, 1 << CLIC_CLICINT_IP_OFFSET
+    10000254:	00100393          	li	t2,1
+  or   t1, t1, t2
+    10000258:	00736333          	or	t1,t1,t2
+  sw   t1, 0(t0)
+    1000025c:	0062a023          	sw	t1,0(t0)
+
+  // set number of bits for level encoding
+  li   t0, CLIC_CLICCFG_REG
+    10000260:	080002b7          	lui	t0,0x8000
+  li   t1, 0x4 << 1
+    10000264:	00800313          	li	t1,8
+  sw   t1, 0(t0)
+    10000268:	0062a023          	sw	t1,0(t0) # 8000000 <__base_clic>
+
+  // set interrupt level and priority for interrupt 31
+  li   t0, CLIC_CLICINT_REG(31)
+    1000026c:	080012b7          	lui	t0,0x8001
+    10000270:	07c2829b          	addiw	t0,t0,124 # 800107c <__base_clic+0x107c>
+  lw   t1, 0(t0)
+    10000274:	0002a303          	lw	t1,0(t0)
+  li   t2, 0xaa << CLIC_CLICINT_CTL_OFFSET
+    10000278:	0550039b          	addiw	t2,zero,85
+    1000027c:	01939393          	slli	t2,t2,0x19
+  or   t1, t1, t2
+    10000280:	00736333          	or	t1,t1,t2
+  sw   t1, 0(t0)
+    10000284:	0062a023          	sw	t1,0(t0)
+
+  // raise interrupt threshold to max and check that the interrupt doesn't fire yet
+  li   a0, 0x1
+    10000288:	00100513          	li	a0,1
+  li   t0, 0xff
+    1000028c:	0ff00293          	li	t0,255
+  csrw 0x347, t0 // mintthresh
+    10000290:	34729073          	csrw	0x347,t0
+  li   t0, CLIC_CLICINT_REG(31)
+    10000294:	080012b7          	lui	t0,0x8001
+    10000298:	07c2829b          	addiw	t0,t0,124 # 800107c <__base_clic+0x107c>
+  lw   t1, 0(t0)
+    1000029c:	0002a303          	lw	t1,0(t0)
+  li   t2, 1 << CLIC_CLICINT_IE_OFFSET
+    100002a0:	10000393          	li	t2,256
+  or   t1, t1, t2
+    100002a4:	00736333          	or	t1,t1,t2
+  sw   t1, 0(t0)
+    100002a8:	0062a023          	sw	t1,0(t0)
+
+  // wait
+  li t0, 500
+    100002ac:	1f400293          	li	t0,500
+1:
+  addi t0, t0, -1
+    100002b0:	fff28293          	addi	t0,t0,-1
+  bnez t0, 1b
+    100002b4:	fe029ee3          	bnez	t0,100002b0 <main+0xb0>
+
+  // lower interrupt threshold (interrupt should happen)
+  li   a0, 0x0
+    100002b8:	00000513          	li	a0,0
+  li   t0, 0x0
+    100002bc:	00000293          	li	t0,0
+  csrw 0x347, t0 // mintthresh
+    100002c0:	34729073          	csrw	0x347,t0
+
+  // wait
+  li t0, 500
+    100002c4:	1f400293          	li	t0,500
+2:
+  addi t0, t0, -1
+    100002c8:	fff28293          	addi	t0,t0,-1
+  bnez t0, 2b
+    100002cc:	fe029ee3          	bnez	t0,100002c8 <main+0xc8>
+
+  j fail_restore
+    100002d0:	0100006f          	j	100002e0 <fail_restore>
+
+00000000100002d4 <pass_restore>:
+
+pass_restore:
+  csrw mtvec, s0
+    100002d4:	30541073          	csrw	mtvec,s0
+  li a0, 0
+    100002d8:	00000513          	li	a0,0
+  ret
+    100002dc:	00008067          	ret
+
+00000000100002e0 <fail_restore>:
+
+fail_restore:
+  csrw mtvec, s0
+    100002e0:	30541073          	csrw	mtvec,s0
+  li a0, 1
+    100002e4:	00100513          	li	a0,1
+  ret
+    100002e8:	00008067          	ret
+
+00000000100002ec <thirtyone>:
+
+thirtyone:
+  // a0=0: we should not get here, fail. else: we expect to get here, pass.
+  beqz a0, pass_restore
+    100002ec:	fe0504e3          	beqz	a0,100002d4 <pass_restore>
+  j fail_restore
+    100002f0:	ff1ff06f          	j	100002e0 <fail_restore>
+    100002f4:	00000013          	nop
+    100002f8:	00000013          	nop
+    100002fc:	00000013          	nop
+
+0000000010000300 <mtvt_handler>:
+
+  .align 8
+  .global mtvt_handler
+mtvt_handler:
+  j fail_restore
+    10000300:	fe1ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000304:	fddff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000308:	fd9ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    1000030c:	fd5ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000310:	fd1ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000314:	fcdff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000318:	fc9ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    1000031c:	fc5ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000320:	fc1ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000324:	fbdff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000328:	fb9ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    1000032c:	fb5ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000330:	fb1ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000334:	fadff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000338:	fa9ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    1000033c:	fa5ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000340:	fa1ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000344:	f9dff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000348:	f99ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    1000034c:	f95ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000350:	f91ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000354:	f8dff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000358:	f89ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    1000035c:	f85ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000360:	f81ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000364:	f7dff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000368:	f79ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    1000036c:	f75ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000370:	f71ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000374:	f6dff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000378:	f69ff06f          	j	100002e0 <fail_restore>
+  j thirtyone
+    1000037c:	f71ff06f          	j	100002ec <thirtyone>
+  j fail_restore
+    10000380:	f61ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000384:	f5dff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000388:	f59ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    1000038c:	f55ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000390:	f51ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000394:	f4dff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    10000398:	f49ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    1000039c:	f45ff06f          	j	100002e0 <fail_restore>
+  j fail_restore
+    100003a0:	f41ff06f          	j	100002e0 <fail_restore>
+    100003a4:	00000013          	nop
+    100003a8:	00000013          	nop
+    100003ac:	00000013          	nop
+    100003b0:	00000013          	nop
+    100003b4:	00000013          	nop
+    100003b8:	00000013          	nop
+    100003bc:	00000013          	nop
+    100003c0:	00000013          	nop
+    100003c4:	00000013          	nop
+    100003c8:	00000013          	nop
+    100003cc:	00000013          	nop
+    100003d0:	00000013          	nop
+    100003d4:	00000013          	nop
+    100003d8:	00000013          	nop
+    100003dc:	00000013          	nop
+    100003e0:	00000013          	nop
+    100003e4:	00000013          	nop
+    100003e8:	00000013          	nop
+    100003ec:	00000013          	nop
+    100003f0:	00000013          	nop
+    100003f4:	00000013          	nop
+    100003f8:	00000013          	nop
+    100003fc:	00000013          	nop
+
+0000000010000400 <mtvec_handler_fail>:
+
+  .align 8
+  .global mtvec_handler_fail
+mtvec_handler_fail:
+  // Restore mtvec and fail
+  csrw mtvec, s0
+    10000400:	30541073          	csrw	mtvec,s0
+  li a0, 1
+    10000404:	00100513          	li	a0,1
+  ret
+    10000408:	00008067          	ret
+    1000040c:	00000013          	nop
+    10000410:	00000013          	nop
+    10000414:	00000013          	nop
+    10000418:	00000013          	nop
+    1000041c:	00000013          	nop
+    10000420:	00000013          	nop
+    10000424:	00000013          	nop
+    10000428:	00000013          	nop
+    1000042c:	00000013          	nop
+    10000430:	00000013          	nop
+    10000434:	00000013          	nop
+    10000438:	00000013          	nop
+    1000043c:	00000013          	nop
+    10000440:	00000013          	nop
+    10000444:	00000013          	nop
+    10000448:	00000013          	nop
+    1000044c:	00000013          	nop
+    10000450:	00000013          	nop
+    10000454:	00000013          	nop
+    10000458:	00000013          	nop
+    1000045c:	00000013          	nop
+    10000460:	00000013          	nop
+    10000464:	00000013          	nop
+    10000468:	00000013          	nop
+    1000046c:	00000013          	nop

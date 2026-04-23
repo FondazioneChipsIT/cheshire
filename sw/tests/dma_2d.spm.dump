@@ -1,0 +1,505 @@
+
+/data/ytortorella/emulator/tender-release/cheshire/sw/tests/dma_2d.spm.elf:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000010000000 <__base_spm>:
+// Minimal CRT0
+.global _start
+.align 4
+_start:
+    // Globally disable Machine and Supervisor interrupts
+    csrrc x0, mstatus, 10
+    10000000:	30057073          	csrci	mstatus,10
+
+    // Park SMP harts
+    csrr t0, mhartid
+    10000004:	f14022f3          	csrr	t0,mhartid
+    beqz t0, 2f
+    10000008:	00028563          	beqz	t0,10000012 <__base_spm+0x12>
+1:
+    wfi
+    1000000c:	10500073          	wfi
+    j 1b
+    10000010:	bff5                	j	1000000c <__base_spm+0xc>
+2:
+    // Init stack and global pointer iff linked as nonzero
+    mv t1, sp
+    10000012:	830a                	mv	t1,sp
+    la t0, __stack_pointer$
+    10000014:	00000293          	li	t0,0
+    beqz t0, 1f
+    10000018:	00028363          	beqz	t0,1000001e <__base_spm+0x1e>
+    mv sp, t0
+    1000001c:	8116                	mv	sp,t0
+1:  .option push
+    .option norelax
+    la t0, __global_pointer$
+    1000001e:	00000297          	auipc	t0,0x0
+    10000022:	31128293          	addi	t0,t0,785 # 1000032f <__global_pointer$>
+    beqz t0, 1f
+    10000026:	00028363          	beqz	t0,1000002c <__base_spm+0x2c>
+    mv gp, t0
+    1000002a:	8196                	mv	gp,t0
+1:  .option pop
+
+    // Store existing stack, global, return pointers on new stack
+    addi sp, sp, -24
+    1000002c:	1121                	addi	sp,sp,-24
+    sd t1, 0(sp)
+    1000002e:	e01a                	sd	t1,0(sp)
+    sd gp, 8(sp)
+    10000030:	e40e                	sd	gp,8(sp)
+    sd ra, 16(sp)
+    10000032:	e806                	sd	ra,16(sp)
+
+    // Set trap vector
+    la t0, _trap_handler_wrap
+    10000034:	00000297          	auipc	t0,0x0
+    10000038:	10c28293          	addi	t0,t0,268 # 10000140 <_trap_handler_wrap>
+    csrrw x0, mtvec, t0
+    1000003c:	30529073          	csrw	mtvec,t0
+
+    // Zero the .bss section
+    la t0, __bss_start      // t0 = bss start address
+    10000040:	02118293          	addi	t0,gp,33 # 10000350 <__bss_end>
+    la t1, __bss_end        // t1 = bss end address
+    10000044:	02118313          	addi	t1,gp,33 # 10000350 <__bss_end>
+    sub t2, t1, t0          // t2 = #bytes to zero
+    10000048:	405303b3          	sub	t2,t1,t0
+    li a0, 0
+    1000004c:	4501                	li	a0,0
+
+000000001000004e <_zero_bss_loop>:
+
+_zero_bss_loop:
+    addi t4, t2, -32
+    1000004e:	fe038e93          	addi	t4,t2,-32
+    blez t2, _fp_init           // t2 <= 0? => No bss to zero
+    10000052:	02705863          	blez	t2,10000082 <_fp_init>
+    blt t4, x0, _zero_bss_rem   // t4 <  0? => Less than 4 words left
+    10000056:	020ec063          	bltz	t4,10000076 <_zero_bss_rem>
+    sd a0, 0(t0)
+    1000005a:	00a2b023          	sd	a0,0(t0)
+    sd a0, 8(t0)
+    1000005e:	00a2b423          	sd	a0,8(t0)
+    sd a0, 16(t0)
+    10000062:	00a2b823          	sd	a0,16(t0)
+    sd a0, 24(t0)
+    10000066:	00a2bc23          	sd	a0,24(t0)
+    addi t2, t2, -32
+    1000006a:	1381                	addi	t2,t2,-32
+    addi t0, t0, 32
+    1000006c:	02028293          	addi	t0,t0,32
+    bgt t2, x0, _zero_bss_loop  // Still more to go
+    10000070:	fc704fe3          	bgtz	t2,1000004e <_zero_bss_loop>
+    j _fp_init
+    10000074:	a039                	j	10000082 <_fp_init>
+
+0000000010000076 <_zero_bss_rem>:
+
+_zero_bss_rem:
+    sb a0, 0(t0)
+    10000076:	00a28023          	sb	a0,0(t0)
+    addi t2, t2, -1
+    1000007a:	13fd                	addi	t2,t2,-1
+    addi t0, t0, 1
+    1000007c:	0285                	addi	t0,t0,1
+    bgt t2, x0, _zero_bss_rem
+    1000007e:	fe704ce3          	bgtz	t2,10000076 <_zero_bss_rem>
+
+0000000010000082 <_fp_init>:
+
+_fp_init:
+    // Set FS state to "Initial", enabling FP instructions
+    li t1, 1
+    10000082:	4305                	li	t1,1
+    slli t1, t1, 13
+    10000084:	0336                	slli	t1,t1,0xd
+    csrs mstatus, t1
+    10000086:	30032073          	csrs	mstatus,t1
+
+    // Clear all 32 double FP registers
+    fcvt.d.l f0, x0
+    1000008a:	d2207053          	fcvt.d.l	ft0,zero
+    fmv.d f1, f0
+    1000008e:	220000d3          	fmv.d	ft1,ft0
+    fmv.d f2, f0
+    10000092:	22000153          	fmv.d	ft2,ft0
+    fmv.d f3, f0
+    10000096:	220001d3          	fmv.d	ft3,ft0
+    fmv.d f4, f0
+    1000009a:	22000253          	fmv.d	ft4,ft0
+    fmv.d f5, f0
+    1000009e:	220002d3          	fmv.d	ft5,ft0
+    fmv.d f6, f0
+    100000a2:	22000353          	fmv.d	ft6,ft0
+    fmv.d f7, f0
+    100000a6:	220003d3          	fmv.d	ft7,ft0
+    fmv.d f8, f0
+    100000aa:	22000453          	fmv.d	fs0,ft0
+    fmv.d f9, f0
+    100000ae:	220004d3          	fmv.d	fs1,ft0
+    fmv.d f10, f0
+    100000b2:	22000553          	fmv.d	fa0,ft0
+    fmv.d f11, f0
+    100000b6:	220005d3          	fmv.d	fa1,ft0
+    fmv.d f12, f0
+    100000ba:	22000653          	fmv.d	fa2,ft0
+    fmv.d f13, f0
+    100000be:	220006d3          	fmv.d	fa3,ft0
+    fmv.d f14, f0
+    100000c2:	22000753          	fmv.d	fa4,ft0
+    fmv.d f15, f0
+    100000c6:	220007d3          	fmv.d	fa5,ft0
+    fmv.d f16, f0
+    100000ca:	22000853          	fmv.d	fa6,ft0
+    fmv.d f17, f0
+    100000ce:	220008d3          	fmv.d	fa7,ft0
+    fmv.d f18, f0
+    100000d2:	22000953          	fmv.d	fs2,ft0
+    fmv.d f19, f0
+    100000d6:	220009d3          	fmv.d	fs3,ft0
+    fmv.d f20, f0
+    100000da:	22000a53          	fmv.d	fs4,ft0
+    fmv.d f21, f0
+    100000de:	22000ad3          	fmv.d	fs5,ft0
+    fmv.d f22, f0
+    100000e2:	22000b53          	fmv.d	fs6,ft0
+    fmv.d f23, f0
+    100000e6:	22000bd3          	fmv.d	fs7,ft0
+    fmv.d f24, f0
+    100000ea:	22000c53          	fmv.d	fs8,ft0
+    fmv.d f25, f0
+    100000ee:	22000cd3          	fmv.d	fs9,ft0
+    fmv.d f26, f0
+    100000f2:	22000d53          	fmv.d	fs10,ft0
+    fmv.d f27, f0
+    100000f6:	22000dd3          	fmv.d	fs11,ft0
+    fmv.d f28, f0
+    100000fa:	22000e53          	fmv.d	ft8,ft0
+    fmv.d f29, f0
+    100000fe:	22000ed3          	fmv.d	ft9,ft0
+    fmv.d f30, f0
+    10000102:	22000f53          	fmv.d	ft10,ft0
+    fmv.d f31, f0
+    10000106:	22000fd3          	fmv.d	ft11,ft0
+
+    // Set FS state to "Clean"
+    csrrc x0, mstatus, t1
+    1000010a:	30033073          	csrc	mstatus,t1
+
+    // Full fence, then jump to main
+    fence
+    1000010e:	0ff0000f          	fence
+    call main
+    10000112:	088000ef          	jal	1000019a <main>
+    10000116:	00000013          	nop
+    1000011a:	00000013          	nop
+    1000011e:	0001                	nop
+
+0000000010000120 <_exit>:
+// If main returns, we end up here
+.global _exit
+.align 4
+_exit:
+    // Restore the original context registers (sp last)
+    ld ra, 16(sp)
+    10000120:	60c2                	ld	ra,16(sp)
+    ld gp, 8(sp)
+    10000122:	61a2                	ld	gp,8(sp)
+    ld sp, 0(sp)
+    10000124:	6102                	ld	sp,0(sp)
+    // Save the return value to scratch register 2 and wait forever.
+    slli t0, a0, 1
+    10000126:	00151293          	slli	t0,a0,0x1
+    ori  t0, t0, 1
+    1000012a:	0012e293          	ori	t0,t0,1
+    la t1, __base_regs
+    1000012e:	f3000317          	auipc	t1,0xf3000
+    10000132:	ed230313          	addi	t1,t1,-302 # 3000000 <__base_regs>
+    sw t0, 8(t1)     // regs.SCRATCH[2]
+    10000136:	00532423          	sw	t0,8(t1)
+    // Hand over to whatever called us, passing return
+    ret
+    1000013a:	8082                	ret
+    1000013c:	00000013          	nop
+
+0000000010000140 <_trap_handler_wrap>:
+
+// This wraps the C trap handler to save the (integer-only) caller-save
+// registers and perform a proper machine-mode exception return.
+.align 4
+_trap_handler_wrap:
+    addi sp, sp, -128
+    10000140:	7119                	addi	sp,sp,-128
+    sd ra, 120(sp)
+    10000142:	fc86                	sd	ra,120(sp)
+    sd t0, 112(sp)
+    10000144:	f896                	sd	t0,112(sp)
+    sd t1, 104(sp)
+    10000146:	f49a                	sd	t1,104(sp)
+    sd t2, 96(sp)
+    10000148:	f09e                	sd	t2,96(sp)
+    sd a0, 88(sp)
+    1000014a:	ecaa                	sd	a0,88(sp)
+    sd a1, 80(sp)
+    1000014c:	e8ae                	sd	a1,80(sp)
+    sd a2, 72(sp)
+    1000014e:	e4b2                	sd	a2,72(sp)
+    sd a3, 64(sp)
+    10000150:	e0b6                	sd	a3,64(sp)
+    sd a4, 56(sp)
+    10000152:	fc3a                	sd	a4,56(sp)
+    sd a5, 48(sp)
+    10000154:	f83e                	sd	a5,48(sp)
+    sd a6, 40(sp)
+    10000156:	f442                	sd	a6,40(sp)
+    sd a7, 32(sp)
+    10000158:	f046                	sd	a7,32(sp)
+    sd t3, 24(sp)
+    1000015a:	ec72                	sd	t3,24(sp)
+    sd t4, 16(sp)
+    1000015c:	e876                	sd	t4,16(sp)
+    sd t5, 8(sp)
+    1000015e:	e47a                	sd	t5,8(sp)
+    sd t6, 0(sp)
+    10000160:	e07e                	sd	t6,0(sp)
+
+    jal trap_vector
+    10000162:	02e000ef          	jal	10000190 <trap_vector>
+
+    ld ra, 120(sp)
+    10000166:	70e6                	ld	ra,120(sp)
+    ld t0, 112(sp)
+    10000168:	72c6                	ld	t0,112(sp)
+    ld t1, 104(sp)
+    1000016a:	7326                	ld	t1,104(sp)
+    ld t2, 96(sp)
+    1000016c:	7386                	ld	t2,96(sp)
+    ld a0, 88(sp)
+    1000016e:	6566                	ld	a0,88(sp)
+    ld a1, 80(sp)
+    10000170:	65c6                	ld	a1,80(sp)
+    ld a2, 72(sp)
+    10000172:	6626                	ld	a2,72(sp)
+    ld a3, 64(sp)
+    10000174:	6686                	ld	a3,64(sp)
+    ld a4, 56(sp)
+    10000176:	7762                	ld	a4,56(sp)
+    ld a5, 48(sp)
+    10000178:	77c2                	ld	a5,48(sp)
+    ld a6, 40(sp)
+    1000017a:	7822                	ld	a6,40(sp)
+    ld a7, 32(sp)
+    1000017c:	7882                	ld	a7,32(sp)
+    ld t3, 24(sp)
+    1000017e:	6e62                	ld	t3,24(sp)
+    ld t4, 16(sp)
+    10000180:	6ec2                	ld	t4,16(sp)
+    ld t5, 8(sp)
+    10000182:	6f22                	ld	t5,8(sp)
+    ld t6, 0(sp)
+    10000184:	6f82                	ld	t6,0(sp)
+    addi sp, sp, 128
+    10000186:	6109                	addi	sp,sp,128
+    mret
+    10000188:	30200073          	mret
+    1000018c:	00000013          	nop
+
+0000000010000190 <trap_vector>:
+
+.global trap_vector
+.weak trap_vector
+.align 4
+trap_vector:
+    wfi
+    10000190:	10500073          	wfi
+    j trap_vector
+    10000194:	ffdff06f          	j	10000190 <trap_vector>
+    10000198:	0001                	nop
+
+000000001000019a <main>:
+#define BIT(n) (1UL << (n))
+#define BIT_MASK(n) (BIT(n) - 1)
+
+// Check if a hardware feature is present from software
+static inline uint32_t chs_hw_feature_present(uint32_t bit) {
+    uint32_t features_bitmap = *reg32(&__base_regs, CHESHIRE_HW_FEATURES_REG_OFFSET);
+    1000019a:	f3000797          	auipc	a5,0xf3000
+    1000019e:	e6678793          	addi	a5,a5,-410 # 3000000 <__base_regs>
+    100001a2:	4bbc                	lw	a5,80(a5)
+    return (features_bitmap & BIT(bit)) != 0;
+    100001a4:	0067d79b          	srliw	a5,a5,0x6
+#include "dif/clint.h"
+#include "dif/dma.h"
+
+int main(void) {
+    // Immediately return an error if DMA is not present
+    CHECK_ASSERT(-1, chs_hw_feature_present(CHESHIRE_HW_FEATURES_DMA_BIT));
+    100001a8:	8b85                	andi	a5,a5,1
+    100001aa:	14078d63          	beqz	a5,10000304 <main+0x16a>
+
+    volatile char src_cached[] = "This is a DMA test";
+    100001ae:	00000717          	auipc	a4,0x0
+    100001b2:	16270713          	addi	a4,a4,354 # 10000310 <main+0x176>
+    100001b6:	630c                	ld	a1,0(a4)
+    100001b8:	6710                	ld	a2,8(a4)
+int main(void) {
+    100001ba:	7159                	addi	sp,sp,-112
+    volatile char src_cached[] = "This is a DMA test";
+    100001bc:	01075683          	lhu	a3,16(a4)
+    volatile char gold[] = "This ishis is is is as is a DMA test!";
+    100001c0:	00000797          	auipc	a5,0x0
+    volatile char src_cached[] = "This is a DMA test";
+    100001c4:	e42e                	sd	a1,8(sp)
+    volatile char gold[] = "This ishis is is is as is a DMA test!";
+    100001c6:	16878793          	addi	a5,a5,360 # 10000328 <main+0x18e>
+    volatile char src_cached[] = "This is a DMA test";
+    100001ca:	01274703          	lbu	a4,18(a4)
+    100001ce:	e832                	sd	a2,16(sp)
+    volatile char gold[] = "This ishis is is is as is a DMA test!";
+    100001d0:	6390                	ld	a2,0(a5)
+    volatile char src_cached[] = "This is a DMA test";
+    100001d2:	00d11c23          	sh	a3,24(sp)
+    volatile char gold[] = "This ishis is is is as is a DMA test!";
+    100001d6:	6794                	ld	a3,8(a5)
+    volatile char src_cached[] = "This is a DMA test";
+    100001d8:	00e10d23          	sb	a4,26(sp)
+    volatile char gold[] = "This ishis is is is as is a DMA test!";
+    100001dc:	6b98                	ld	a4,16(a5)
+    100001de:	e4b2                	sd	a2,72(sp)
+    100001e0:	e8b6                	sd	a3,80(sp)
+    100001e2:	6f94                	ld	a3,24(a5)
+    100001e4:	ecba                	sd	a4,88(sp)
+    100001e6:	5398                	lw	a4,32(a5)
+    100001e8:	0247d783          	lhu	a5,36(a5)
+    100001ec:	f0b6                	sd	a3,96(sp)
+    100001ee:	d4ba                	sw	a4,104(sp)
+    100001f0:	06f11623          	sh	a5,108(sp)
+    // Get pointer to uncached SPM source and destination
+    volatile char *src = src_cached + 0x04000000;
+    volatile char *dst = dst_cached + 0x04000000;
+
+    // Copy from cached to uncached source to ensure it is DMA-accessible
+    for (unsigned i = 0; i < sizeof(src_cached); ++i) src[i] = src_cached[i];
+    100001f4:	04000537          	lui	a0,0x4000
+    100001f8:	003c                	addi	a5,sp,8
+    100001fa:	00a78633          	add	a2,a5,a0
+    100001fe:	45cd                	li	a1,19
+    volatile char gold[] = "This ishis is is is as is a DMA test!";
+    10000200:	4781                	li	a5,0
+    for (unsigned i = 0; i < sizeof(src_cached); ++i) src[i] = src_cached[i];
+    10000202:	02079713          	slli	a4,a5,0x20
+    10000206:	9301                	srli	a4,a4,0x20
+    10000208:	970a                	add	a4,a4,sp
+    1000020a:	00874703          	lbu	a4,8(a4)
+    1000020e:	00f606b3          	add	a3,a2,a5
+    10000212:	0785                	addi	a5,a5,1
+    10000214:	00e68023          	sb	a4,0(a3)
+    10000218:	feb795e3          	bne	a5,a1,10000202 <main+0x68>
+
+    // Pre-write finishing "!\0" to guard against overlength transfers
+    dst[sizeof(gold) - 2] = '!';
+    1000021c:	040007b7          	lui	a5,0x4000
+    10000220:	07078793          	addi	a5,a5,112 # 4000070 <__base_plic+0x70>
+    10000224:	00f10733          	add	a4,sp,a5
+    10000228:	02100793          	li	a5,33
+    1000022c:	fcf70a23          	sb	a5,-44(a4)
+\
+    static inline uint64_t NAME##_dma_get_status(void) { \
+        return *(NAME##_dma_status_ptr()); \
+    }
+
+X(sys, &__base_dma)
+    10000230:	f1000797          	auipc	a5,0xf1000
+    dst[sizeof(gold) - 1] = '\0';
+    10000234:	fc070aa3          	sb	zero,-43(a4)
+    10000238:	dd078793          	addi	a5,a5,-560 # 1000000 <__base_dma>
+    1000023c:	eff0                	sd	a2,216(a5)
+    1000023e:	f1000717          	auipc	a4,0xf1000
+
+    // Issue blocking 2D memcpy (exclude null terminator from source)
+    sys_dma_2d_blk_memcpy((uintptr_t)(void *)dst, (uintptr_t)(void *)src, sizeof(src_cached) - 4, 7,
+    10000242:	101c                	addi	a5,sp,32
+    10000244:	00a786b3          	add	a3,a5,a0
+    10000248:	dc270713          	addi	a4,a4,-574 # 1000000 <__base_dma>
+    1000024c:	f1000797          	auipc	a5,0xf1000
+    10000250:	eb74                	sd	a3,208(a4)
+    10000252:	db478793          	addi	a5,a5,-588 # 1000000 <__base_dma>
+    10000256:	473d                	li	a4,15
+    10000258:	f3f8                	sd	a4,224(a5)
+    1000025a:	40000693          	li	a3,1024
+    1000025e:	f1000797          	auipc	a5,0xf1000
+    10000262:	f1000717          	auipc	a4,0xf1000
+    10000266:	dad7b123          	sd	a3,-606(a5) # 1000000 <__base_dma>
+    1000026a:	d9e70713          	addi	a4,a4,-610 # 1000000 <__base_dma>
+    1000026e:	4685                	li	a3,1
+    10000270:	f1000797          	auipc	a5,0xf1000
+    10000274:	fb74                	sd	a3,240(a4)
+    10000276:	d9078793          	addi	a5,a5,-624 # 1000000 <__base_dma>
+    1000027a:	469d                	li	a3,7
+    1000027c:	f1000717          	auipc	a4,0xf1000
+    10000280:	f7f4                	sd	a3,232(a5)
+    10000282:	d8470713          	addi	a4,a4,-636 # 1000000 <__base_dma>
+    10000286:	4691                	li	a3,4
+    10000288:	f1000797          	auipc	a5,0xf1000
+    1000028c:	ff74                	sd	a3,248(a4)
+    1000028e:	d7878793          	addi	a5,a5,-648 # 1000000 <__base_dma>
+    10000292:	43f4                	lw	a3,68(a5)
+    10000294:	47b8                	lw	a4,72(a5)
+    10000296:	f1000797          	auipc	a5,0xf1000
+    1000029a:	1682                	slli	a3,a3,0x20
+    1000029c:	9281                	srli	a3,a3,0x20
+    1000029e:	1702                	slli	a4,a4,0x20
+    100002a0:	8f55                	or	a4,a4,a3
+    100002a2:	d6a78793          	addi	a5,a5,-662 # 1000000 <__base_dma>
+    100002a6:	e03a                	sd	a4,0(sp)
+    100002a8:	a031                	j	100002b4 <main+0x11a>
+    100002aa:	0001                	nop
+    100002ac:	f1000797          	auipc	a5,0xf1000
+    100002b0:	d5478793          	addi	a5,a5,-684 # 1000000 <__base_dma>
+    100002b4:	0847a703          	lw	a4,132(a5)
+    100002b8:	0887a783          	lw	a5,136(a5)
+    100002bc:	6682                	ld	a3,0(sp)
+    100002be:	1702                	slli	a4,a4,0x20
+    100002c0:	9301                	srli	a4,a4,0x20
+    100002c2:	1782                	slli	a5,a5,0x20
+    100002c4:	8fd9                	or	a5,a5,a4
+    100002c6:	fed792e3          	bne	a5,a3,100002aa <main+0x110>
+                          1, 4, DMA_CONF_DECOUPLE_NONE);
+
+    // Check destination string
+    int errors = sizeof(gold);
+    for (unsigned i = 0; i < sizeof(gold); ++i) errors -= (dst[i] == gold[i]);
+    100002ca:	040007b7          	lui	a5,0x4000
+    int errors = sizeof(gold);
+    100002ce:	02600513          	li	a0,38
+    for (unsigned i = 0; i < sizeof(gold); ++i) errors -= (dst[i] == gold[i]);
+    100002d2:	02078793          	addi	a5,a5,32 # 4000020 <__base_plic+0x20>
+    100002d6:	00f10633          	add	a2,sp,a5
+    100002da:	85aa                	mv	a1,a0
+    volatile char gold[] = "This ishis is is is as is a DMA test!";
+    100002dc:	4701                	li	a4,0
+    for (unsigned i = 0; i < sizeof(gold); ++i) errors -= (dst[i] == gold[i]);
+    100002de:	02071693          	slli	a3,a4,0x20
+    100002e2:	9281                	srli	a3,a3,0x20
+    100002e4:	00e607b3          	add	a5,a2,a4
+    100002e8:	968a                	add	a3,a3,sp
+    100002ea:	0007c783          	lbu	a5,0(a5)
+    100002ee:	0486c683          	lbu	a3,72(a3)
+    100002f2:	0705                	addi	a4,a4,1
+    100002f4:	8f95                	sub	a5,a5,a3
+    100002f6:	0017b793          	seqz	a5,a5
+    100002fa:	9d1d                	subw	a0,a0,a5
+    100002fc:	feb711e3          	bne	a4,a1,100002de <main+0x144>
+
+    return errors;
+}
+    10000300:	6165                	addi	sp,sp,112
+    10000302:	8082                	ret
+    CHECK_ASSERT(-1, chs_hw_feature_present(CHESHIRE_HW_FEATURES_DMA_BIT));
+    10000304:	557d                	li	a0,-1
+}
+    10000306:	8082                	ret

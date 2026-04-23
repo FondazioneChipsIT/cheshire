@@ -1,0 +1,576 @@
+
+/data/ytortorella/emulator/tender-release/cheshire/sw/tests/helloworld.rom.elf:     file format elf64-littleriscv
+
+
+Disassembly of section .misc:
+
+0000000010000000 <__base_spm>:
+// Minimal CRT0
+.global _start
+.align 4
+_start:
+    // Globally disable Machine and Supervisor interrupts
+    csrrc x0, mstatus, 10
+    10000000:	30057073          	csrci	mstatus,10
+
+    // Park SMP harts
+    csrr t0, mhartid
+    10000004:	f14022f3          	csrr	t0,mhartid
+    beqz t0, 2f
+    10000008:	00028563          	beqz	t0,10000012 <__base_spm+0x12>
+1:
+    wfi
+    1000000c:	10500073          	wfi
+    j 1b
+    10000010:	bff5                	j	1000000c <__base_spm+0xc>
+2:
+    // Init stack and global pointer iff linked as nonzero
+    mv t1, sp
+    10000012:	830a                	mv	t1,sp
+    la t0, __stack_pointer$
+    10000014:	00000293          	li	t0,0
+    beqz t0, 1f
+    10000018:	00028363          	beqz	t0,1000001e <__base_spm+0x1e>
+    mv sp, t0
+    1000001c:	8116                	mv	sp,t0
+1:  .option push
+    .option norelax
+    la t0, __global_pointer$
+    1000001e:	00000297          	auipc	t0,0x0
+    10000022:	19528293          	addi	t0,t0,405 # 100001b3 <__global_pointer$>
+    beqz t0, 1f
+    10000026:	00028363          	beqz	t0,1000002c <__base_spm+0x2c>
+    mv gp, t0
+    1000002a:	8196                	mv	gp,t0
+1:  .option pop
+
+    // Store existing stack, global, return pointers on new stack
+    addi sp, sp, -24
+    1000002c:	1121                	addi	sp,sp,-24
+    sd t1, 0(sp)
+    1000002e:	e01a                	sd	t1,0(sp)
+    sd gp, 8(sp)
+    10000030:	e40e                	sd	gp,8(sp)
+    sd ra, 16(sp)
+    10000032:	e806                	sd	ra,16(sp)
+
+    // Set trap vector
+    la t0, _trap_handler_wrap
+    10000034:	00000297          	auipc	t0,0x0
+    10000038:	10c28293          	addi	t0,t0,268 # 10000140 <_trap_handler_wrap>
+    csrrw x0, mtvec, t0
+    1000003c:	30529073          	csrw	mtvec,t0
+
+    // Zero the .bss section
+    la t0, __bss_start      // t0 = bss start address
+    10000040:	1bd18293          	addi	t0,gp,445 # 10000370 <__bss_end>
+    la t1, __bss_end        // t1 = bss end address
+    10000044:	1bd18313          	addi	t1,gp,445 # 10000370 <__bss_end>
+    sub t2, t1, t0          // t2 = #bytes to zero
+    10000048:	405303b3          	sub	t2,t1,t0
+    li a0, 0
+    1000004c:	4501                	li	a0,0
+
+000000001000004e <_zero_bss_loop>:
+
+_zero_bss_loop:
+    addi t4, t2, -32
+    1000004e:	fe038e93          	addi	t4,t2,-32
+    blez t2, _fp_init           // t2 <= 0? => No bss to zero
+    10000052:	02705863          	blez	t2,10000082 <_fp_init>
+    blt t4, x0, _zero_bss_rem   // t4 <  0? => Less than 4 words left
+    10000056:	020ec063          	bltz	t4,10000076 <_zero_bss_rem>
+    sd a0, 0(t0)
+    1000005a:	00a2b023          	sd	a0,0(t0)
+    sd a0, 8(t0)
+    1000005e:	00a2b423          	sd	a0,8(t0)
+    sd a0, 16(t0)
+    10000062:	00a2b823          	sd	a0,16(t0)
+    sd a0, 24(t0)
+    10000066:	00a2bc23          	sd	a0,24(t0)
+    addi t2, t2, -32
+    1000006a:	1381                	addi	t2,t2,-32
+    addi t0, t0, 32
+    1000006c:	02028293          	addi	t0,t0,32
+    bgt t2, x0, _zero_bss_loop  // Still more to go
+    10000070:	fc704fe3          	bgtz	t2,1000004e <_zero_bss_loop>
+    j _fp_init
+    10000074:	a039                	j	10000082 <_fp_init>
+
+0000000010000076 <_zero_bss_rem>:
+
+_zero_bss_rem:
+    sb a0, 0(t0)
+    10000076:	00a28023          	sb	a0,0(t0)
+    addi t2, t2, -1
+    1000007a:	13fd                	addi	t2,t2,-1
+    addi t0, t0, 1
+    1000007c:	0285                	addi	t0,t0,1
+    bgt t2, x0, _zero_bss_rem
+    1000007e:	fe704ce3          	bgtz	t2,10000076 <_zero_bss_rem>
+
+0000000010000082 <_fp_init>:
+
+_fp_init:
+    // Set FS state to "Initial", enabling FP instructions
+    li t1, 1
+    10000082:	4305                	li	t1,1
+    slli t1, t1, 13
+    10000084:	0336                	slli	t1,t1,0xd
+    csrs mstatus, t1
+    10000086:	30032073          	csrs	mstatus,t1
+
+    // Clear all 32 double FP registers
+    fcvt.d.l f0, x0
+    1000008a:	d2207053          	fcvt.d.l	ft0,zero
+    fmv.d f1, f0
+    1000008e:	220000d3          	fmv.d	ft1,ft0
+    fmv.d f2, f0
+    10000092:	22000153          	fmv.d	ft2,ft0
+    fmv.d f3, f0
+    10000096:	220001d3          	fmv.d	ft3,ft0
+    fmv.d f4, f0
+    1000009a:	22000253          	fmv.d	ft4,ft0
+    fmv.d f5, f0
+    1000009e:	220002d3          	fmv.d	ft5,ft0
+    fmv.d f6, f0
+    100000a2:	22000353          	fmv.d	ft6,ft0
+    fmv.d f7, f0
+    100000a6:	220003d3          	fmv.d	ft7,ft0
+    fmv.d f8, f0
+    100000aa:	22000453          	fmv.d	fs0,ft0
+    fmv.d f9, f0
+    100000ae:	220004d3          	fmv.d	fs1,ft0
+    fmv.d f10, f0
+    100000b2:	22000553          	fmv.d	fa0,ft0
+    fmv.d f11, f0
+    100000b6:	220005d3          	fmv.d	fa1,ft0
+    fmv.d f12, f0
+    100000ba:	22000653          	fmv.d	fa2,ft0
+    fmv.d f13, f0
+    100000be:	220006d3          	fmv.d	fa3,ft0
+    fmv.d f14, f0
+    100000c2:	22000753          	fmv.d	fa4,ft0
+    fmv.d f15, f0
+    100000c6:	220007d3          	fmv.d	fa5,ft0
+    fmv.d f16, f0
+    100000ca:	22000853          	fmv.d	fa6,ft0
+    fmv.d f17, f0
+    100000ce:	220008d3          	fmv.d	fa7,ft0
+    fmv.d f18, f0
+    100000d2:	22000953          	fmv.d	fs2,ft0
+    fmv.d f19, f0
+    100000d6:	220009d3          	fmv.d	fs3,ft0
+    fmv.d f20, f0
+    100000da:	22000a53          	fmv.d	fs4,ft0
+    fmv.d f21, f0
+    100000de:	22000ad3          	fmv.d	fs5,ft0
+    fmv.d f22, f0
+    100000e2:	22000b53          	fmv.d	fs6,ft0
+    fmv.d f23, f0
+    100000e6:	22000bd3          	fmv.d	fs7,ft0
+    fmv.d f24, f0
+    100000ea:	22000c53          	fmv.d	fs8,ft0
+    fmv.d f25, f0
+    100000ee:	22000cd3          	fmv.d	fs9,ft0
+    fmv.d f26, f0
+    100000f2:	22000d53          	fmv.d	fs10,ft0
+    fmv.d f27, f0
+    100000f6:	22000dd3          	fmv.d	fs11,ft0
+    fmv.d f28, f0
+    100000fa:	22000e53          	fmv.d	ft8,ft0
+    fmv.d f29, f0
+    100000fe:	22000ed3          	fmv.d	ft9,ft0
+    fmv.d f30, f0
+    10000102:	22000f53          	fmv.d	ft10,ft0
+    fmv.d f31, f0
+    10000106:	22000fd3          	fmv.d	ft11,ft0
+
+    // Set FS state to "Clean"
+    csrrc x0, mstatus, t1
+    1000010a:	30033073          	csrc	mstatus,t1
+
+    // Full fence, then jump to main
+    fence
+    1000010e:	0ff0000f          	fence
+    call main
+    10000112:	088000ef          	jal	1000019a <main>
+    10000116:	00000013          	nop
+    1000011a:	00000013          	nop
+    1000011e:	0001                	nop
+
+0000000010000120 <_exit>:
+// If main returns, we end up here
+.global _exit
+.align 4
+_exit:
+    // Restore the original context registers (sp last)
+    ld ra, 16(sp)
+    10000120:	60c2                	ld	ra,16(sp)
+    ld gp, 8(sp)
+    10000122:	61a2                	ld	gp,8(sp)
+    ld sp, 0(sp)
+    10000124:	6102                	ld	sp,0(sp)
+    // Save the return value to scratch register 2 and wait forever.
+    slli t0, a0, 1
+    10000126:	00151293          	slli	t0,a0,0x1
+    ori  t0, t0, 1
+    1000012a:	0012e293          	ori	t0,t0,1
+    la t1, __base_regs
+    1000012e:	f3000317          	auipc	t1,0xf3000
+    10000132:	ed230313          	addi	t1,t1,-302 # 3000000 <__base_regs>
+    sw t0, 8(t1)     // regs.SCRATCH[2]
+    10000136:	00532423          	sw	t0,8(t1)
+    // Hand over to whatever called us, passing return
+    ret
+    1000013a:	8082                	ret
+    1000013c:	00000013          	nop
+
+0000000010000140 <_trap_handler_wrap>:
+
+// This wraps the C trap handler to save the (integer-only) caller-save
+// registers and perform a proper machine-mode exception return.
+.align 4
+_trap_handler_wrap:
+    addi sp, sp, -128
+    10000140:	7119                	addi	sp,sp,-128
+    sd ra, 120(sp)
+    10000142:	fc86                	sd	ra,120(sp)
+    sd t0, 112(sp)
+    10000144:	f896                	sd	t0,112(sp)
+    sd t1, 104(sp)
+    10000146:	f49a                	sd	t1,104(sp)
+    sd t2, 96(sp)
+    10000148:	f09e                	sd	t2,96(sp)
+    sd a0, 88(sp)
+    1000014a:	ecaa                	sd	a0,88(sp)
+    sd a1, 80(sp)
+    1000014c:	e8ae                	sd	a1,80(sp)
+    sd a2, 72(sp)
+    1000014e:	e4b2                	sd	a2,72(sp)
+    sd a3, 64(sp)
+    10000150:	e0b6                	sd	a3,64(sp)
+    sd a4, 56(sp)
+    10000152:	fc3a                	sd	a4,56(sp)
+    sd a5, 48(sp)
+    10000154:	f83e                	sd	a5,48(sp)
+    sd a6, 40(sp)
+    10000156:	f442                	sd	a6,40(sp)
+    sd a7, 32(sp)
+    10000158:	f046                	sd	a7,32(sp)
+    sd t3, 24(sp)
+    1000015a:	ec72                	sd	t3,24(sp)
+    sd t4, 16(sp)
+    1000015c:	e876                	sd	t4,16(sp)
+    sd t5, 8(sp)
+    1000015e:	e47a                	sd	t5,8(sp)
+    sd t6, 0(sp)
+    10000160:	e07e                	sd	t6,0(sp)
+
+    jal trap_vector
+    10000162:	02e000ef          	jal	10000190 <trap_vector>
+
+    ld ra, 120(sp)
+    10000166:	70e6                	ld	ra,120(sp)
+    ld t0, 112(sp)
+    10000168:	72c6                	ld	t0,112(sp)
+    ld t1, 104(sp)
+    1000016a:	7326                	ld	t1,104(sp)
+    ld t2, 96(sp)
+    1000016c:	7386                	ld	t2,96(sp)
+    ld a0, 88(sp)
+    1000016e:	6566                	ld	a0,88(sp)
+    ld a1, 80(sp)
+    10000170:	65c6                	ld	a1,80(sp)
+    ld a2, 72(sp)
+    10000172:	6626                	ld	a2,72(sp)
+    ld a3, 64(sp)
+    10000174:	6686                	ld	a3,64(sp)
+    ld a4, 56(sp)
+    10000176:	7762                	ld	a4,56(sp)
+    ld a5, 48(sp)
+    10000178:	77c2                	ld	a5,48(sp)
+    ld a6, 40(sp)
+    1000017a:	7822                	ld	a6,40(sp)
+    ld a7, 32(sp)
+    1000017c:	7882                	ld	a7,32(sp)
+    ld t3, 24(sp)
+    1000017e:	6e62                	ld	t3,24(sp)
+    ld t4, 16(sp)
+    10000180:	6ec2                	ld	t4,16(sp)
+    ld t5, 8(sp)
+    10000182:	6f22                	ld	t5,8(sp)
+    ld t6, 0(sp)
+    10000184:	6f82                	ld	t6,0(sp)
+    addi sp, sp, 128
+    10000186:	6109                	addi	sp,sp,128
+    mret
+    10000188:	30200073          	mret
+    1000018c:	00000013          	nop
+
+0000000010000190 <trap_vector>:
+
+.global trap_vector
+.weak trap_vector
+.align 4
+trap_vector:
+    wfi
+    10000190:	10500073          	wfi
+    j trap_vector
+    10000194:	ffdff06f          	j	10000190 <trap_vector>
+    10000198:	0001                	nop
+
+000000001000019a <main>:
+#include "params.h"
+#include "util.h"
+
+int main(void) {
+    char str[] = "Hello World!\r\n";
+    uint32_t rtc_freq = *reg32(&__base_regs, CHESHIRE_RTC_FREQ_REG_OFFSET);
+    1000019a:	f3000797          	auipc	a5,0xf3000
+    1000019e:	e6678793          	addi	a5,a5,-410 # 3000000 <__base_regs>
+    100001a2:	43e8                	lw	a0,68(a5)
+    clint_spin_until(clint_get_mtime() + ticks);
+}
+
+uint64_t clint_get_core_freq(uint64_t ref_freq, uint64_t ref_time_inv) {
+    uint64_t end_mcycle, start_mcycle;
+    uint64_t num_ticks = ref_freq / ref_time_inv;
+    100001a4:	1a36e8b7          	lui	a7,0x1a36e
+    100001a8:	2eb88893          	addi	a7,a7,747 # 1a36e2eb <__bss_end+0xa36df7b>
+    100001ac:	38866737          	lui	a4,0x38866
+    100001b0:	94b70713          	addi	a4,a4,-1717 # 3886594b <__bss_end+0x288655db>
+    uint64_t reset_freq = clint_get_core_freq(rtc_freq, 2500);
+    100001b4:	1502                	slli	a0,a0,0x20
+    100001b6:	1886                	slli	a7,a7,0x21
+    100001b8:	98ba                	add	a7,a7,a4
+    100001ba:	9101                	srli	a0,a0,0x20
+    char str[] = "Hello World!\r\n";
+    100001bc:	00000797          	auipc	a5,0x0
+    100001c0:	19c78793          	addi	a5,a5,412 # 10000358 <__global_pointer$+0x1a5>
+    100001c4:	031538b3          	mulhu	a7,a0,a7
+    100001c8:	0087a803          	lw	a6,8(a5)
+    100001cc:	0007b303          	ld	t1,0(a5)
+    100001d0:	00c7d583          	lhu	a1,12(a5)
+    100001d4:	00e7c683          	lbu	a3,14(a5)
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    100001d8:	f2040717          	auipc	a4,0xf2040
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    100001dc:	f2040797          	auipc	a5,0xf2040
+int main(void) {
+    100001e0:	1141                	addi	sp,sp,-16
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    100001e2:	6631                	lui	a2,0xc
+    100001e4:	e2870713          	addi	a4,a4,-472 # 2040000 <__base_clint>
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    100001e8:	e2478793          	addi	a5,a5,-476 # 2040000 <__base_clint>
+    char str[] = "Hello World!\r\n";
+    100001ec:	e01a                	sd	t1,0(sp)
+    100001ee:	c442                	sw	a6,8(sp)
+    100001f0:	00b11623          	sh	a1,12(sp)
+    100001f4:	00d10723          	sb	a3,14(sp)
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    100001f8:	9732                	add	a4,a4,a2
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    100001fa:	97b2                	add	a5,a5,a2
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    100001fc:	ffc72803          	lw	a6,-4(a4)
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    10000200:	ff87a783          	lw	a5,-8(a5)
+    uint64_t num_ticks = ref_freq / ref_time_inv;
+    10000204:	0098d893          	srli	a7,a7,0x9
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    10000208:	1802                	slli	a6,a6,0x20
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    1000020a:	1782                	slli	a5,a5,0x20
+    1000020c:	9381                	srli	a5,a5,0x20
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    1000020e:	00f86833          	or	a6,a6,a5
+}
+
+// Get cycle count since reset
+static inline uint64_t get_mcycle() {
+    uint64_t mcycle;
+    asm volatile("csrr %0, mcycle" : "=r"(mcycle)::"memory");
+    10000212:	b00025f3          	csrr	a1,mcycle
+    10000216:	f2040717          	auipc	a4,0xf2040
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    1000021a:	f2040797          	auipc	a5,0xf2040
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    1000021e:	dea70713          	addi	a4,a4,-534 # 2040000 <__base_clint>
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    10000222:	de678793          	addi	a5,a5,-538 # 2040000 <__base_clint>
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    10000226:	9732                	add	a4,a4,a2
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    10000228:	97b2                	add	a5,a5,a2
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    1000022a:	ffc72683          	lw	a3,-4(a4)
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    1000022e:	ff87a783          	lw	a5,-8(a5)
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    10000232:	1682                	slli	a3,a3,0x20
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    10000234:	1782                	slli	a5,a5,0x20
+    10000236:	9381                	srli	a5,a5,0x20
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    10000238:	8edd                	or	a3,a3,a5
+    uint64_t end_mtime = clint_get_mtime(), start_mtime;
+    // Capture start times until we observe an RTC tick rollover
+    do {
+        start_mcycle = get_mcycle();
+        start_mtime = clint_get_mtime();
+    } while (start_mtime == end_mtime);
+    1000023a:	fcd80ce3          	beq	a6,a3,10000212 <__global_pointer$+0x5f>
+    // Capture end times until we observe rollover to the past-the-end RTC tick
+    do {
+        end_mcycle = get_mcycle();
+        end_mtime = clint_get_mtime();
+    } while (end_mtime < start_mtime + num_ticks);
+    1000023e:	98b6                	add	a7,a7,a3
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    10000240:	6331                	lui	t1,0xc
+    10000242:	b0002873          	csrr	a6,mcycle
+    10000246:	f2040717          	auipc	a4,0xf2040
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    1000024a:	f2040797          	auipc	a5,0xf2040
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    1000024e:	dba70713          	addi	a4,a4,-582 # 2040000 <__base_clint>
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    10000252:	db678793          	addi	a5,a5,-586 # 2040000 <__base_clint>
+    10000256:	979a                	add	a5,a5,t1
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    10000258:	971a                	add	a4,a4,t1
+    1000025a:	ffc72703          	lw	a4,-4(a4)
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    1000025e:	ff87a603          	lw	a2,-8(a5)
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    10000262:	02071793          	slli	a5,a4,0x20
+           ((uint64_t)*reg32(&__base_clint, CLINT_MTIME_LOW_REG_OFFSET));
+    10000266:	02061713          	slli	a4,a2,0x20
+    1000026a:	9301                	srli	a4,a4,0x20
+    return (((uint64_t)*reg32(&__base_clint, CLINT_MTIME_HIGH_REG_OFFSET)) << 32) |
+    1000026c:	8fd9                	or	a5,a5,a4
+    } while (end_mtime < start_mtime + num_ticks);
+    1000026e:	fd17eae3          	bltu	a5,a7,10000242 <__global_pointer$+0x8f>
+    // Compute current frequency in Hz
+    return ((end_mcycle - start_mcycle) * ref_freq) / (end_mtime - start_mtime);
+    10000272:	40b80733          	sub	a4,a6,a1
+    10000276:	02a70733          	mul	a4,a4,a0
+    1000027a:	8f95                	sub	a5,a5,a3
+#include "dif/uart.h"
+#include "util.h"
+#include "params.h"
+
+void uart_init(void *uart_base, uint64_t freq, uint64_t baud) {
+    uint64_t divisor = freq / (baud << 4);
+    1000027c:	226af637          	lui	a2,0x226af
+    10000280:	012346b7          	lui	a3,0x1234
+    10000284:	38560613          	addi	a2,a2,901 # 226af385 <__bss_end+0x126af015>
+    10000288:	56768693          	addi	a3,a3,1383 # 1234567 <__base_dma+0x234567>
+    1000028c:	060a                	slli	a2,a2,0x2
+    1000028e:	1682                	slli	a3,a3,0x20
+    10000290:	96b2                	add	a3,a3,a2
+    uint8_t dlo = (uint8_t)(divisor);
+    uint8_t dhi = (uint8_t)(divisor >> 8);
+    *reg8(uart_base, UART_INTR_ENABLE_REG_OFFSET) = 0x00;   // Disable all interrupts
+    *reg8(uart_base, UART_LINE_CONTROL_REG_OFFSET) = 0x80;  // Enable DLAB (set baud rate divisor)
+    10000292:	f8000613          	li	a2,-128
+    10000296:	02f757b3          	divu	a5,a4,a5
+    *reg8(uart_base, UART_INTR_ENABLE_REG_OFFSET) = 0x00;   // Disable all interrupts
+    1000029a:	f3002717          	auipc	a4,0xf3002
+    1000029e:	d6670713          	addi	a4,a4,-666 # 3002000 <__base_uart>
+    100002a2:	00070223          	sb	zero,4(a4)
+    *reg8(uart_base, UART_LINE_CONTROL_REG_OFFSET) = 0x80;  // Enable DLAB (set baud rate divisor)
+    100002a6:	f3002717          	auipc	a4,0xf3002
+    100002aa:	d5a70713          	addi	a4,a4,-678 # 3002000 <__base_uart>
+    100002ae:	00c70623          	sb	a2,12(a4)
+    *reg8(uart_base, UART_DLAB_LSB_REG_OFFSET) = dlo;       // divisor (lo byte)
+    *reg8(uart_base, UART_DLAB_MSB_REG_OFFSET) = dhi;       // divisor (hi byte)
+    100002b2:	f3002897          	auipc	a7,0xf3002
+    100002b6:	d4e88893          	addi	a7,a7,-690 # 3002000 <__base_uart>
+    *reg8(uart_base, UART_LINE_CONTROL_REG_OFFSET) = 0x03;  // 8 bits, no parity, one stop bit
+    100002ba:	f3002817          	auipc	a6,0xf3002
+    100002be:	d4680813          	addi	a6,a6,-698 # 3002000 <__base_uart>
+    100002c2:	4f0d                	li	t5,3
+    *reg8(uart_base, UART_FIFO_CONTROL_REG_OFFSET) = 0xC7;  // Enable & clear FIFO, 14B threshold
+    100002c4:	f3002517          	auipc	a0,0xf3002
+    100002c8:	d3c50513          	addi	a0,a0,-708 # 3002000 <__base_uart>
+    100002cc:	fc700e93          	li	t4,-57
+    *reg8(uart_base, UART_MODEM_CONTROL_REG_OFFSET) = 0x20; // Autoflow mode
+    100002d0:	f3002597          	auipc	a1,0xf3002
+    100002d4:	d3058593          	addi	a1,a1,-720 # 3002000 <__base_uart>
+    100002d8:	02000e13          	li	t3,32
+    100002dc:	870a                	mv	a4,sp
+    100002de:	00e10613          	addi	a2,sp,14
+    uint64_t divisor = freq / (baud << 4);
+    100002e2:	83b5                	srli	a5,a5,0xd
+    100002e4:	02d7b7b3          	mulhu	a5,a5,a3
+    *reg8(uart_base, UART_DLAB_LSB_REG_OFFSET) = dlo;       // divisor (lo byte)
+    100002e8:	f3002697          	auipc	a3,0xf3002
+    100002ec:	d0f68c23          	sb	a5,-744(a3) # 3002000 <__base_uart>
+    uint8_t dhi = (uint8_t)(divisor >> 8);
+    100002f0:	0087df93          	srli	t6,a5,0x8
+    *reg8(uart_base, UART_DLAB_MSB_REG_OFFSET) = dhi;       // divisor (hi byte)
+    100002f4:	01f88223          	sb	t6,4(a7)
+    *reg8(uart_base, UART_LINE_CONTROL_REG_OFFSET) = 0x03;  // 8 bits, no parity, one stop bit
+    100002f8:	01e80623          	sb	t5,12(a6)
+    *reg8(uart_base, UART_FIFO_CONTROL_REG_OFFSET) = 0xC7;  // Enable & clear FIFO, 14B threshold
+    100002fc:	01d50423          	sb	t4,8(a0)
+    *reg8(uart_base, UART_MODEM_CONTROL_REG_OFFSET) = 0x20; // Autoflow mode
+    10000300:	01c58823          	sb	t3,16(a1)
+        ;
+    *reg8(uart_base, UART_THR_REG_OFFSET) = byte;
+}
+
+void uart_write_str(void *uart_base, void *src, uint64_t len) {
+    for (uint64_t i = 0; i < len; ++i) uart_write(uart_base, ((uint8_t *)src)[i]);
+    10000304:	00074683          	lbu	a3,0(a4)
+    return *reg8(uart_base, UART_LINE_STATUS_REG_OFFSET) & (1 << UART_LINE_STATUS_THR_EMPTY_BIT);
+    10000308:	f3002797          	auipc	a5,0xf3002
+    1000030c:	cf878793          	addi	a5,a5,-776 # 3002000 <__base_uart>
+    10000310:	0147c783          	lbu	a5,20(a5)
+    while (!__uart_write_ready(uart_base))
+    10000314:	0207f793          	andi	a5,a5,32
+    10000318:	dbe5                	beqz	a5,10000308 <__global_pointer$+0x155>
+    *reg8(uart_base, UART_THR_REG_OFFSET) = byte;
+    1000031a:	f3002797          	auipc	a5,0xf3002
+    for (uint64_t i = 0; i < len; ++i) uart_write(uart_base, ((uint8_t *)src)[i]);
+    1000031e:	0705                	addi	a4,a4,1
+    *reg8(uart_base, UART_THR_REG_OFFSET) = byte;
+    10000320:	ced78323          	sb	a3,-794(a5) # 3002000 <__base_uart>
+    for (uint64_t i = 0; i < len; ++i) uart_write(uart_base, ((uint8_t *)src)[i]);
+    10000324:	fee610e3          	bne	a2,a4,10000304 <__global_pointer$+0x151>
+    asm volatile("fence" ::: "memory");
+    10000328:	0ff0000f          	fence
+    return *reg8(uart_base, UART_LINE_STATUS_REG_OFFSET) & (1 << UART_LINE_STATUS_THR_EMPTY_BIT);
+    1000032c:	f3002797          	auipc	a5,0xf3002
+    10000330:	cd478793          	addi	a5,a5,-812 # 3002000 <__base_uart>
+    10000334:	0147c783          	lbu	a5,20(a5)
+           *reg8(uart_base, UART_LINE_STATUS_REG_OFFSET) & (1 << UART_LINE_STATUS_TMIT_EMPTY_BIT);
+    10000338:	f3002717          	auipc	a4,0xf3002
+    1000033c:	cc870713          	addi	a4,a4,-824 # 3002000 <__base_uart>
+    return __uart_write_ready(uart_base) &&
+    10000340:	0207f793          	andi	a5,a5,32
+    10000344:	d7e5                	beqz	a5,1000032c <__global_pointer$+0x179>
+           *reg8(uart_base, UART_LINE_STATUS_REG_OFFSET) & (1 << UART_LINE_STATUS_TMIT_EMPTY_BIT);
+    10000346:	01474783          	lbu	a5,20(a4)
+    return __uart_write_ready(uart_base) &&
+    1000034a:	0407f793          	andi	a5,a5,64
+    1000034e:	dff9                	beqz	a5,1000032c <__global_pointer$+0x179>
+    uart_init(&__base_uart, reset_freq, __BOOT_BAUDRATE);
+    uart_write_str(&__base_uart, str, sizeof(str) - 1);
+    uart_write_flush(&__base_uart);
+    return 0;
+}
+    10000350:	4501                	li	a0,0
+    10000352:	0141                	addi	sp,sp,16
+    10000354:	8082                	ret
+    10000356:	0000                	unimp
+    10000358:	6548                	ld	a0,136(a0)
+    1000035a:	6c6c                	ld	a1,216(s0)
+    1000035c:	6f57206f          	j	10073250 <__bss_end+0x72ee0>
+    10000360:	6c72                	ld	s8,280(sp)
+    10000362:	2164                	fld	fs1,192(a0)
+    10000364:	0a0d                	addi	s4,s4,3
+	...
