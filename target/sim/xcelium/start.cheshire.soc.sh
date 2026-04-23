@@ -6,6 +6,9 @@
 # Yvan Tortorella <yvan.tortorella@gmail.com>
 
 TESTBENCH=tb_cheshire_soc
+BOOTMODE=0
+PRELMODE=0
+BINARY="../../../sw/tests/coremark64_75K.elf"
 
 # Set full path to c++ compiler.
 if [ -z "${CXX_PATH}" ]; then

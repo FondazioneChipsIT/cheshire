@@ -8,6 +8,9 @@
 # Paul Scheffler <paulsc@iis.ee.ethz.ch>
 
 set TESTBENCH tb_cheshire_soc
+set BOOTMODE 0
+set PRELMODE 0
+set BINARY "../../../sw/tests/coremark64_75K.elf"
 
 # Set full path to c++ compiler.
 if { ![info exists CXX_PATH] } {
