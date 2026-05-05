@@ -62,9 +62,9 @@ _start:
     // Set C910 CSRs if C910 is present
     la t0, __base_regs
     lw t0, 80(t0)   // regs.HW_FEATURES
-    li t1, 0x4000
+    li t1, 0xC000   // mask all bits except [15:14]
     and t0, t0, t1  // regs.HW_FEATURES.core_type
-    beqz t0, _skip_c910_config
+    bnez t0, _skip_c910_config
 
     // C910 functions enable
     # invalid all memory for IBP,BTB,BHT,DCACHE,ICACHE
@@ -152,9 +152,9 @@ boot_next_stage:
     // Set C910 CSRs if C910 is present
     la t0, __base_regs
     lw t0, 80(t0)   // regs.HW_FEATURES
-    li t1, 0x4000
+    li t1, 0xC000   // mask all bits except [15:14]
     and t0, t0, t1  // regs.HW_FEATURES.core_type
-    beqz t0, _skip_c910_config2
+    bnez t0, _skip_c910_config2
 
     // dcache write back dirty entries
     li t3, 0x20

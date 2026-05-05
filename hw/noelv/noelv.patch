@@ -1,0 +1,13 @@
+diff --git a/cheshire_noelv/cheshire/hw/noelv/grlib-gpl-2025.2-b4298/designs/noelv-generic/grlib_config.vhd b/noelv/lib/grlib/grlib_config.vhd
+index 4745499..6fb266a 100644
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/designs/noelv-generic/grlib_config.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/designs/noelv-generic/grlib_config.vhd
+@@ -38,7 +38,7 @@ package config is
+ -- The value here sets the width of the AMBA AHB data vectors for all
+ -- cores in the library.
+ --
+-constant CFG_AHBDW     : integer := 128;
++constant CFG_AHBDW     : integer := 64;
+ 
+ -- CFG_AHB_ACDM - Enable AMBA Compliant Data Muxing in cores
+ --

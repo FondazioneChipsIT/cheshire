@@ -1,0 +1,179 @@
+package:
+  name: noelv
+  authors:
+    - Frontgrade Gaisler
+
+targets:
+  sim:
+    default_tool: vsim
+
+sources:
+  - files:
+      - grlib-gpl-2025.2-b4298/lib/grlib/stdlib/version.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/stdlib/config_types.vhd
+      - grlib-gpl-2025.2-b4298/designs/noelv-generic/grlib_config.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/stdlib/stdlib.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/stdlib/stdio.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/stdlib/testlib.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/util/util.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/amba.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/devices.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/defmst.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/apbctrl.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/apbctrlx.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/apbctrlsp.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/apbctrldp.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/apbctrl3p.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/apbctrl4p.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/ahbctrl.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/dma2ahb_pkg.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/dma2ahb.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/ahbmst.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/amba/ahblitm2ahbm.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/modgen/multlib.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/modgen/leaves.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/sparc/sparc.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/sparc/sparc_disas.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/sparc/cpu_disas.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/riscv/riscv.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/riscv/riscv_disas.vhd
+      - grlib-gpl-2025.2-b4298/lib/grlib/riscv/cpu_disas.vhd
+    library: grlib
+
+  - files:
+      - grlib-gpl-2025.2-b4298/lib/techmap/gencomp/gencomp.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/gencomp/netcomp.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/inferred/memory_inferred.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/inferred/mul_inferred.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/alltech/allclkgen.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/alltech/allddr.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/alltech/allmem.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/alltech/allmul.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/alltech/allpads.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/alltech/alltap.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/maps/syncram.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/maps/syncram_2p.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/maps/syncramlb.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/maps/syncram64.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/maps/techmult.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/maps/memrwcol.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/maps/tap.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/maps/techbuf.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/maps/grgates.vhd
+    library: techmap
+
+  - files:
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/misc.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/rstgen.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/gptimer.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/ahbram.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/ahbdpram.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/ahbtrace_mmb.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/ahbtrace_mb.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/ahbtrace.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/grgpio.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/ahbstat.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/logan.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/apbps2.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/charrom_package.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/charrom.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/apbvga.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/svgactrl.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/grsysmon.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/gracectrl.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/grgpreg.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/ahb_mst_iface.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/grgprbank.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/grversion.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/apb3cdc.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/ahbsmux.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/ahbmmux.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/misc/grtachom.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/uart/uart.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/uart/libdcom.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/uart/apbuart.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/uart/apbuart_16550.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/uart/dcom.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/uart/dcom_uart.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/uart/ahbuart.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/busif5_types.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/l5nv_shared.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_ic_dmaport.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_ic_busport.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_ic_ebp.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_ic.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_ahbs.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/tbufmemnv_mbus.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_trace.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_trace_ahb.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_reg_step.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/l5tsc.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/busif5x.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/busif5rdb.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/busif5.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/tcmwrap5.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/cachemem5.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/snoopmem5.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/axi/axi.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/axi/ahb2axib.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/axi/ahb2axi4b.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/jtag/libjtagcom.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/jtag/jtag.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/jtag/ahbjtagrv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/jtag/jtagcomrv.vhd
+      
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/pkg/noelv_cfg_64.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/pkg/noelv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/pkg/noelv_cpu_cfg.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/pkg/nvnlconfig.vhd
+
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/utilnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/noelvtypes.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/noelvint.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/nvsupport.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/mmuconfig.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/bhtnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/btbnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/btbdmnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/rasnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/tbufmemnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/fputilnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/mul64.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/div64.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/regfile64sramnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/regfile64dffnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/alunv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/rvvi.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/iunv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/itracenv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cctrl5nv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/mulfp.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/nanofpunv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cpucorenvbc.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cpucorenvb.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cpucorenv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/interrupt_file.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/imsic_int_files.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/fpsimutilnv.vhd
+
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/aclint/clint.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/aclint/clint_ahb.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/aclint/aclint_ahb.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/imsic/imsic_ahb.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/dm/dmnvint.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/dm/progbuf.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/dm/dmnvx.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/dm/dmnv.vhd
+      - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/subsys/noelvcpu.vhd
+    library: gaisler
+
+  - files:
+      - jtag_tap_wrap.vhd
+      - noelv_chs_wrap.vhd
+      - noelv_chs_axi_wrap.sv
+
+  - target: all(fpga, xilinx)
+    files:
+      - grlib-gpl-2025.2-b4298/lib/techmap/unisim/memory_kintex7.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/unisim/memory_ultrascale.vhd
+      - grlib-gpl-2025.2-b4298/lib/techmap/unisim/memory_unisim.vhd

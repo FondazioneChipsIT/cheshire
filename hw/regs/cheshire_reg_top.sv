@@ -151,7 +151,7 @@ module cheshire_reg_top #(
   logic hw_features_irq_router_re;
   logic hw_features_bus_err_qs;
   logic hw_features_bus_err_re;
-  logic hw_features_core_type_qs;
+  logic [1:0] hw_features_core_type_qs;
   logic hw_features_core_type_re;
   logic [31:0] llc_size_qs;
   logic llc_size_re;
@@ -873,9 +873,9 @@ module cheshire_reg_top #(
   );
 
 
-  //   F[core_type]: 14:14
+  //   F[core_type]: 15:14
   prim_subreg_ext #(
-    .DW    (1)
+    .DW    (2)
   ) u_hw_features_core_type (
     .re     (hw_features_core_type_re),
     .we     (1'b0),
@@ -1204,7 +1204,7 @@ module cheshire_reg_top #(
         reg_rdata_next[11] = hw_features_clic_qs;
         reg_rdata_next[12] = hw_features_irq_router_qs;
         reg_rdata_next[13] = hw_features_bus_err_qs;
-        reg_rdata_next[14] = hw_features_core_type_qs;
+        reg_rdata_next[15:14] = hw_features_core_type_qs;
       end
 
       addr_hit[21]: begin

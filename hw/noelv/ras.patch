@@ -1,0 +1,13 @@
+diff --git a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cpucorenvbc.vhd b/../../cheshire_noelv/cheshire/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cpucorenvbc.vhd
+index c8086be..6a230a0 100644
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cpucorenvbc.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cpucorenvbc.vhd
+@@ -731,7 +731,7 @@ begin
+   rasgen : if cfg_c.ras >= 1 generate
+     ras0 : rasnv
+       generic map (
+-        depth             => 8,
++        depth             => 2,
+         pcbits            => pcaddr_bits
+       )
+       port map (

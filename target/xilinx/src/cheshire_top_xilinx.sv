@@ -146,6 +146,16 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
     ret.ClicPrioWidth = 1;
   `endif
 
+  `ifdef TARGET_NOELV
+    ret.Core = NOELV;
+  `endif
+  `ifdef TARGET_VCU118
+    ret.Tech = VCU118;
+  `endif
+  `ifdef TARGET_GENESYS2
+    ret.Tech = GENESYS2;
+  `endif
+
   `ifdef TARGET_C910
     ret.Core            = C910;
     ret.AddrWidth       = 40;

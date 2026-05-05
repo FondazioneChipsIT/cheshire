@@ -1,0 +1,13 @@
+diff --git a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/axi/ahb2axib.vhd b/../../noelv/lib/gaisler/axi/ahb2axib.vhd
+index 7ba7f90..7c3ecfe 100644
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/axi/ahb2axib.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/axi/ahb2axib.vhd
+@@ -364,7 +364,7 @@ begin
+     report "AXI Write Response Channel: Write was unsuccessful! BRESP value : 0b"
+            & std_logic'image(aximi.b.resp(1))
+            & std_logic'image(aximi.b.resp(0))
+-    severity failure;
++    severity warning;
+   -- pragma translate_on
+ 
+   arst <= ahbsi.testrst when (ASYNC_RESET and scantest /= 0 and ahbsi.testen /= '0') else

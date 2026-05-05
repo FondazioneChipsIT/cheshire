@@ -22,7 +22,7 @@ dependencies:
   clint:                    { git: "https://github.com/pulp-platform/clint.git",                  version: =0.2.0  }
   common_cells:             { git: "https://github.com/pulp-platform/common_cells.git",           version: =1.38.0 }
   common_verification:      { git: "https://github.com/pulp-platform/common_verification.git",    version: =0.2.5  }
-  cva6:                     { git: "https://github.com/ricted98/cva6.git",                        rev: 43bc8910be } # branch: cva6splus
+  cva6:                     { git: "https://github.com/openhwgroup/cva6.git",                     rev: 02e11e3b9d9 }
   iDMA:                     { git: "https://github.com/pulp-platform/iDMA.git",                   version: =0.6.5  }
   irq_router:               { git: "https://github.com/pulp-platform/irq_router.git",             version: =0.0.1-beta.1 }
   opentitan_peripherals:    { git: "https://github.com/pulp-platform/opentitan_peripherals.git",  version: =0.4.0  }
@@ -32,6 +32,7 @@ dependencies:
   unbent:                   { git: "https://github.com/pulp-platform/unbent.git",                 version: =0.1.6  }
   dram_rtl_sim:             { git: "https://github.com/pulp-platform/dram_rtl_sim.git",           version: =0.1.1  }
   pulp-c910:                { git: "https://github.com/Simonzhu04/pulp-c910.git",                 rev: dae1a7f3    }
+  noelv:                    { path: hw/noelv                                                                       }
 
 export_include_dirs:
   - hw/include

@@ -207,8 +207,9 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
   //  JTAG  //
   ////////////
 
+  localparam int JTAGAccessWidth = (DutCfg.Core == NOELV) ? 2 : 3;
   localparam dm::sbcs_t JtagInitSbcs = dm::sbcs_t'{
-      sbautoincrement: 1'b1, sbreadondata: 1'b1, sbaccess: 3, default: '0};
+      sbautoincrement: 1'b1, sbreadondata: 1'b1, sbaccess: JTAGAccessWidth, default: '0};
 
   // Generate clock
   clk_rst_gen #(
@@ -348,7 +349,7 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
       // Write address as 64-bit double
       jtag_write(dm::SBAddress1, sec_addr[63:32]);
       jtag_write(dm::SBAddress0, sec_addr[31:0]);
-      for (longint i = 0; i <= sec_len ; i += 8) begin
+      for (longint i = 0; i <= sec_len ; i += 2**(JTAGAccessWidth)) begin
         bit checkpoint = (i != 0 && i % 512 == 0);
         if (checkpoint)
           $display("[JTAG] - %0d/%0d bytes (%0d%%)", i, sec_len, i*100/(sec_len>1 ? sec_len-1 : 1));

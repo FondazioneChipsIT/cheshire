@@ -60,10 +60,19 @@ package cheshire_pkg;
   typedef bit [63:0] doub_bt;
   typedef bit [ 9:0] dw_bt;   // data widths
   typedef bit [ 5:0] aw_bt;   // address, ID widths or small buffers
-  typedef enum logic {
-    CVA6            = 'b0,
-    C910            = 'b1
+  typedef enum logic [1:0] {
+    C910            = 'b00,
+    CVA6            = 'b01,
+    NOELV           = 'b10
   } core_select_e;
+
+  // NOEL-V tech
+  typedef enum int {
+    INFERRED        = 0,
+    GENESYS2        = 49,
+    GF22            = 64,
+    VCU118          = 65
+  } tech_select_e;
 
   // Externally controllable parameters
   typedef struct packed {
@@ -79,6 +88,7 @@ package cheshire_pkg;
     bit     Cva6ExtCieOnTop;
     // Hart parameters
     core_select_e Core;
+    tech_select_e Tech;
     bit [MaxCoresWidth-1:0] NumCores;
     doub_bt NumExtIrqHarts;
     doub_bt NumExtDbgHarts;
@@ -555,6 +565,7 @@ package cheshire_pkg;
     Cva6ExtCieOnTop   : 0,
     // Harts
     Core              : CVA6,
+    Tech              : INFERRED,
     NumCores          : 1,
     CoreMaxTxns       : 8,
     CoreMaxTxnsPerId  : 4,
