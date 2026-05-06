@@ -207,3 +207,10 @@ CHS_SW_TESTS += $(CHS_SW_TEST_ROM_DUMP:.rom.dump=.rom.memh) $(CHS_SW_TEST_ROM_DU
 
 # Add all dumps to test build
 CHS_SW_TESTS += $(CHS_SW_TEST_DUMP)
+
+# RTEMS build (external BSP)
+RTEMS_PORTS_DIR ?= $(CHS_ROOT)/../cpu-benchmarks-collection/target/cheshire/ports/rtems
+
+.PHONY: rtems
+rtems:
+	$(MAKE) -C $(RTEMS_PORTS_DIR) RTEMS_DIR=$(CHS_ROOT)/../rtems-project/rtems
