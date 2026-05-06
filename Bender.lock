@@ -101,7 +101,7 @@ packages:
       Git: https://github.com/pulp-platform/common_verification.git
     dependencies: []
   cva6:
-    revision: dfb2d92395e34e5a021f372cdcd6b716bbf31703
+    revision: db4c6af72f30b58127a2f1823368059e0693f278
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cva6.git
@@ -111,7 +111,7 @@ packages:
     - fpnew
     - tech_cells_generic
   cva6-dcls:
-    revision: 48c6d66571dd3ec34171616734e3c6fd3ab67db7
+    revision: d5b49a02fbeaf602b1930569f44a761b9985d229
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cva6-dcls.git
@@ -189,7 +189,7 @@ packages:
     - register_interface
     - tech_cells_generic
   redundancy_cells:
-    revision: 3c7c57e80fe2f65812db092182ce68ee810943df
+    revision: ac3597a8ae824dfc9b4bbda3d66d28786675ca83
     version: null
     source:
       Git: https://github.com/pulp-platform/redundancy_cells.git
@@ -199,8 +199,8 @@ packages:
     - register_interface
     - tech_cells_generic
   register_interface:
-    revision: 8e8c209ea559d3b54f45cf30fcce95ce70ff5e49
-    version: 0.4.6
+    revision: d6e1d4cdaab7870f4faf3f88a1c788eaf5ac129d
+    version: 0.4.7
     source:
       Git: https://github.com/pulp-platform/register_interface.git
     dependencies:

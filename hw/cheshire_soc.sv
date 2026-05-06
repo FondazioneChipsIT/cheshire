@@ -629,7 +629,9 @@ module cheshire_soc import cheshire_pkg::*; #(
     logic              clic_irq_v;
     logic [5:0]        clic_irq_vsid;
 
-    cva6 #(
+    cva6_dcls #(
+      .EnableDMR ( 1'b1 ),
+      .EnableHMR ( 1'b0 ),
       .CVA6Cfg        ( build_config_pkg::build_config(Cva6Cfg) ),
       .axi_ar_chan_t  ( axi_cva6_ar_chan_t ),
       .axi_aw_chan_t  ( axi_cva6_aw_chan_t ),
@@ -637,11 +639,12 @@ module cheshire_soc import cheshire_pkg::*; #(
       .b_chan_t       ( axi_cva6_b_chan_t  ),
       .r_chan_t       ( axi_cva6_r_chan_t  ),
       .noc_req_t      ( axi_cva6_req_t ),
-      .noc_resp_t     ( axi_cva6_rsp_t )
+      .noc_resp_t     ( axi_cva6_rsp_t ),
+      .apb_req_t      ( apb_req_t ),
+      .apb_rsp_t      ( apb_resp_t )
     ) i_core_cva6 (
       .clk_i,
       .rst_ni,
-      .clear_i ( '0 ),
       .boot_addr_i      ( BootAddr ),
       .hart_id_i        ( 64'(i) ),
       .irq_i            ( xeip[i] ),
@@ -664,7 +667,10 @@ module cheshire_soc import cheshire_pkg::*; #(
       .cvxif_req_o      ( ),
       .cvxif_resp_i     ( '0 ),
       .noc_req_o        ( core_out_req ),
-      .noc_resp_i       ( core_out_rsp )
+      .noc_resp_i       ( core_out_rsp ),
+      .dmr_failure_o    ( ), // Temorarily pending
+      .hmr_apb_req_i    ( '0 ), // Temorarily pending
+      .hmr_apb_rsp_o    ( ) // Temorarily pending
     );
 
     if (Cfg.BusErr) begin : gen_cva6_bus_err
