@@ -111,7 +111,7 @@ packages:
     - fpnew
     - tech_cells_generic
   cva6-dcls:
-    revision: 29de33706855b6772e25af359b56361b05d5e056
+    revision: dfd44141b355e3474e7f668e96da73ef58113ae8
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cva6-dcls.git
