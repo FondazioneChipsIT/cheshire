@@ -101,7 +101,7 @@ packages:
       Git: https://github.com/pulp-platform/common_verification.git
     dependencies: []
   cva6:
-    revision: 2544d3629e85bf60319849c16d222ee0ba2f5ef3
+    revision: 238998f4e8d8772470aa2a32d044541089180654
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cva6.git
@@ -111,7 +111,7 @@ packages:
     - fpnew
     - tech_cells_generic
   cva6-dcls:
-    revision: 30dc3e53a9601d61999bb5958cbcd2b1ff4e14ce
+    revision: 29de33706855b6772e25af359b56361b05d5e056
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cva6-dcls.git
