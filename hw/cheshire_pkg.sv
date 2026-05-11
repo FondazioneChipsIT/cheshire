@@ -527,6 +527,7 @@ package cheshire_pkg;
     ret.SuperscalarEn         = 1'b1;
     ret.BPType                = config_pkg::PH_BHT;
     ret.ALUBypass             = 1'b1;
+    ret.NrLoadPipeRegs        = 0;
     // Return modified config
     return ret;
   endfunction
@@ -542,7 +543,7 @@ package cheshire_pkg;
 
   localparam cheshire_cfg_t DefaultCfg = '{
     // CVA6 parameters
-    Cva6RASDepth      : 2,
+    Cva6RASDepth      : 4,
     Cva6BTBEntries    : 32,
     Cva6BHTEntries    : 128,
     Cva6NrPMPEntries  : 0,
