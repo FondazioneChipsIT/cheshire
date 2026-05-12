@@ -208,9 +208,21 @@ CHS_SW_TESTS += $(CHS_SW_TEST_ROM_DUMP:.rom.dump=.rom.memh) $(CHS_SW_TEST_ROM_DU
 # Add all dumps to test build
 CHS_SW_TESTS += $(CHS_SW_TEST_DUMP)
 
+# RTMES TOOLCHAIN build
+RTEMS_TOOLCHAIN_INSTALL_DIR ?= $(CHS_ROOT)/../rtems-project/compiler-strict
+
+.PHONY: rtems-toolchain
+rtems-toolchain:
+	@echo "[TOOLCHAIN] Starting build of strict-align toolchain..."
+	@$(CHS_ROOT)/../cpu-benchmarks-collection/target/cheshire/ports/rtems/toolchain/build-toolchain.sh \
+		$(CHS_ROOT)/../rtems-project/rsb-strict \
+		$(RTEMS_TOOLCHAIN_INSTALL_DIR)
+		
 # RTEMS build (external BSP)
 RTEMS_PORTS_DIR ?= $(CHS_ROOT)/../cpu-benchmarks-collection/target/cheshire/ports/rtems
 
 .PHONY: rtems
 rtems:
-	$(MAKE) -C $(RTEMS_PORTS_DIR) RTEMS_DIR=$(CHS_ROOT)/../rtems-project/rtems
+	$(MAKE) -C $(RTEMS_PORTS_DIR) \
+		RTEMS_DIR=$(CHS_ROOT)/../rtems-project/rtems \
+		RTEMS_TOOLS=$(CHS_ROOT)/../rtems-project/compiler-strict
