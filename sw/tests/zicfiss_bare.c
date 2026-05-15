@@ -1,20 +1,26 @@
-// this is a bare-metal test intended to verify the correct 
+// Copyright Fondazione Chips-IT.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Lorenzo Ridolfi <lorenzo.ridolfi@chips.it>
+
+// This is a bare-metal test intended to verify the correct
 // functioning of the Shadow Stack RISC-V extension on CVA6 CPU.
 // The test executes in Machine mode and the CPU is extended
 // with a custom Shadow Stack test mode CSR at address 0xCA0
-// which can be enabled only in machine mode (supposed to be 
-// trusted) by writing the value 1 in that CSR. Once the SS 
+// which can be enabled only in machine mode (supposed to be
+// trusted) by writing the value 1 in that CSR. Once the SS
 // test mode is enabled, the test verifies the correct execution
-// of the single Shadow Stack instructions by issueing a 
-// sequence of Shadow Stack Push instructions. 
+// of the single Shadow Stack instructions by issueing a
+// sequence of Shadow Stack Push instructions.
 // In parallel a "golden model" of the Shadow Stack pointer
 // is updated and then the orginal content of the link register
-// is compared with the value written on the Shadow Stack by 
-// the Shadow Stack Push instructions adn the updated 
+// is compared with the value written on the Shadow Stack by
+// the Shadow Stack Push instructions adn the updated
 // Shadow Stack pointer. The Shadow Stack Pointer
 // is verified by using the Shadow Stack pointer read instruction.
-// Then a sequence of Shadow Stack Pop Check instructions is executed. 
-// Also the compressed version of the instrction is verified.     
+// Then a sequence of Shadow Stack Pop Check instructions is executed.
+// Also the compressed version of the instrction is verified.
 
 #include "regs/cheshire.h"
 #include "dif/clint.h"
@@ -39,307 +45,262 @@ int main(void) {
 
     // define Shadow Stack base addr
     // to test the ISA ext. is in a random data location
-    uint64_t * ssp = (long int *)0x800084e0;
+    uint64_t *ssp = (long int *)0x800084e0;
 
     // Number of iteration of Shadow Stack writes
     uint32_t ssp_iter = 4;
 
     // emulate link register content
     uint64_t lr_content[ssp_iter];
-    for (int i = 0; i < ssp_iter; i++)
-    	lr_content[i] = LR_BASE + i * 4;
+    for (int i = 0; i < ssp_iter; i++) lr_content[i] = LR_BASE + i * 4;
 
     *ssp = 0xbaadc0de;
 
     // Enable Shadow Stack test mode
-    asm volatile("csrw %0, %1"
-                  :
-                  : "i"(CSR_SSTE), "r"(1)
-                  : "memory");
+    asm volatile("csrw %0, %1" : : "i"(CSR_SSTE), "r"(1) : "memory");
 
     // Menv SS enable
-    asm volatile("csrw %0, %1"
-                  :
-                  : "i"(CSR_MENVCFG), "r"(8)
-                  : "memory");
+    asm volatile("csrw %0, %1" : : "i"(CSR_MENVCFG), "r"(8) : "memory");
 
     // HENV SS enable
-    asm volatile("csrw %0, %1"
-                  :
-                  : "i"(CSR_HENVCFG), "r"(8)
-                  : "memory");
+    asm volatile("csrw %0, %1" : : "i"(CSR_HENVCFG), "r"(8) : "memory");
 
     // SENV SS enable
-    asm volatile("csrw %0, %1"
-                  :
-                  : "i"(CSR_SENVCFG), "r"(8)
-                  : "memory");
+    asm volatile("csrw %0, %1" : : "i"(CSR_SENVCFG), "r"(8) : "memory");
 
     // Set the machine status register (mstatus) for Supervisor Mode
     unsigned long mstatus;
-    asm volatile ("csrr %0, mstatus" : "=r"(mstatus)); // Read mstatus
-    mstatus &= ~MSTATUS_MPP;  // Clear MPP (Machine Previous Privilege)
-    mstatus |= (1 << 11);     // Set MPP to 01 (Supervisor Mode)
-    asm volatile ("csrw mstatus, %0" :: "r"(mstatus)); // Write back to mstatus
- 
+    asm volatile("csrr %0, mstatus" : "=r"(mstatus)); // Read mstatus
+    mstatus &= ~MSTATUS_MPP;                          // Clear MPP (Machine Previous Privilege)
+    mstatus |= (1 << 11);                             // Set MPP to 01 (Supervisor Mode)
+    asm volatile("csrw mstatus, %0" ::"r"(mstatus));  // Write back to mstatus
+
     // Variable to read the link register
     // uint64_t lr;
     uint64_t *ssprd_check;
 
-
     // Write shadow stack pointer CSR
-    asm volatile("csrw %0, %1"
-                  :
-                  : "i"(CSR_SSP), "r"(ssp)
-                  : "memory");
+    asm volatile("csrw %0, %1" : : "i"(CSR_SSP), "r"(ssp) : "memory");
 
-    for (int i = 0; i < 500; i++) asm volatile ("nop\n");
+    for (int i = 0; i < 500; i++) asm volatile("nop\n");
 
     // Read Shadow Stack pointer in t0
-    asm volatile (".word 0xCDC042F3");
-    for(int i = 0; i < 20; i++) asm volatile ("nop\n");
+    asm volatile(".word 0xCDC042F3");
+    for (int i = 0; i < 20; i++) asm volatile("nop\n");
 
     // Copy Shadow Stack pointer in variable
-    asm volatile (
-       "mv %0, t0\n" //
-       : "=r" (ssprd_check)
-       :
-       :
-    );
+    asm volatile("mv %0, t0\n" //
+                 : "=r"(ssprd_check)
+                 :
+                 :);
 
-    // Check Shadow Stack pointer read 
+    // Check Shadow Stack pointer read
     if (ssprd_check == ssp) {
         printf("Shadow Stack pointer read correct: ssp: %x, reg content: %x\n", ssp, ssprd_check);
     } else {
         printf("Shadow Stack pointer read broken: ssp: %x, reg content: %x\n", ssp, ssprd_check);
-	    return 1;
+        return 1;
     }
 
     printf("//--- Test compressed shadow stack push (on x1)\n");
     for (uint32_t i = 0; i < ssp_iter; i++) {
-        
+
         // Update shadow stack pointer in parallel
-	    ssp--;
-        
+        ssp--;
+
         // load lr content in x1 to check
-        asm volatile (
-            "ld x1, %0\n"
-            :
-            : "m" (lr_content[i])
-        );
+        asm volatile("ld x1, %0\n" : : "m"(lr_content[i]));
 
         // Execute a Shadow Stack Push instruction
         asm volatile(".half 0x6082");
-	
-        // Read Shadow Stack pointer in t0
-        asm volatile (".word 0xCDC042F3");
-     
-	    // Copy Shadow Stack pointer in variable
-        asm volatile (
-            "mv %0, t0\n" //
-            : "=r" (ssprd_check)
-            :
-            :
-        );
-   
-        printf("Compressed shadow Stack push %d: Val at address 0x%x is: 0x%x, x1 content: 0x%x, CVA6 ssp: 0x%x\n", i, (unsigned long)ssp, *ssp, lr_content[i], ssprd_check);
 
-        if(ssp != ssprd_check || lr_content[i] != *ssp){
+        // Read Shadow Stack pointer in t0
+        asm volatile(".word 0xCDC042F3");
+
+        // Copy Shadow Stack pointer in variable
+        asm volatile("mv %0, t0\n" //
+                     : "=r"(ssprd_check)
+                     :
+                     :);
+
+        printf("Compressed shadow Stack push %d: Val at address 0x%x is: 0x%x, x1 content: 0x%x, "
+               "CVA6 ssp: 0x%x\n",
+               i, (unsigned long)ssp, *ssp, lr_content[i], ssprd_check);
+
+        if (ssp != ssprd_check || lr_content[i] != *ssp) {
             printf("early exit, failed at: %d\n", i);
-	    return i;
+            return i;
         }
     }
-    
-    printf("//----- Test compressed shadow stack pop check (on x5)\n"); 
-    for (int i = 0; i < ssp_iter; i++) {   
-        asm volatile (
-            "ld x5, %0\n"
-            :
-            : "m" (lr_content[ssp_iter - i - 1])
-        );
- 
-	    // Shadow Stack pop check    
-        asm volatile (".half 0x6282");
 
-        printf("Val at ssp 0x%x is: 0x%x, x5 content: 0x%x\n", (unsigned long)ssp, *ssp, lr_content[ssp_iter - i - 1]);
+    printf("//----- Test compressed shadow stack pop check (on x5)\n");
+    for (int i = 0; i < ssp_iter; i++) {
+        asm volatile("ld x5, %0\n" : : "m"(lr_content[ssp_iter - i - 1]));
 
+        // Shadow Stack pop check
+        asm volatile(".half 0x6282");
 
-        for (int j = 0; j < 50; j++) asm volatile ("nop\n");
-        
+        printf("Val at ssp 0x%x is: 0x%x, x5 content: 0x%x\n", (unsigned long)ssp, *ssp,
+               lr_content[ssp_iter - i - 1]);
+
+        for (int j = 0; j < 50; j++) asm volatile("nop\n");
+
         ssp++;
-        	
+
         // Shadow stack pointer read in t0
-        asm volatile (".word 0xCDC042F3");
-        
-	    // Copy Shadow Stack pointer in variable
-        asm volatile (
-            "mv %0, t0\n" //
-            : "=r" (ssprd_check)
-            :
-            :
-        );
-        
+        asm volatile(".word 0xCDC042F3");
+
+        // Copy Shadow Stack pointer in variable
+        asm volatile("mv %0, t0\n" //
+                     : "=r"(ssprd_check)
+                     :
+                     :);
+
         // Check Shadow stack pointer
-	    if (ssp != ssprd_check) {      
-            printf("Compressed Shadow Stack pop check iter %d wrong: Current CVA6 ssp: %x, GM ssp: %x\n", i, ssprd_check, ssp);
+        if (ssp != ssprd_check) {
+            printf("Compressed Shadow Stack pop check iter %d wrong: Current CVA6 ssp: %x, GM ssp: "
+                   "%x\n",
+                   i, ssprd_check, ssp);
             return i;
-	    }
+        }
         printf("ssppopchk iter %d ok: CVA6 ssp: %x, GM ssp: %x\n", i, ssprd_check, ssp);
     }
 
     printf("//------- Test Shadow Stack Push on x1\n");
     for (uint32_t i = 0; i < ssp_iter; i++) {
-        
+
         // Update shadow stack pointer in parallel
-	    ssp--;
-        
+        ssp--;
+
         // load lr content in x1 to check
-        asm volatile (
-            "ld x1, %0\n"
-            :
-            : "m" (lr_content[i])
-        );
+        asm volatile("ld x1, %0\n" : : "m"(lr_content[i]));
 
         // Execute a Shadow Stack Push instruction
         asm volatile(".word 0xCE104073");
-	
+
         // Read Shadow Stack pointer in t0
-        asm volatile (".word 0xCDC042F3");
-     
-	    // Copy Shadow Stack pointer in variable
-        asm volatile (
-            "mv %0, t0\n" //
-            : "=r" (ssprd_check)
-            :
-            :
-        );
-   
-        printf("Shadow Stack push %d: Val at address 0x%x is: 0x%x, x1 content: 0x%x, CVA6 ssp: 0x%x\n", i, (unsigned long)ssp, *ssp, lr_content[i], ssprd_check);
+        asm volatile(".word 0xCDC042F3");
+
+        // Copy Shadow Stack pointer in variable
+        asm volatile("mv %0, t0\n" //
+                     : "=r"(ssprd_check)
+                     :
+                     :);
+
+        printf("Shadow Stack push %d: Val at address 0x%x is: 0x%x, x1 content: 0x%x, CVA6 ssp: "
+               "0x%x\n",
+               i, (unsigned long)ssp, *ssp, lr_content[i], ssprd_check);
 
         if (ssp != ssprd_check || lr_content[i] != *ssp) {
             printf("early exit, failed at: %d\n", i);
-	        return i;
+            return i;
         }
     }
     //------------------------------------------------------
-    printf("%d SSP executed with success, current Shadow Stack pointer: %x\n", ssp_iter,(unsigned long) ssp);
+    printf("%d SSP executed with success, current Shadow Stack pointer: %x\n", ssp_iter,
+           (unsigned long)ssp);
 
     printf("//------- Test Shadow Stack Pop Check on x1\n");
-    for (int i = 0; i < ssp_iter; i++) {   
-        asm volatile (
-            "ld x1, %0\n"
-            :
-            : "m" (lr_content[ssp_iter - i - 1])
-	    );
-        
-	    // Shadow stack pointer read in t0
-        asm volatile (".word 0xCDC042F3");
+    for (int i = 0; i < ssp_iter; i++) {
+        asm volatile("ld x1, %0\n" : : "m"(lr_content[ssp_iter - i - 1]));
+
+        // Shadow stack pointer read in t0
+        asm volatile(".word 0xCDC042F3");
 
         // Copy Shadow Stack pointer in variable
-        asm volatile (
-            "mv %0, t0\n" //
-          : "=r" (ssprd_check)
-          :
-          :
-        );
- 
-	    // Shadow Stack pop check    
-        asm volatile (".word 0xCDC0C073");
-        for(int j = 0; j < 50; j++) asm volatile ("nop\n");
-        
+        asm volatile("mv %0, t0\n" //
+                     : "=r"(ssprd_check)
+                     :
+                     :);
+
+        // Shadow Stack pop check
+        asm volatile(".word 0xCDC0C073");
+        for (int j = 0; j < 50; j++) asm volatile("nop\n");
+
         ssp++;
-        	
+
         // Shadow stack pointer read in t0
-        asm volatile (".word 0xCDC042F3");
-        
-	    // Copy Shadow Stack pointer in variable
-        asm volatile (
-            "mv %0, t0\n" //
-          : "=r" (ssprd_check)
-          :
-          :
-        );
+        asm volatile(".word 0xCDC042F3");
 
-	    if (ssp != ssprd_check) {      
-             printf("Shadow Stack pop check iter %d wrong: Current CVA6 ssp: %x, GM ssp: %x\n", i, ssprd_check, ssp);
-             return i;
-	    }
+        // Copy Shadow Stack pointer in variable
+        asm volatile("mv %0, t0\n" //
+                     : "=r"(ssprd_check)
+                     :
+                     :);
+
+        if (ssp != ssprd_check) {
+            printf("Shadow Stack pop check iter %d wrong: Current CVA6 ssp: %x, GM ssp: %x\n", i,
+                   ssprd_check, ssp);
+            return i;
+        }
         printf("ssppopchk iter %d ok: CVA6 ssp: %x, GM ssp: %x\n", i, ssprd_check, ssp);
-
     }
 
-    //---------------------------------- Test x5 as link register ---------------------------------------------------//
+    //---------------------------------- Test x5 as link register
+    //---------------------------------------------------//
     printf("//------- Test Shadow Stack Push on x5\n");
-    for (int i = 0; i < ssp_iter; i++) {	 
+    for (int i = 0; i < ssp_iter; i++) {
         // Update shadow stack pointer in parallel
-	    ssp--;
+        ssp--;
 
         // load lr content in x1 to check
-        asm volatile (
-            "ld x5, %0\n"
-            :
-            : "m" (lr_content[i])
-        );
+        asm volatile("ld x5, %0\n" : : "m"(lr_content[i]));
 
         // Shadow stack push with x5 as link register
-        asm volatile (".word 0xCE504073");
- 
-	    // Read Shadow Stack pointer in t0
-        asm volatile (".word 0xCDC042F3");
-     
-	    // Copy Shadow Stack pointer in variable
-        asm volatile (
-            "mv %0, t0\n" //
-            : "=r" (ssprd_check)
-            :
-            :
-        );
-   
-        printf("Shadow Stack push %d: Val at address 0x%x is: 0x%x, x5 content: 0x%x, CVA6 ssp: 0x%x\n", i, (unsigned long)ssp, *ssp, lr_content[i], ssprd_check);
+        asm volatile(".word 0xCE504073");
+
+        // Read Shadow Stack pointer in t0
+        asm volatile(".word 0xCDC042F3");
+
+        // Copy Shadow Stack pointer in variable
+        asm volatile("mv %0, t0\n" //
+                     : "=r"(ssprd_check)
+                     :
+                     :);
+
+        printf("Shadow Stack push %d: Val at address 0x%x is: 0x%x, x5 content: 0x%x, CVA6 ssp: "
+               "0x%x\n",
+               i, (unsigned long)ssp, *ssp, lr_content[i], ssprd_check);
 
         // Check Shadow astack pointer and content of the link register
         if (ssp != ssprd_check || lr_content[i] != *ssp) {
             printf("early exit, failed at: %d\n", i);
-	        return i;
+            return i;
         }
     }
 
     printf("//------- Test Shadow Stack Pop Check on x5\n");
-    for (int i = 0; i < ssp_iter; i++) { 
-        asm volatile (
-            "ld x5, %0\n"
-            :
-            : "m" (lr_content[ssp_iter - i - 1])
-        );
+    for (int i = 0; i < ssp_iter; i++) {
+        asm volatile("ld x5, %0\n" : : "m"(lr_content[ssp_iter - i - 1]));
 
-	    // Shadow Stack pop check in x5    
-        asm volatile (".word 0xCDC2C073");
+        // Shadow Stack pop check in x5
+        asm volatile(".word 0xCDC2C073");
 
-	    printf("Val at ssp 0x%x is: 0x%x, x5 content: 0x%x\n", (unsigned long)ssp, *ssp, lr_content[ssp_iter - i - 1]);
+        printf("Val at ssp 0x%x is: 0x%x, x5 content: 0x%x\n", (unsigned long)ssp, *ssp,
+               lr_content[ssp_iter - i - 1]);
 
-        for(int j = 0; j < 50; j++) asm volatile ("nop\n");
-        
+        for (int j = 0; j < 50; j++) asm volatile("nop\n");
+
         ssp++;
-        	
-	    // Shadow stack pointer read in t0
-        asm volatile (".word 0xCDC042F3");
-        
-	    // Copy Shadow Stack pointer in variable
-        asm volatile (
-            "mv %0, t0\n" //
-          : "=r" (ssprd_check)
-          :
-          :
-        );
 
-        if (ssp != ssprd_check) {      
-                printf("Shadow Stack pop check iter %d wrong: Current CVA6 ssp: %x, GM ssp: %x\n", i, ssprd_check, ssp);
-                return i;
+        // Shadow stack pointer read in t0
+        asm volatile(".word 0xCDC042F3");
+
+        // Copy Shadow Stack pointer in variable
+        asm volatile("mv %0, t0\n" //
+                     : "=r"(ssprd_check)
+                     :
+                     :);
+
+        if (ssp != ssprd_check) {
+            printf("Shadow Stack pop check iter %d wrong: Current CVA6 ssp: %x, GM ssp: %x\n", i,
+                   ssprd_check, ssp);
+            return i;
         }
-        printf("ssppopchk iter %d ok: CVA6 ssp: %x, GM ssp: %x\n", i, ssprd_check, ssp); 
+        printf("ssppopchk iter %d ok: CVA6 ssp: %x, GM ssp: %x\n", i, ssprd_check, ssp);
     }
-    
-    printf("Test succesfully finished\n\r"); 
+
+    printf("Test succesfully finished\n\r");
 
     return 0;
 }
