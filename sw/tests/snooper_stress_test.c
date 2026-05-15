@@ -1,3 +1,9 @@
+// Copyright Fondazione Chips-IT.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Lorenzo Ridolfi <lorenzo.ridolfi@chips.it>
+
 #include "regs/cheshire.h"
 #include "dif/clint.h"
 #include "dif/uart.h"
@@ -18,7 +24,7 @@ void clear_register_bit(void *base_addr, uint32_t reg_offset, uint32_t bit_posit
 }
 
 int main(void) {
-    
+
     extern char dummy1_code_start, dummy1_code_end, dummy2_code_start, dummy2_code_end, dummy3_code_start, dummy3_code_end;
 
     int base, last, new_last, PC_DST_H, PC_DST_L, PC_SRC_L, PC_SRC_H, CTR_TYPE;
@@ -75,7 +81,7 @@ int main(void) {
     // thus the watermark level is increased by 5 for every element logged in address mode
 
     // Set watermark level to 10 instructions (instruction mode) or 2 instruction addresses (address mode)
-    *reg32(&__base_snprcfg, CFG_REGS_WATERMARK_LEVEL_REG_OFFSET) = 0x0000000a; 
+    *reg32(&__base_snprcfg, CFG_REGS_WATERMARK_LEVEL_REG_OFFSET) = 0x0000000a;
     // Enable watermark interrupt
     set_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_WATERMARK_EN_BIT);
 
@@ -213,4 +219,3 @@ int main(void) {
 
     return 0;
 }
-

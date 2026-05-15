@@ -1,10 +1,12 @@
-// Copyright 2026 Fondazione Chips-IT.
+// Copyright Fondazione Chips-IT.
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 //
+// Pierangelo Rapa <pierangelo.rapa@chips.it>
+//
 // Cheshire PLIC driver
 //
-// A self-contained, header-only driver for the rv_plic peripheral  
+// A self-contained, header-only driver for the rv_plic peripheral
 // The hardware is the OT-derived `rv_plic` IP from the `opentitan_peripherals` repository, instantiated
 // in `cheshire_soc.sv`.
 //

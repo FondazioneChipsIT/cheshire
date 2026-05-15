@@ -1,3 +1,9 @@
+// Copyright Fondazione Chips-IT.
+// Licensed under the Apache License, Version 2.0, see LICENSE for details.
+// SPDX-License-Identifier: Apache-2.0
+//
+// Lorenzo Ridolfi <lorenzo.ridolfi@chips.it>
+
 #include "regs/cheshire.h"
 #include "dif/clint.h"
 #include "dif/uart.h"
@@ -18,17 +24,17 @@ void clear_register_bit(void *base_addr, uint32_t reg_offset, uint32_t bit_posit
 }
 
 int main(void) {
-    
+
     extern char dummy1_code_start, dummy1_code_end, dummy2_code_start, dummy2_code_end;
 
-    uint32_t instructions[] = {0xf3000017, 0xf3000017, 
+    uint32_t instructions[] = {0xf3000017, 0xf3000017,
                                 0x00100013, 0xda678013,
-                                0xf3000017, 0x00200013, 
-                                0xd9a78013, 0xf3000017, 
+                                0xf3000017, 0x00200013,
+                                0xd9a78013, 0xf3000017,
                                 0x00300013, 0xd8e78013,
-                                0xf3000017, 0xf3000017, 
-                                0xd8270013, 0xf3000017,  
-                                0xd7278013, 0xf3000017, 
+                                0xf3000017, 0xf3000017,
+                                0xd8270013, 0xf3000017,
+                                0xd7278013, 0xf3000017,
                                 0xd6678013};
 
 
@@ -113,7 +119,7 @@ int main(void) {
     //-------------------------------------TRIGGER INTERRUPT---------------------------------------//
     // This interrupt triggers when the snooper reads a committing instruction with PC=TRIGGER_PC0
     // The trigger interrupt resets the snooper ctrl register, this stops the snooper operation
-    // allowing to read the execution trace without the risk of new instructions 
+    // allowing to read the execution trace without the risk of new instructions
     // overwriting the instructions already stored in the buffer
 
     // Enable level triggered behaviour for trigger interrupt (default behaviour is edge triggered)
@@ -136,7 +142,7 @@ int main(void) {
     // thus the watermark level is increased by 5 for every element logged in address mode
 
     // Set watermark level to 10 instructions (instruction mode) or 2 instruction addresses (address mode)
-    *reg32(&__base_snprcfg, CFG_REGS_WATERMARK_LEVEL_REG_OFFSET) = 0x0000000a; 
+    *reg32(&__base_snprcfg, CFG_REGS_WATERMARK_LEVEL_REG_OFFSET) = 0x0000000a;
     // Enable watermark interrupt
     set_register_bit(&__base_snprcfg, CFG_REGS_CTRL_REG_OFFSET,CFG_REGS_CTRL_WATERMARK_EN_BIT);
 
@@ -153,7 +159,7 @@ int main(void) {
     *reg32(&__base_regs, CHESHIRE_SCRATCH_2_REG_OFFSET) = 2;
     *reg32(&__base_regs, CHESHIRE_SCRATCH_3_REG_OFFSET) = 3;
     for (int i=0; i<(int) *reg32(&__base_regs, CHESHIRE_SCRATCH_3_REG_OFFSET); i++) {
-        *reg32(&__base_regs, CHESHIRE_SCRATCH_0_REG_OFFSET) = 0;  
+        *reg32(&__base_regs, CHESHIRE_SCRATCH_0_REG_OFFSET) = 0;
     }
 
     asm volatile ("dummy2_code_end:");
@@ -176,4 +182,3 @@ int main(void) {
 
     return 0;
 }
-
