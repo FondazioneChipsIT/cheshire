@@ -24,55 +24,41 @@ int main(void) {
     uart_init(&__base_uart, reset_freq, __BOOT_BAUDRATE);
 
     // Enable landing pad on machine mode
-    asm volatile("csrw %0, %1"
-                  :
-                  : "i"(CSR_MSECCFG), "r"(1024)
-                  : "memory");
+    asm volatile("csrw %0, %1" : : "i"(CSR_MSECCFG), "r"(1024) : "memory");
 
     // Menv LP enable
-    asm volatile("csrw %0, %1"
-                  :
-                  : "i"(CSR_MENVCFG), "r"(4)
-                  : "memory");
+    asm volatile("csrw %0, %1" : : "i"(CSR_MENVCFG), "r"(4) : "memory");
 
     // HENV LP enable
-    asm volatile("csrw %0, %1"
-                  :
-                  : "i"(CSR_HENVCFG), "r"(4)
-                  : "memory");
+    asm volatile("csrw %0, %1" : : "i"(CSR_HENVCFG), "r"(4) : "memory");
 
     // SENV LP enable
-    asm volatile("csrw %0, %1"
-                  :
-                  : "i"(CSR_SENVCFG), "r"(4)
-                  : "memory");
+    asm volatile("csrw %0, %1" : : "i"(CSR_SENVCFG), "r"(4) : "memory");
 
     // test jalr
-    asm volatile (
-        "la   t1, lpad0       \n\t"
-        "jalr ra, t1, 0       \n\t"
-        "nop                  \n\t"
-        "nop                  \n\t"
-        "nop                  \n\t"
+    asm volatile("la   t1, lpad0       \n\t"
+                 "jalr ra, t1, 0       \n\t"
+                 "nop                  \n\t"
+                 "nop                  \n\t"
+                 "nop                  \n\t"
 
-        "lpad0:               \n\t"
-        ".word 0x00000017     \n\t"  // landing pad instruction
+                 "lpad0:               \n\t"
+                 ".word 0x00000017     \n\t" // landing pad instruction
     );
 
     // test jr
-    asm volatile (
-        "la   t1, lpad1       \n\t"
-        "jr   t1              \n\t"
-        "nop                  \n\t"
-        "nop                  \n\t"
-        "nop                  \n\t"
+    asm volatile("la   t1, lpad1       \n\t"
+                 "jr   t1              \n\t"
+                 "nop                  \n\t"
+                 "nop                  \n\t"
+                 "nop                  \n\t"
 
-        "lpad1:               \n\t"
-        ".word 0x00000017     \n\t"  // landing pad instruction
+                 "lpad1:               \n\t"
+                 ".word 0x00000017     \n\t" // landing pad instruction
     );
 
     // test jalr with label
-    asm volatile (
+    asm volatile(
         "lui   t2, 123    \n\t" // set landing pad label in the bits 31:12 of the x7 register
         "la   t1, lpad3   \n\t"
         "jalr ra, t1, 0   \n\t"

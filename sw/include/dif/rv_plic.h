@@ -7,8 +7,8 @@
 // Cheshire PLIC driver
 //
 // A self-contained, header-only driver for the rv_plic peripheral
-// The hardware is the OT-derived `rv_plic` IP from the `opentitan_peripherals` repository, instantiated
-// in `cheshire_soc.sv`.
+// The hardware is the OT-derived `rv_plic` IP from the `opentitan_peripherals` repository,
+// instantiated in `cheshire_soc.sv`.
 //
 //
 // Source count:
@@ -81,7 +81,7 @@
  * Important: PLIC source IDs are derived from the bit index in
  * cheshire_intr_t.  See the file header for the full source mapping.
  */
-#define CHS_PLIC_NUM_SRC     ((uint32_t)RV_PLIC_PARAM_NUM_SRC)
+#define CHS_PLIC_NUM_SRC ((uint32_t)RV_PLIC_PARAM_NUM_SRC)
 
 /**
  * Number of interrupt targets (harts) in the rv_plic.
@@ -89,13 +89,13 @@
  * Target 0 = CVA6 machine-mode hart 0 (host domain).
  * Targets 1..5 map to additional harts in other domains.
  */
-#define CHS_PLIC_NUM_TARGET  ((uint32_t)RV_PLIC_PARAM_NUM_TARGET)
+#define CHS_PLIC_NUM_TARGET ((uint32_t)RV_PLIC_PARAM_NUM_TARGET)
 
 /**
  * Maximum priority value. Derived from `RV_PLIC_PARAM_PRIO_WIDTH` in the
  * auto-generated `rv_plic_regs.h` (3-bit field → range 0 (off) to 7 (highest)).
  */
-#define CHS_PLIC_MAX_PRIO    ((1u << RV_PLIC_PARAM_PRIO_WIDTH) - 1u)
+#define CHS_PLIC_MAX_PRIO ((1u << RV_PLIC_PARAM_PRIO_WIDTH) - 1u)
 
 // ---------------------------------------------------------------------------
 // Interrupt source IDs (hardware wiring, derived from SoC package)
@@ -105,17 +105,17 @@
 // Source 0 (cheshire_int_intr_t.zero) is always 0 — do not enable it.
 
 /** PULP integer cluster end-of-compute signal. */
-#define CHS_PLIC_IRQ_PULPCL_EOC          60u
+#define CHS_PLIC_IRQ_PULPCL_EOC 60u
 /** PULP integer cluster → host-domain mailbox interrupt. */
-#define CHS_PLIC_IRQ_PULPCL_MBOX_HOSTD  61u
+#define CHS_PLIC_IRQ_PULPCL_MBOX_HOSTD 61u
 /** Spatz FP cluster → host-domain mailbox interrupt. */
 #define CHS_PLIC_IRQ_SPATZCL_MBOX_HOSTD 62u
 /** Safety island → host-domain mailbox interrupt. */
-#define CHS_PLIC_IRQ_SAFED_MBOX_HOSTD   63u
+#define CHS_PLIC_IRQ_SAFED_MBOX_HOSTD 63u
 /** Security island → host-domain mailbox interrupt. */
-#define CHS_PLIC_IRQ_SECD_MBOX_HOSTD    64u
+#define CHS_PLIC_IRQ_SECD_MBOX_HOSTD 64u
 /** L2 ECC error interrupt. */
-#define CHS_PLIC_IRQ_L2_ECC_ERR          65u
+#define CHS_PLIC_IRQ_L2_ECC_ERR 65u
 // Sources 66..82: car_periph_intrs (advanced timers, system timers,
 //                 watchdog timers, CAN, Ethernet).
 // Sources 83..91: unused (tied to 0).
@@ -128,15 +128,13 @@
  * Priority register offset for interrupt source @p irq.
  * Layout: one 32-bit word per source starting at offset 0x0.
  */
-#define CHS_PLIC_PRIO_OFFSET(irq) \
-    ((uintptr_t)(irq) * 4u)
+#define CHS_PLIC_PRIO_OFFSET(irq) ((uintptr_t)(irq) * 4u)
 
 /**
  * Interrupt-Pending register offset containing the pending bit for @p irq.
  * Layout: 1 bit per source, packed into 32-bit words at base 0x1000.
  */
-#define CHS_PLIC_IP_OFFSET(irq) \
-    (0x1000u + ((uintptr_t)(irq) / 32u) * 4u)
+#define CHS_PLIC_IP_OFFSET(irq) (0x1000u + ((uintptr_t)(irq) / 32u) * 4u)
 
 /**
  * Stride in bytes between the IE register banks of consecutive targets.
@@ -144,7 +142,7 @@
  * PLIC specification and confirmed by the rv_plic register file
  * (IE0_0=0x2000, IE1_0=0x2080).
  */
-#define CHS_PLIC_IE_TARGET_STRIDE  0x80u
+#define CHS_PLIC_IE_TARGET_STRIDE 0x80u
 
 /**
  * Interrupt-Enable register offset for source @p irq and target @p target.
@@ -152,14 +150,13 @@
  * are packed into 32-bit words (1 bit per source).
  */
 #define CHS_PLIC_IE_OFFSET(target, irq) \
-    (0x2000u + (uintptr_t)(target) * CHS_PLIC_IE_TARGET_STRIDE \
-             + ((uintptr_t)(irq) / 32u) * 4u)
+    (0x2000u + (uintptr_t)(target) * CHS_PLIC_IE_TARGET_STRIDE + ((uintptr_t)(irq) / 32u) * 4u)
 
 /**
  * Stride in bytes between the Threshold/CC register pairs of consecutive
  * targets. THRESHOLD0=0x200000, THRESHOLD1=0x201000 → stride = 0x1000.
  */
-#define CHS_PLIC_TARGET_UPPER_STRIDE  0x1000u
+#define CHS_PLIC_TARGET_UPPER_STRIDE 0x1000u
 
 /**
  * Priority Threshold register offset for @p target.
@@ -174,8 +171,7 @@
  * Reading this register claims the highest-priority pending interrupt;
  * writing the returned source ID back completes service.
  */
-#define CHS_PLIC_CC_OFFSET(target) \
-    (0x200004u + (uintptr_t)(target) * CHS_PLIC_TARGET_UPPER_STRIDE)
+#define CHS_PLIC_CC_OFFSET(target) (0x200004u + (uintptr_t)(target) * CHS_PLIC_TARGET_UPPER_STRIDE)
 
 /**
  * Machine Software Interrupt Pending register offset for @p target.
@@ -190,10 +186,10 @@
 // ---------------------------------------------------------------------------
 
 /** Operation completed successfully. */
-#define CHS_PLIC_OK       0
+#define CHS_PLIC_OK 0
 
 /** Bad argument (NULL pointer or out-of-range value). */
-#define CHS_PLIC_ERR_ARG  (-1)
+#define CHS_PLIC_ERR_ARG (-1)
 
 // ---------------------------------------------------------------------------
 // Types
@@ -246,8 +242,7 @@ static inline int chs_plic_reset(void *base) {
     for (chs_plic_target_t t = 0; t < CHS_PLIC_NUM_TARGET; ++t) {
         /* IE words for this target */
         for (uint32_t w = 0; w < num_ie_words; ++w)
-            *_chs_plic_reg(base,
-                0x2000u + t * CHS_PLIC_IE_TARGET_STRIDE + w * 4u) = 0u;
+            *_chs_plic_reg(base, 0x2000u + t * CHS_PLIC_IE_TARGET_STRIDE + w * 4u) = 0u;
         /* Threshold */
         *_chs_plic_reg(base, CHS_PLIC_THRESHOLD_OFFSET(t)) = 0u;
         /* Software interrupt */
@@ -269,11 +264,8 @@ static inline int chs_plic_reset(void *base) {
  * @param priority  Priority value in the range [0, CHS_PLIC_MAX_PRIO].
  * @return CHS_PLIC_OK, or CHS_PLIC_ERR_ARG on invalid input.
  */
-static inline int chs_plic_irq_set_priority(void *base,
-                                             chs_plic_irq_id_t irq,
-                                             uint32_t priority) {
-    if (!base || irq >= CHS_PLIC_NUM_SRC || priority > CHS_PLIC_MAX_PRIO)
-        return CHS_PLIC_ERR_ARG;
+static inline int chs_plic_irq_set_priority(void *base, chs_plic_irq_id_t irq, uint32_t priority) {
+    if (!base || irq >= CHS_PLIC_NUM_SRC || priority > CHS_PLIC_MAX_PRIO) return CHS_PLIC_ERR_ARG;
     *_chs_plic_reg(base, CHS_PLIC_PRIO_OFFSET(irq)) = priority;
     return CHS_PLIC_OK;
 }
@@ -290,12 +282,9 @@ static inline int chs_plic_irq_set_priority(void *base,
  * @param enable  Non-zero to enable the interrupt; zero to disable it.
  * @return CHS_PLIC_OK, or CHS_PLIC_ERR_ARG on invalid input.
  */
-static inline int chs_plic_irq_set_enabled(void *base,
-                                            chs_plic_irq_id_t irq,
-                                            chs_plic_target_t target,
-                                            int enable) {
-    if (!base || irq >= CHS_PLIC_NUM_SRC || target >= CHS_PLIC_NUM_TARGET)
-        return CHS_PLIC_ERR_ARG;
+static inline int chs_plic_irq_set_enabled(void *base, chs_plic_irq_id_t irq,
+                                           chs_plic_target_t target, int enable) {
+    if (!base || irq >= CHS_PLIC_NUM_SRC || target >= CHS_PLIC_NUM_TARGET) return CHS_PLIC_ERR_ARG;
 
     volatile uint32_t *reg = _chs_plic_reg(base, CHS_PLIC_IE_OFFSET(target, irq));
     uint32_t bit = 1u << (irq % 32u);
@@ -317,12 +306,9 @@ static inline int chs_plic_irq_set_enabled(void *base,
  * @param enabled  Output: set to 1 if enabled, 0 if disabled.
  * @return CHS_PLIC_OK, or CHS_PLIC_ERR_ARG on invalid input.
  */
-static inline int chs_plic_irq_get_enabled(void *base,
-                                            chs_plic_irq_id_t irq,
-                                            chs_plic_target_t target,
-                                            int *enabled) {
-    if (!base || irq >= CHS_PLIC_NUM_SRC || target >= CHS_PLIC_NUM_TARGET
-            || !enabled)
+static inline int chs_plic_irq_get_enabled(void *base, chs_plic_irq_id_t irq,
+                                           chs_plic_target_t target, int *enabled) {
+    if (!base || irq >= CHS_PLIC_NUM_SRC || target >= CHS_PLIC_NUM_TARGET || !enabled)
         return CHS_PLIC_ERR_ARG;
 
     uint32_t reg = *_chs_plic_reg(base, CHS_PLIC_IE_OFFSET(target, irq));
@@ -343,11 +329,8 @@ static inline int chs_plic_irq_get_enabled(void *base,
  * @param pending  Output: set to 1 if the interrupt is pending, 0 otherwise.
  * @return CHS_PLIC_OK, or CHS_PLIC_ERR_ARG on invalid input.
  */
-static inline int chs_plic_irq_is_pending(void *base,
-                                           chs_plic_irq_id_t irq,
-                                           int *pending) {
-    if (!base || irq >= CHS_PLIC_NUM_SRC || !pending)
-        return CHS_PLIC_ERR_ARG;
+static inline int chs_plic_irq_is_pending(void *base, chs_plic_irq_id_t irq, int *pending) {
+    if (!base || irq >= CHS_PLIC_NUM_SRC || !pending) return CHS_PLIC_ERR_ARG;
 
     uint32_t reg = *_chs_plic_reg(base, CHS_PLIC_IP_OFFSET(irq));
     *pending = (int)((reg >> (irq % 32u)) & 1u);
@@ -366,9 +349,8 @@ static inline int chs_plic_irq_is_pending(void *base,
  * @param threshold  Threshold value in the range [0, CHS_PLIC_MAX_PRIO].
  * @return CHS_PLIC_OK, or CHS_PLIC_ERR_ARG on invalid input.
  */
-static inline int chs_plic_target_set_threshold(void *base,
-                                                 chs_plic_target_t target,
-                                                 uint32_t threshold) {
+static inline int chs_plic_target_set_threshold(void *base, chs_plic_target_t target,
+                                                uint32_t threshold) {
     if (!base || target >= CHS_PLIC_NUM_TARGET || threshold > CHS_PLIC_MAX_PRIO)
         return CHS_PLIC_ERR_ARG;
     *_chs_plic_reg(base, CHS_PLIC_THRESHOLD_OFFSET(target)) = threshold;
@@ -391,11 +373,9 @@ static inline int chs_plic_target_set_threshold(void *base,
  * @param irq_id  Output: claimed interrupt source ID (0 = no interrupt).
  * @return CHS_PLIC_OK, or CHS_PLIC_ERR_ARG on invalid input.
  */
-static inline int chs_plic_irq_claim(void *base,
-                                      chs_plic_target_t target,
-                                      chs_plic_irq_id_t *irq_id) {
-    if (!base || target >= CHS_PLIC_NUM_TARGET || !irq_id)
-        return CHS_PLIC_ERR_ARG;
+static inline int chs_plic_irq_claim(void *base, chs_plic_target_t target,
+                                     chs_plic_irq_id_t *irq_id) {
+    if (!base || target >= CHS_PLIC_NUM_TARGET || !irq_id) return CHS_PLIC_ERR_ARG;
     *irq_id = *_chs_plic_reg(base, CHS_PLIC_CC_OFFSET(target));
     return CHS_PLIC_OK;
 }
@@ -413,11 +393,9 @@ static inline int chs_plic_irq_claim(void *base,
  *                chs_plic_irq_claim().
  * @return CHS_PLIC_OK, or CHS_PLIC_ERR_ARG on invalid input.
  */
-static inline int chs_plic_irq_complete(void *base,
-                                         chs_plic_target_t target,
-                                         chs_plic_irq_id_t irq_id) {
-    if (!base || target >= CHS_PLIC_NUM_TARGET)
-        return CHS_PLIC_ERR_ARG;
+static inline int chs_plic_irq_complete(void *base, chs_plic_target_t target,
+                                        chs_plic_irq_id_t irq_id) {
+    if (!base || target >= CHS_PLIC_NUM_TARGET) return CHS_PLIC_ERR_ARG;
     *_chs_plic_reg(base, CHS_PLIC_CC_OFFSET(target)) = irq_id;
     return CHS_PLIC_OK;
 }
@@ -433,11 +411,8 @@ static inline int chs_plic_irq_complete(void *base,
  * @param assert  Non-zero to assert, zero to deassert the software interrupt.
  * @return CHS_PLIC_OK, or CHS_PLIC_ERR_ARG on invalid input.
  */
-static inline int chs_plic_software_irq_set(void *base,
-                                             chs_plic_target_t target,
-                                             int assert) {
-    if (!base || target >= CHS_PLIC_NUM_TARGET)
-        return CHS_PLIC_ERR_ARG;
+static inline int chs_plic_software_irq_set(void *base, chs_plic_target_t target, int assert) {
+    if (!base || target >= CHS_PLIC_NUM_TARGET) return CHS_PLIC_ERR_ARG;
     *_chs_plic_reg(base, CHS_PLIC_MSIP_OFFSET(target)) = assert ? 1u : 0u;
     return CHS_PLIC_OK;
 }

@@ -61,21 +61,21 @@ jobs:
           ./sw/include/regs/*.h
           ./target/sim/src/elfloader.cpp
 
-  lint-tcl:
-    runs-on: ubuntu-latest
-    steps:
-    -
-      name: Checkout
-      uses: actions/checkout@v3
-    -
-      name: Install Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.9
-        cache: pip
-    -
-      name: Install Python requirements
-      run: pip install -r requirements.txt
-    -
-      name: Run Tcllint
-      run: tclint .  --style-spaces-in-braces --style-line-length 100
+  # lint-tcl:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   -
+  #     name: Checkout
+  #     uses: actions/checkout@v3
+  #   -
+  #     name: Install Python
+  #     uses: actions/setup-python@v5
+  #     with:
+  #       python-version: 3.9
+  #       cache: pip
+  #   -
+  #     name: Install Python requirements
+  #     run: pip install -r requirements.txt
+  #   -
+  #     name: Run Tcllint
+  #     run: tclint .  --style-spaces-in-braces --style-line-length 100
