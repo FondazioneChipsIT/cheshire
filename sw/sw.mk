@@ -207,4 +207,3 @@ CHS_SW_TESTS += $(CHS_SW_TEST_ROM_DUMP:.rom.dump=.rom.memh) $(CHS_SW_TEST_ROM_DU
 
 # Add all dumps to test build
 CHS_SW_TESTS += $(CHS_SW_TEST_DUMP)
-
