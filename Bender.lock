@@ -206,7 +206,7 @@ packages:
     - common_cells
     - register_interface
   snooper:
-    revision: 0683a28dac2dd23fff338e2939d9202d544a1210
+    revision: 5bb0a396212bee9a9fb4ff950c7569e04c934b48
     version: null
     source:
       Git: https://github.com/FondazioneChipsIT/cfi-snooper.git
@@ -216,8 +216,8 @@ packages:
     - register_interface
     - tcdm_interconnect
   tcdm_interconnect:
-    revision: 7d0a4f8acae71a583a6713cab5554e60b9bb8d27
-    version: 1.2.1
+    revision: 0cec1c9d4b42e8fa65ba7365f79be361fd9d5e69
+    version:
     source:
       Git: https://github.com/pulp-platform/cluster_interconnect.git
     dependencies:
