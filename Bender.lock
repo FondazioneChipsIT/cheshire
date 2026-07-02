@@ -100,6 +100,15 @@ packages:
     source:
       Git: https://github.com/pulp-platform/common_verification.git
     dependencies: []
+  core_tile:
+    revision: e8a79cb919e44a50f600ab985917104e6c016a62
+    version: null
+    source:
+      Git: https://github.com/LorenzoR01/core_tile.git
+    dependencies:
+    - axi
+    - common_cells
+    - common_verification
   cva6:
     revision: 02e11e3b9d9e6a087dc4811b933bf0cc80156e1a
     version: null

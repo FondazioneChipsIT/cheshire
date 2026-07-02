@@ -54,11 +54,19 @@ package tb_cheshire_pkg;
       return ret;
     endfunction
 
+    // SARGANTANA config
+    function automatic cheshire_cfg_t gen_cheshire_sarg_cfg();
+      cheshire_cfg_t ret  = DefaultCfg;
+      ret.Core            = SARGANTANA;
+      return ret;
+    endfunction
+
     // Number of Cheshire configurations
-    localparam int unsigned NumCheshireConfigs = 32'd6;
+    localparam int unsigned NumCheshireConfigs = 32'd7;
 
     // Assemble a configuration array indexed by a numeric parameter
     localparam cheshire_cfg_t [NumCheshireConfigs-1:0] TbCheshireConfigs = {
+        gen_cheshire_sarg_cfg(),  // 6: SARGANTANA configuration
         gen_cheshire_noelv_cfg(), // 5: NOELV configuration
         gen_cheshire_c910_cfg(),  // 4: C910 configuration
         gen_cheshire_vclic_cfg(), // 3: vCLIC-enabled configuration

@@ -63,7 +63,8 @@ package cheshire_pkg;
   typedef enum logic [1:0] {
     C910            = 'b00,
     CVA6            = 'b01,
-    NOELV           = 'b10
+    NOELV           = 'b10,
+    SARGANTANA      = 'b11
   } core_select_e;
 
   // NOEL-V tech

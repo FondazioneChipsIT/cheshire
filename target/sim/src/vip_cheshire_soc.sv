@@ -383,6 +383,30 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
   task automatic jtag_elf_run(input string binary);
     doub_bt entry;
     jtag_elf_halt_load(binary, entry);
+    if (DutCfg.Core == SARGANTANA) begin
+      // Sargantana: use scratch registers instead of abstract command
+      jtag_write(dm::SBCS, dm::sbcs_t'{sbaccess: 3'(2), default: '0}, 0, 1);
+      jtag_write(dm::SBAddress0, AmRegs + cheshire_reg_pkg::CHESHIRE_SCRATCH_0_OFFSET);
+      jtag_write(dm::SBData0, entry[31:0]);
+      jtag_write(dm::SBAddress0, AmRegs + cheshire_reg_pkg::CHESHIRE_SCRATCH_1_OFFSET);
+      jtag_write(dm::SBData0, entry[63:32]);
+      jtag_write(dm::SBAddress0, AmRegs + cheshire_reg_pkg::CHESHIRE_SCRATCH_2_OFFSET);
+      jtag_write(dm::SBData0, 32'd2);
+    end else begin
+      // CVA6: set PC via abstract command
+      jtag_write(dm::Data1, entry[63:32]);
+      jtag_write(dm::Data0, entry[31:0]);
+      jtag_write(dm::Command, 32'h0033_07b1, 0, 1);
+    end    // Resume hart 0
+    jtag_write(dm::DMControl, dm::dmcontrol_t'{resumereq: 1, dmactive: 1, default: '0});
+    $display("[JTAG] Resumed hart 0 from 0x%016x", entry);
+  endtask
+
+/*
+  // Run a binary
+  task automatic jtag_elf_run(input string binary);
+    doub_bt entry;
+    jtag_elf_halt_load(binary, entry);
     // Repoint execution
     jtag_write(dm::Data1, entry[63:32]);
     jtag_write(dm::Data0, entry[31:0]);
@@ -391,6 +415,7 @@ module vip_cheshire_soc import cheshire_pkg::*; #(
     jtag_write(dm::DMControl, dm::dmcontrol_t'{resumereq: 1, dmactive: 1, default: '0});
     $display("[JTAG] Resumed hart 0 from 0x%h", entry);
   endtask
+*/
 
   // Wait for termination signal and get return code
   task automatic jtag_wait_for_eoc(output word_bt exit_code);
