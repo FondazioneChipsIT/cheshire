@@ -103,6 +103,12 @@ CHS_PEAKRDL_DEFINES  := -D CHS_DRAM
 
 include $(CHS_ROOT)/sw/sw.mk
 
+##############
+# Build ZOIX #
+##############
+
+include $(CHS_ROOT)/target/zoix/zoix.mk
+
 ###############
 # Generate HW #
 ###############
@@ -116,7 +122,7 @@ $(CHS_ROOT)/hw/cheshire_addrmap_pkg.sv: $(CHS_ROOT)/hw/cheshire.rdl $(CHS_SLINK_
 	$(PEAKRDL) raw-header $< --format svpkg --no-prefix $(CHS_PEAKRDL_INCLUDES) $(CHS_PEAKRDL_PARAMS) $(CHS_PEAKRDL_DEFINES) --license-str $$'Copyright 2025 ETH Zurich and University of Bologna.\nSolderpad Hardware License, Version 0.51, see LICENSE for details.\nSPDX-License-Identifier: SHL-0.51' -o $@
 
 # CLINT
-CLINTCORES ?= 1
+CLINTCORES ?= 2
 include $(CLINTROOT)/clint.mk
 $(CLINTROOT)/.generated:
 	flock -x $@ $(MAKE) clint && touch $@
