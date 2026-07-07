@@ -6,8 +6,9 @@
 # Cyril Koenig <cykoenig@iis.ee.ethz.ch>
 
 TESTBENCH=tb_cheshire_soc
-DUT_PATH="${TESTBENCH}.fix.dut.i_core_cva6.gen_cva6_core[0].i_cva6"
+DUT_PATH="${TESTBENCH}.fix.dut.gen_cva6_cores[0].i_core_cva6"
 
+# Set default VCS binary
 VCS_BIN="vcs"
 
 # Set full path to c++ compiler.
@@ -18,23 +19,22 @@ if [ -z "${CXX_PATH}" ]; then
     CXX_PATH=`which ${CXX}`
 fi
 
-# Set default VCS binary
-#[[ -z "${VERDI_VERSION}" ]] && VERDI_VERSION=""
-flags="+warn=noRT-NCMUCS +warn=noRT-MTOCMUCS "
+[[ -z "${VERDI_VERSION}" ]] && VERDI_VERSION=""
+
 #Set VCS compile args
+flags="+warn=noRT-NCMUCS +warn=noRT-MTOCMUCS "
 flags+="-O2 "
 flags+="-kdb -lca -sverilog -full64 -j8 -override_timescale=1ns/10ps "
 flags+="+lint=TFIPC-L +lint=PCWM +warn=noCWUC +warn=noUII-L -l compile.log "
 flags+="+vcs+fsdbon -debug_access+all "
+flags+="-cpp ${CXX_PATH} " 
+
 #Set ZOIX compile args
 flags+="+notimingchecks "
 flags+="-debug_access+class -debug_access+pp -xlrm nettype_array -debug_region=lib+cell -force_list -debug_access+cbkd -debug_access+fwn "
 flags+="-fsim "
-#flags+="-fsim=dut:${TESTBENCH}.fix.dut.i_core_cva6 "
 flags+="-fsim=dut:${DUT_PATH} "
 flags+="-fsim=portfaults -fsim=class "
-
-flags+="-cpp ${CXX_PATH} "
 [[ -n "${SELCFG}" ]]   && flags+="-pvalue+SelectedCfg=${SELCFG} "
 
 ${VCS_BIN} ${flags} ../elfloader.cpp ${TESTBENCH}
