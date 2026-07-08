@@ -14,7 +14,7 @@ set_config -global_max_jobs 12
 # set_config -max_faults_per_fsim_task 50
 
 # Create fault campaign (Build fault universe through VC FCC)
-create_campaign -localhost -args "-full64 -daidir simv.daidir -dut ${faultsim_tb}.fix.dut.i_core_cva6 -sff states.sff -sff ${faultsim_tb}.sff -campaign fc1 -sample num:${num_fault_sim} -overwrite"
+create_campaign -localhost -args "-full64 -daidir simv.daidir -dut ${faultsim_tb}.fix.dut.gen_cva6_cores[0].i_core_cva6 -sff states.sff -sff ${faultsim_tb}.sff -campaign fc1 -sample num:${num_fault_sim} -overwrite"
 #create_campaign -localhost -args "-full64 -daidir $simv.daidir -sff states.sff -sff ${faultsim_tb}.sff -campaign fc1 -sample num:${num_fault_sim} -overwrite"
 # Create testcases
 create_testcases -name {test1} -exec simv -daidir simv.daidir -campaign fc1 -args "-no_save +BOOTMODE=\"$bootmode\" +PRELMODE=\"$prelmode\" +BINARY=\"$binary\""
