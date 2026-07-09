@@ -180,6 +180,9 @@ $(CHS_ROOT)/target/sim/vcs/compile.cheshire_soc.sh: $(CHS_ROOT)/Bender.yml $(CHS
 	$(BENDER) script vcs -t sim -t test $(CHS_BENDER_RTL_FLAGS) --vlog-arg="$(VLOGAN_ARGS)" --vlogan-bin="$(VLOGAN)" > $@
 	chmod +x $@
 
+$(CHS_ROOT)/target/lint/slang/parse.cheshire_soc.f: $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock
+	$(BENDER) script flist-plus $(CHS_BENDER_RTL_FLAGS) > $@
+
 .PRECIOUS: $(CHS_ROOT)/target/sim/models
 $(CHS_ROOT)/target/sim/models:
 	mkdir -p $@
@@ -199,6 +202,7 @@ CHS_SIM_ALL += $(CHS_ROOT)/target/sim/models/s25fs512s.v
 CHS_SIM_ALL += $(CHS_ROOT)/target/sim/models/24FC1025.v
 CHS_SIM_ALL += $(CHS_ROOT)/target/sim/vsim/compile.cheshire_soc.tcl
 CHS_SIM_ALL += $(CHS_ROOT)/target/sim/vcs/compile.cheshire_soc.sh
+CHS_SIM_ALL += $(CHS_ROOT)/target/lint/slang/parse.cheshire_soc.f
 
 ###########
 # DRAMSys #
@@ -214,6 +218,12 @@ CHS_DRAMSYS_ALL += $(DRAMSYS_ROOT)/build/lib/libsystemc.so
 #############
 
 include $(CHS_ROOT)/target/xilinx/xilinx.mk
+
+#############
+# Lint Flow #
+#############
+
+include $(CHS_ROOT)/target/lint/slang/slang.mk
 
 #################################
 # Phonies (KEEP AT END OF FILE) #
