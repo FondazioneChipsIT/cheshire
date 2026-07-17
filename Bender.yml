@@ -33,7 +33,7 @@ dependencies:
   dram_rtl_sim:             { git: "https://github.com/pulp-platform/dram_rtl_sim.git",           version: =0.1.1  }
   pulp-c910:                { git: "https://github.com/Simonzhu04/pulp-c910.git",                 rev: dae1a7f3    }
   noelv:                    { path: hw/noelv                                                                       }
-  core_tile:                { git: "https://github.com/LorenzoR01/core_tile.git",                 rev: e8a79cb9    }
+  core_tile:                { git: "https://github.com/MGK098/core_tile_benderized.git",          rev: 6c0f0e190   }
 
 export_include_dirs:
   - hw/include
