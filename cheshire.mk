@@ -127,10 +127,6 @@ $(CHS_SLINK_DIR)/.generated: $(CHS_ROOT)/hw/serial_link.hjson
 # iDMA
 include $(IDMA_ROOT)/idma.mk
 
-# Patch C910 with JTAG fix
-$(PULP_C910_ROOT)/hw/c910_axi_wrap.sv:
-	cd $(PULP_C910_ROOT) && git apply $(CHS_ROOT)/hw/c910_jtag_fix.patch
-
 # Download and patch NOEL-V
 $(CHS_ROOT)/hw/noelv/grlib-gpl-2025.2-b4298:
 	wget https://download.gaisler.com/products/GRLIB/bin/grlib-gpl-2025.2-b4298.tar.gz
@@ -145,7 +141,6 @@ CHS_HW_ALL += $(OTPROOT)/.generated
 CHS_HW_ALL += $(AXIRTROOT)/.generated
 CHS_HW_ALL += $(AXI_VGA_ROOT)/.generated
 CHS_HW_ALL += $(CHS_SLINK_DIR)/.generated
-CHS_HW_ALL += $(PULP_C910_ROOT)/hw/c910_axi_wrap.sv
 CHS_HW_ALL += $(CHS_ROOT)/hw/noelv/grlib-gpl-2025.2-b4298
 
 #####################

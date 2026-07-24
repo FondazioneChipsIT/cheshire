@@ -163,10 +163,10 @@ packages:
     - common_cells
     - register_interface
   pulp-c910:
-    revision: dae1a7f35de382db8432ebb520b742a24c518606
+    revision: 88441a273988afcded88ae22c26a16b6fb32a8f8
     version: null
     source:
-      Git: https://github.com/Simonzhu04/pulp-c910.git
+      Git: https://github.com/pulp-platform/pulp-c910.git
     dependencies:
     - axi
     - common_cells
