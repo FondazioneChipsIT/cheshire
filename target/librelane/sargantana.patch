@@ -1,0 +1,88 @@
+diff --git a/rtl/core/sargantana/rtl/datapath/rtl/if_stage_1/rtl/if_stage_1.sv b/rtl/core/sargantana/rtl/datapath/rtl/if_stage_1/rtl/if_stage_1.sv
+index a8e7464..762821d 100644
+--- a/rtl/core/sargantana/rtl/datapath/rtl/if_stage_1/rtl/if_stage_1.sv
++++ b/rtl/core/sargantana/rtl/datapath/rtl/if_stage_1/rtl/if_stage_1.sv
+@@ -77,6 +77,8 @@ module if_stage_1
+     logic       branch_predict_taken;
+     addrPC_t    branch_predict_addr;
+ 
++    logic npc_rst_load_q;
++
+     always_comb begin
+         priority case (cu_if_i.next_pc)
+             NEXT_PC_SEL_KEEP_PC: begin
+@@ -106,7 +108,10 @@ module if_stage_1
+                 `ifdef VERIFICATION
+                     $error("next pc not defined error in if stage");
+                 `endif
+-                next_pc = trunc_pc_sum(pc + 64'h04);
++                if (npc_rst_load_q)
++                    next_pc = {24'b0,reset_addr_i};
++                else
++                    next_pc = trunc_pc_sum(pc + 64'h04);
+                 `ifdef SIM_KONATA_DUMP
+                 next_id = id + 64'h01;
+                 `endif
+@@ -117,11 +122,13 @@ module if_stage_1
+     // PC output is the next_pc after a latch
+     always_ff @(posedge clk_i, negedge rstn_i) begin
+         if (!rstn_i) begin
+-            pc <= {24'b0,reset_addr_i};
++            npc_rst_load_q    <= 1'b1;
++            pc <= '0;
+             `ifdef SIM_KONATA_DUMP
+             id <= 64'h0;
+             `endif
+         end else begin
++            npc_rst_load_q    <= 1'b0;
+             pc <= next_pc;
+             `ifdef SIM_KONATA_DUMP
+             id <= next_id;
+diff --git a/rtl/core/sargantana/rtl/datapath/rtl/wb_stage/rtl/graduation_list.sv b/rtl/core/sargantana/rtl/datapath/rtl/wb_stage/rtl/graduation_list.sv
+index 911f323..74f785f 100644
+--- a/rtl/core/sargantana/rtl/datapath/rtl/wb_stage/rtl/graduation_list.sv
++++ b/rtl/core/sargantana/rtl/datapath/rtl/wb_stage/rtl/graduation_list.sv
+@@ -281,7 +281,7 @@ always_comb begin
+     instruction_o[0] = 'b0;
+     instruction_o[1] = 'b0;
+     commit_gl_entry_o = head;
+-    head_puls_one = trunc_gl_ptr_sum(head + 1);
++    head_puls_one = trunc_gl_ptr_sum(head + 5'b00001);
+ 
+     if ((~flush_commit_i)) begin
+         if (((num == 1) & valid_bit_q[head]) || ((num > 1) & valid_bit_q[head] & !valid_bit_q[head_puls_one])) begin // Imposible case
+diff --git a/rtl/core/sargantana/rtl/register.sv b/rtl/core/sargantana/rtl/register.sv
+index 2d97045..296b37b 100644
+--- a/rtl/core/sargantana/rtl/register.sv
++++ b/rtl/core/sargantana/rtl/register.sv
+@@ -28,17 +28,22 @@
+     input logic [WIDTH-1:0] input_i,
+     output logic [WIDTH-1:0] output_o
+ );
+-logic [WIDTH-1:0] register_q;
+-    
++logic [WIDTH-1:0] register_n, register_q;
++
++    always_comb begin
++        register_n = register_q;
++        if (flush_i) begin
++            register_n = '0;
++        end else if (load_i) begin
++            register_n = input_i;
++        end
++    end
++
+     always_ff @(posedge clk_i, negedge rstn_i) begin
+         if (~rstn_i) begin
+-            register_q <= 0;
+-        end else if (flush_i) begin
+-            register_q <= 0;
+-        end else if (load_i) begin
+-            register_q <= input_i;
++            register_q <= '0;
+         end else begin
+-            register_q <= register_q;
++            register_q <= register_n;
+         end
+     end
+ 

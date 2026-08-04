@@ -1,0 +1,4 @@
+`verilator_config
+lint_off -rule ASSIGNIN
+lint_off -rule UNSUPPORTED
+lint_off -rule ENUMVALUE

@@ -6,3 +6,6 @@
 	path = sw/deps/cva6-sdk
 	url = https://github.com/pulp-platform/cva6-sdk.git
 	branch = zx/cheshire_c910
+[submodule "target/librelane/pdk"]
+	path = target/librelane/pdk
+	url = https://github.com/IHP-GmbH/IHP-Open-PDK

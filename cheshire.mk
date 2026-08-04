@@ -41,6 +41,8 @@ AXI_VGA_ROOT      := $(shell $(BENDER) path axi_vga)
 IDMA_ROOT         := $(shell $(BENDER) path idma)
 DRAM_RTL_SIM_ROOT := $(shell $(BENDER) path dram_rtl_sim)
 PULP_C910_ROOT    := $(shell $(BENDER) path pulp-c910)
+CVA6_ROOT         := $(shell $(BENDER) path cva6)
+SARG_ROOT		  := $(shell $(BENDER) path core_tile)
 
 REGTOOL ?= $(CHS_REG_DIR)/vendor/lowrisc_opentitan/util/regtool.py
 
@@ -127,6 +129,11 @@ $(CHS_SLINK_DIR)/.generated: $(CHS_ROOT)/hw/serial_link.hjson
 # iDMA
 include $(IDMA_ROOT)/idma.mk
 
+# Patch C910 with Verilator fix
+$(PULP_C910_ROOT)/.patched: $(CHS_ROOT)/target/librelane/c910_lint.patch
+	cd $(PULP_C910_ROOT) && git apply $<
+	touch $@
+
 # Download and patch NOEL-V
 $(CHS_ROOT)/hw/noelv/grlib-gpl-2025.2-b4298:
 	wget https://download.gaisler.com/products/GRLIB/bin/grlib-gpl-2025.2-b4298.tar.gz
@@ -141,6 +148,7 @@ CHS_HW_ALL += $(OTPROOT)/.generated
 CHS_HW_ALL += $(AXIRTROOT)/.generated
 CHS_HW_ALL += $(AXI_VGA_ROOT)/.generated
 CHS_HW_ALL += $(CHS_SLINK_DIR)/.generated
+CHS_HW_ALL += $(PULP_C910_ROOT)/.patched
 CHS_HW_ALL += $(CHS_ROOT)/hw/noelv/grlib-gpl-2025.2-b4298
 
 #####################
@@ -209,6 +217,32 @@ CHS_DRAMSYS_ALL += $(DRAMSYS_ROOT)/build/lib/libsystemc.so
 
 include $(CHS_ROOT)/target/xilinx/xilinx.mk
 
+##################
+# Librelane Flow #
+##################
+
+$(CHS_ROOT)/target/librelane/rtl_files.flist: $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock
+	$(BENDER) script flist > $@
+
+$(CVA6_ROOT)/.patched: \
+    $(CHS_ROOT)/target/librelane/cva6_fifo.patch \
+    $(CHS_ROOT)/target/librelane/amo_cut.patch
+	cd $(CVA6_ROOT) && git apply $^
+	touch $@
+
+$(OTPROOT)/.patched: $(CHS_ROOT)/target/librelane/prim_fifo.patch
+	cd $(OTPROOT) && git apply $<
+	touch $@
+
+$(SARG_ROOT)/.patched: $(CHS_ROOT)/target/librelane/sargantana.patch
+	cd $(SARG_ROOT) && git apply $<
+	touch $@
+
+CHS_LIBRELANE_ALL += $(CHS_ROOT)/target/librelane/rtl_files.flist
+CHS_LIBRELANE_ALL += $(CVA6_ROOT)/.patched
+CHS_LIBRELANE_ALL += $(OTPROOT)/.patched
+CHS_LIBRELANE_ALL += $(SARG_ROOT)/.patched
+
 #################################
 # Phonies (KEEP AT END OF FILE) #
 #################################
@@ -222,7 +256,8 @@ chs-bootrom-all: $(CHS_BOOTROM_ALL)
 chs-sim-all:     $(CHS_SIM_ALL)
 chs-dramsys-all: $(CHS_DRAMSYS_ALL)
 chs-xilinx-all:  $(CHS_XILINX_ALL)
+chs-librelane-all: $(CHS_LIBRELANE_ALL)
 
-CHS_PHONY += chs-all chs-sw-all chs-hw-all chs-bootrom-all chs-sim-all chs-dramsys-all chs-xilinx-all
+CHS_PHONY += chs-all chs-sw-all chs-hw-all chs-bootrom-all chs-sim-all chs-dramsys-all chs-xilinx-all chs-librelane-all
 
 .PHONY: $(CHS_PHONY)
