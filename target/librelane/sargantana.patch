@@ -39,15 +39,24 @@ index a8e7464..762821d 100644
              `ifdef SIM_KONATA_DUMP
              id <= next_id;
 diff --git a/rtl/core/sargantana/rtl/datapath/rtl/wb_stage/rtl/graduation_list.sv b/rtl/core/sargantana/rtl/datapath/rtl/wb_stage/rtl/graduation_list.sv
-index 911f323..74f785f 100644
+index 911f323..0c47de2 100644
 --- a/rtl/core/sargantana/rtl/datapath/rtl/wb_stage/rtl/graduation_list.sv
 +++ b/rtl/core/sargantana/rtl/datapath/rtl/wb_stage/rtl/graduation_list.sv
-@@ -281,7 +281,7 @@ always_comb begin
+@@ -78,6 +78,7 @@ localparam NUM_BITS_INDEX = $clog2(NUM_ENTRIES);
+ 
+ gl_index_t head;
+ gl_index_t head_puls_one;
++logic [6:0] head_plus_one_full;
+ gl_index_t tail;
+ 
+ function [NUM_BITS_INDEX:0] trunc_gl_num_sum(input [NUM_BITS_INDEX+1:0] val_in);
+@@ -281,7 +282,8 @@ always_comb begin
      instruction_o[0] = 'b0;
      instruction_o[1] = 'b0;
      commit_gl_entry_o = head;
 -    head_puls_one = trunc_gl_ptr_sum(head + 1);
-+    head_puls_one = trunc_gl_ptr_sum(head + 5'b00001);
++    head_plus_one_full = head + 5'b00001;
++    head_puls_one = head_plus_one_full[5:0];
  
      if ((~flush_commit_i)) begin
          if (((num == 1) & valid_bit_q[head]) || ((num > 1) & valid_bit_q[head] & !valid_bit_q[head_puls_one])) begin // Imposible case

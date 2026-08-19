@@ -1,0 +1,1247 @@
+diff --git a/./../../grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/nvsupport.vhd b/./hw/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/nvsupport.vhd
+index 5cf93a6..0b86a99 100644
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/nvsupport.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/nvsupport.vhd
+@@ -388,7 +388,7 @@ package nvsupport is
+   type hpmevent_vec is array (0 to HWPERFMONITORS + 3 - 1) of hpmevent_type;
+   -- Define event array type
+   type evt_type is array (MHPEVENT_C - 1 downto 0) of events_type;
+-  constant evt_none_type : evt_type := ((others => (others => '0')));
++  constant evt_none_type : evt_type := (others => (others => '0'));
+   function filter_hpmevent(hpmevent : hpmevent_type; evt : evt_type; cnt : integer) return std_logic;
+ 
+   -- CSR Type -----------------------------------------------------------------
+@@ -3344,7 +3344,7 @@ package body nvsupport is
+     -- Evaluate compressed instruction
+     variable op     : word2                         := inst_in( 1 downto  0);
+     variable funct2 : funct2_type                   := inst_in( 6 downto  5);
+-    variable funct3 : funct3_type                   := inst_in(15 downto 13);
++    variable funct3v : funct3_type                   := inst_in(15 downto 13);
+     -- Evaluate imm sign-extension, MSB of imm is always bit 12th.
+     variable imm12  : std_logic_vector(11 downto 0) := (others => inst_in(12));
+     variable rfa1   : reg_t                         := inst_in(11 downto  7);
+@@ -3367,7 +3367,7 @@ package body nvsupport is
+ 
+       -- C0
+       when "00" =>
+-        case funct3 is
++        case funct3v is
+ 
+           -- c.addi4spn -> addi rd', x2, imm
+           when "000" =>
+@@ -3580,7 +3580,7 @@ package body nvsupport is
+ 
+       -- C1
+       when "01" =>
+-        case funct3 is
++        case funct3v is
+ 
+           -- c.nop -> addi x0, x0, 0
+           -- c.addi -> addi rd, rd, imm
+@@ -3924,7 +3924,7 @@ package body nvsupport is
+ 
+       -- C2
+       when "10" =>
+-        case funct3 is
++        case funct3v is
+ 
+           -- c.slli -> slli rd, rs1, shamt
+           when "000" =>
+@@ -4151,14 +4151,14 @@ package body nvsupport is
+     variable ext_d       : boolean := is_enabled(active, x_d);
+     -- Evaluate compressed instruction
+     variable op     : word2       := inst_in( 1 downto  0);
+-    variable funct3 : funct3_type := inst_in(15 downto 13);
++    variable funct3v : funct3_type := inst_in(15 downto 13);
+   begin
+     if op /= "00" and op /= "10" then
+       return false;
+     end if;
+ 
+     -- c.fld[sp] / c.fsd[sp]
+-    if funct3 = "001" or funct3 = "101" then
++    if funct3v = "001" or funct3v = "101" then
+       return not ext_d or not fpu_en;
+     end if;
+ 
+@@ -4167,7 +4167,7 @@ package body nvsupport is
+     end if;
+ 
+     -- c.flw[sp] / c.fsw[sp]
+-    if funct3 = "011" or funct3 = "111" then
++    if funct3v = "011" or funct3v = "111" then
+       return ext_f;
+     end if;
+ 
+@@ -4689,9 +4689,9 @@ package body nvsupport is
+                     imm_out   : out wordx;
+                     bj_imm    : out wordx) is
+     variable op      : opcode_type := opcode(inst_in);
+-    variable funct5  : funct5_type := funct5(inst_in);
+-    variable funct3  : funct3_type := funct3(inst_in);
+-    variable rd      : reg_t       := rd(inst_in);
++    variable funct5v  : funct5_type := funct5(inst_in);
++    variable funct3v  : funct3_type := funct3(inst_in);
++    variable rdv      : reg_t       := rd(inst_in);
+     -- Non-constant
+     variable vimm    : std_ulogic  := '0';
+     variable imm     : wordx       := (others => '0');
+@@ -4727,7 +4727,7 @@ package body nvsupport is
+         imm   := i_imm;
+         vimm  := '1';
+       when OP_IMM =>
+-        if funct3 = I_SLLI or funct3 = I_SRLI then -- I_SRAI
++        if funct3v = I_SLLI or funct3v = I_SRLI then -- I_SRAI
+           imm := si_imm;
+         else
+           imm := i_imm;
+@@ -4764,45 +4764,45 @@ package body nvsupport is
+   -- Currently all instructions with funct3=000 also have rd=0.
+   -- For now, assume we don't need to check rd!
+   function is_system0(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+-    return opcode = OP_SYSTEM and funct3 = "000";
++    return opcodev = OP_SYSTEM and funct3v = "000";
+   end;
+ 
+   function is_system1(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+-    return opcode = OP_SYSTEM and funct3 = "100";
++    return opcodev = OP_SYSTEM and funct3v = "100";
+   end;
+ 
+   function is_wfi(inst :word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct3 : funct3_type := funct3(inst);
+-    variable funct7 : funct7_type := funct7(inst);
+-    variable rs2    : reg_t       := rs2(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct3v : funct3_type := funct3(inst);
++    variable funct7v : funct7_type := funct7(inst);
++    variable rs2v    : reg_t       := rs2(inst);
+   begin
+-    return opcode = OP_SYSTEM and funct3 = "000" and funct7 = F7_WFI and
+-           rs2 = "00101";
++    return opcodev = OP_SYSTEM and funct3v = "000" and funct7v = F7_WFI and
++           rs2v = "00101";
+   end;
+ 
+   function is_xret(inst : word) return boolean is
+-    variable rd     : reg_t       := rd(inst);
+-    variable rs1    : reg_t       := rs1(inst);
+-    variable rs2    : reg_t       := rs2(inst);
+-    variable funct7 : funct7_type := funct7(inst);
++    variable rdv     : reg_t       := rd(inst);
++    variable rs1v    : reg_t       := rs1(inst);
++    variable rs2v    : reg_t       := rs2(inst);
++    variable funct7v : funct7_type := funct7(inst);
+   begin
+-    return is_system0(inst) and all_0(rd) and all_0(rs1) and rs2 = "00010" and
+-           (funct7 = F7_SRET or funct7 = F7_MRET or funct7 = F7_MNRET);
++    return is_system0(inst) and all_0(rdv) and all_0(rs1v) and rs2v = "00010" and
++           (funct7v = F7_SRET or funct7v = F7_MRET or funct7v = F7_MNRET);
+   end;
+ 
+   -- Standard CSR access?
+   function is_csr_access(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+-    return opcode = OP_SYSTEM and funct3(1 downto 0) /= "00";
++    return opcodev = OP_SYSTEM and funct3v(1 downto 0) /= "00";
+   end;
+ 
+   function is_csr(active : extension_type;
+@@ -4822,48 +4822,48 @@ package body nvsupport is
+                      cfi_en : cfi_t;
+                      inst   : word) return boolean is
+     variable ext_zicfiss : boolean      := is_enabled(active, x_zicfiss);
+-    variable rd          : reg_t        := rd(inst);
++    variable rdv          : reg_t        := rd(inst);
+     variable rfa1        : reg_t        := rs1(inst);
+-    variable funct7      : funct7_type  := funct7(inst);
+-    variable funct12     : funct12_type := funct12(inst);
++    variable funct7v      : funct7_type  := funct7(inst);
++    variable funct12v     : funct12_type := funct12(inst);
+   begin
+     return is_csr_access(inst)
+            or (ext_zicfiss and is_system1(inst) and
+-               (funct12 = F12_SSRDPOPCHK or funct7 = F7_SSPUSH))
++               (funct12v = F12_SSRDPOPCHK or funct7v = F7_SSPUSH))
+            ;
+   end;
+ 
+   -- Standard CSR read access?
+   -- Assumes it is already known that inst is a CSR instruction.
+   function csr_access_read(inst : word) return boolean is
+-    variable rd     : reg_t       := rd(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable rdv     : reg_t       := rd(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+-    return ((funct3 = I_CSRRW or funct3 = I_CSRRWI) and rd /= "00000") or
++    return ((funct3v = I_CSRRW or funct3v = I_CSRRWI) and rdv /= "00000") or
+            -- These are read-modify-write.
+-           funct3 = I_CSRRS  or funct3 = I_CSRRC or
+-           funct3 = I_CSRRSI or funct3 = I_CSRRCI;
++           funct3v = I_CSRRS  or funct3v = I_CSRRC or
++           funct3v = I_CSRRSI or funct3v = I_CSRRCI;
+   end;
+ 
+   -- Standard CSR ready-only access?
+   -- Assumes it is already known that inst is a CSR instruction.
+   function csr_access_read_only(inst : word) return boolean is
+     variable rfa1   : reg_t       := rs1(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+     -- CSRR[S/C] and rs1=x0, or CSRR[S/C]I and imm=0, ie read-only?
+     -- (CSRR[S/C][I] are read-modify-write.)
+     return rfa1 = "00000" and
+-           (funct3 = I_CSRRS  or funct3 = I_CSRRC or
+-            funct3 = I_CSRRSI or funct3 = I_CSRRCI);
++           (funct3v = I_CSRRS  or funct3v = I_CSRRC or
++            funct3v = I_CSRRSI or funct3v = I_CSRRCI);
+   end;
+ 
+   function csr_access_write_only(inst : word) return boolean is
+-    variable rd     : reg_t       := rd(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable rdv     : reg_t       := rd(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+     -- CSRRW/CSRRWI and rd=x0, ie write-only?
+-    return rd = "00000" and (funct3 = I_CSRRW or funct3 = I_CSRRWI);
++    return rdv = "00000" and (funct3v = I_CSRRW or funct3v = I_CSRRWI);
+   end;
+ 
+ -- pragma translate_off
+@@ -4880,7 +4880,7 @@ package body nvsupport is
+   function csr_read_only(active  : extension_type;
+                          inst    : word) return boolean is
+     variable rfa1   : reg_t       := rs1(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+     -- CSRR[S/C] and rs1=x0, or CSRR[S/C]I and imm=0, ie read-only?
+     -- Do not care about whether it really is an lps/lpc instruction.
+@@ -4891,8 +4891,8 @@ package body nvsupport is
+   -- Assumes it is already known that inst is a CSR instruction.
+   function csr_write_only(active  : extension_type;
+                           inst    : word) return boolean is
+-    variable rd     : reg_t       := rd(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable rdv     : reg_t       := rd(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+     return csr_access_write_only(inst);
+   end;
+@@ -4902,11 +4902,11 @@ package body nvsupport is
+   function is_sfence_vma(active : extension_type;
+                          inst   : word) return boolean is
+     variable ext_svinval : boolean     := is_enabled(active, x_svinval);
+-    variable rd          : reg_t       := rd(inst);
+-    variable funct7      : funct7_type := funct7(inst);
++    variable rdv          : reg_t       := rd(inst);
++    variable funct7v      : funct7_type := funct7(inst);
+   begin
+     return is_system0(inst) and
+-           (funct7 = F7_SFENCE_VMA or (ext_svinval and funct7 = F7_SINVAL_VMA));
++           (funct7v = F7_SFENCE_VMA or (ext_svinval and funct7v = F7_SINVAL_VMA));
+   end;
+ 
+   -- There may at some later point be other similar instructions.
+@@ -4914,11 +4914,11 @@ package body nvsupport is
+   function is_hfence_vvma(active : extension_type;
+                           inst   : word) return boolean is
+     variable ext_svinval : boolean     := is_enabled(active, x_svinval);
+-    variable rd          : reg_t       := rd(inst);
+-    variable funct7      : funct7_type := funct7(inst);
++    variable rdv          : reg_t       := rd(inst);
++    variable funct7v      : funct7_type := funct7(inst);
+   begin
+     return is_system0(inst) and
+-           (funct7 = F7_HFENCE_VVMA or (ext_svinval and funct7 = F7_HINVAL_VVMA));
++           (funct7v = F7_HFENCE_VVMA or (ext_svinval and funct7v = F7_HINVAL_VVMA));
+   end;
+ 
+   -- There may at some later point be other similar instructions.
+@@ -4926,11 +4926,11 @@ package body nvsupport is
+   function is_hfence_gvma(active : extension_type;
+                           inst   : word) return boolean is
+     variable ext_svinval : boolean     := is_enabled(active, x_svinval);
+-    variable rd          : reg_t       := rd(inst);
+-    variable funct7      : funct7_type := funct7(inst);
++    variable rdv          : reg_t       := rd(inst);
++    variable funct7v      : funct7_type := funct7(inst);
+   begin
+     return is_system0(inst) and
+-           (funct7 = F7_HFENCE_GVMA or (ext_svinval and funct7 = F7_HINVAL_GVMA));
++           (funct7v = F7_HFENCE_GVMA or (ext_svinval and funct7v = F7_HINVAL_GVMA));
+   end;
+ 
+   function is_tlb_fence(active : extension_type;
+@@ -4944,12 +4944,12 @@ package body nvsupport is
+   -- There may at some later point be other similar instructions.
+   -- Then further checks (rd/rs2) will be needed here!
+   function is_hlsv(inst : word) return boolean is
+-    variable funct7 : funct7_type := funct7(inst);
++    variable funct7v : funct7_type := funct7(inst);
+   begin
+     if not is_system1(inst) then
+       return false;
+     end if;
+-    case funct7 is
++    case funct7v is
+       when F7_HLVB | F7_HLVH | F7_HLVW | F7_HLVD |
+            F7_HSVB | F7_HSVH | F7_HSVW | F7_HSVD => return true;
+       when others                                => return false;
+@@ -4958,79 +4958,79 @@ package body nvsupport is
+ 
+   -- Assumes that it is not necessary to check the rs2 field.
+   function is_hlv(inst : word) return boolean is
+-    variable funct7 : funct7_type := funct7(inst);
++    variable funct7v : funct7_type := funct7(inst);
+   begin
+-    return is_hlsv(inst) and funct7(0) = '0';
++    return is_hlsv(inst) and funct7v(0) = '0';
+   end;
+ 
+   function is_hsv(inst : word) return boolean is
+-    variable funct7 : funct7_type := funct7(inst);
++    variable funct7v : funct7_type := funct7(inst);
+   begin
+-    return is_hlsv(inst) and funct7(0) = '1';
++    return is_hlsv(inst) and funct7v(0) = '1';
+   end;
+ 
+   -- Assumes that it is not necessary to completely check the rs2 field.
+   function is_hlvx(inst : word) return boolean is
+-    variable funct7 : funct7_type := funct7(inst);
++    variable funct7v : funct7_type := funct7(inst);
+     variable rfa2   : reg_t       := rs2(inst);
+   begin
+-    return is_hlsv(inst) and funct7(0) = '0' and rfa2(1) = '1';
++    return is_hlsv(inst) and funct7v(0) = '0' and rfa2(1) = '1';
+   end;
+   
+   function is_fence_i(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+-    return opcode = OP_FENCE and funct3 = I_FENCE_I;
++    return opcodev = OP_FENCE and funct3v = I_FENCE_I;
+   end;
+ 
+   function is_fence(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+-    return opcode = OP_FENCE and funct3 = I_FENCE;
++    return opcodev = OP_FENCE and funct3v = I_FENCE;
+   end;
+ 
+   function is_diag(active : extension_type; inst : word) return boolean is
+     variable ext_noelv : boolean     := is_enabled(active, x_noelv);
+-    variable opcode    : opcode_type := opcode(inst);
+-    variable funct7    : funct7_type := funct7(inst);
++    variable opcodev    : opcode_type := opcode(inst);
++    variable funct7v    : funct7_type := funct7(inst);
+   begin
+-    return ext_noelv and opcode = OP_CUSTOM0 and funct7 = F7_BASE;
++    return ext_noelv and opcodev = OP_CUSTOM0 and funct7v = F7_BASE;
+   end;
+ 
+   -- Assumes it is already know that inst is a diagnostic instruction.
+   function is_diag_store(inst : word) return boolean is
+-    variable funct3 : funct3_type := funct3(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+-    return get_hi(funct3) = '1';
++    return get_hi(funct3v) = '1';
+   end;
+ 
+   function is_custom_alu(active : extension_type; inst : word) return boolean is
+     variable ext_noelvalu : boolean     := is_enabled(active, x_noelvalu);
+-    variable opcode       : opcode_type := opcode(inst);
+-    variable funct7       : funct7_type := funct7(inst);
++    variable opcodev       : opcode_type := opcode(inst);
++    variable funct7v       : funct7_type := funct7(inst);
+   begin
+-    return ext_noelvalu and opcode = OP_CUSTOM0 and funct7 = F7_BASE_RV64;
++    return ext_noelvalu and opcodev = OP_CUSTOM0 and funct7v = F7_BASE_RV64;
+   end;
+ 
+   function is_cbo(inst : word) return boolean is
+-    variable opcode   : opcode_type := opcode(inst);
+-    variable funct3   : funct3_type := funct3(inst);
++    variable opcodev   : opcode_type := opcode(inst);
++    variable funct3v   : funct3_type := funct3(inst);
+   begin
+-    return opcode = OP_FENCE and funct3 = I_CBO;
++    return opcodev = OP_FENCE and funct3v = I_CBO;
+   end;
+ 
+   function is_mop_r(active : extension_type;
+                     inst   : word) return boolean is
+     variable ext_zimop : boolean     := is_enabled(active, x_zimop);
+-    variable funct7    : funct7_type := funct7(inst);
++    variable funct7v    : funct7_type := funct7(inst);
+   begin
+     if not ext_zimop or not is_system1(inst) then
+       return false;
+     end if;
+ 
+-    case funct7 is
++    case funct7v is
+       when F7_MOPR_0  | F7_MOPR_4  | F7_MOPR_8  | F7_MOPR_12 |
+            F7_MOPR_16 | F7_MOPR_20 | F7_MOPR_24 | F7_MOPR_28 =>
+         -- MOPR is really 1-00--0 111--,
+@@ -5045,13 +5045,13 @@ package body nvsupport is
+   function is_mop_rr(active : extension_type;
+                      inst   : word) return boolean is
+     variable ext_zimop : boolean     := is_enabled(active, x_zimop);
+-    variable funct7    : funct7_type := funct7(inst);
++    variable funct7v    : funct7_type := funct7(inst);
+   begin
+     if not ext_zimop or not is_system1(inst) then
+       return false;
+     end if;
+ 
+-    case funct7 is
++    case funct7v is
+       when F7_MOPRR_0 | F7_MOPRR_1 | F7_MOPRR_2 | F7_MOPRR_3 |
+            F7_MOPRR_4 | F7_MOPRR_5 | F7_MOPRR_6 | F7_MOPRR_7 =>
+         return true;
+@@ -5078,19 +5078,19 @@ package body nvsupport is
+                            inst   : word) return boolean is
+     variable ext_zimop   : boolean      := is_enabled(active, x_zimop);
+     variable ext_zicfiss : boolean      := is_enabled(active, x_zicfiss);
+-    variable rd          : reg_t        := rd(inst);
++    variable rdv          : reg_t        := rd(inst);
+     variable rfa1        : reg_t        := rs1(inst);
+     variable rfa2        : reg_t        := rs2(inst);
+-    variable funct7      : funct7_type  := funct7(inst);
+-    variable funct12     : funct12_type := funct12(inst);
++    variable funct7v      : funct7_type  := funct7(inst);
++    variable funct12v     : funct12_type := funct12(inst);
+   begin
+     if not ext_zimop or not is_system1(inst)
+        or not ext_zicfiss or not cfi_en.ss then
+       return false;
+     end if;
+ 
+-    if    funct12 = F12_SSRDPOPCHK then
+-      return (rfa1 = "00001" or rfa1 = "00101") and rd = "00000";  -- SSPOPCHK
++    if    funct12v = F12_SSRDPOPCHK then
++      return (rfa1 = "00001" or rfa1 = "00101") and rdv = "00000";  -- SSPOPCHK
+     else
+       return false;
+     end if;
+@@ -5101,17 +5101,17 @@ package body nvsupport is
+                            inst   : word) return boolean is
+     variable ext_zimop   : boolean     := is_enabled(active, x_zimop);
+     variable ext_zicfiss : boolean     := is_enabled(active, x_zicfiss);
+-    variable rd          : reg_t       := rd(inst);
++    variable rdv          : reg_t       := rd(inst);
+     variable rfa1        : reg_t       := rs1(inst);
+     variable rfa2        : reg_t       := rs2(inst);
+-    variable funct7      : funct7_type := funct7(inst);
++    variable funct7v      : funct7_type := funct7(inst);
+   begin
+     if not ext_zimop or not is_system1(inst)
+        or not ext_zicfiss or not cfi_en.ss then
+       return false;
+     end if;
+ 
+-    if funct7 = F7_SSPUSH and rd = "00000" and rfa1 = "00000" then
++    if funct7v = F7_SSPUSH and rdv = "00000" and rfa1 = "00000" then
+       return rfa2 = "00001" or rfa2 = "00101";                     -- SSPUSH
+     else
+       return false;
+@@ -5122,14 +5122,14 @@ package body nvsupport is
+                    cfi_en : cfi_t;
+                    inst   : word) return boolean is
+     variable ext_zicfilp : boolean     := is_enabled(active, x_zicfilp);
+-    variable rd          : reg_t       := rd(inst);
+-    variable opcode      : opcode_type := opcode(inst);
++    variable rdv          : reg_t       := rd(inst);
++    variable opcodev      : opcode_type := opcode(inst);
+   begin
+-    if not ext_zicfilp or opcode /= AUIPC or not cfi_en.lp then
++    if not ext_zicfilp or opcodev /= AUIPC or not cfi_en.lp then
+       return false;
+     end if;
+ 
+-    if rd = "00000" then
++    if rdv = "00000" then
+       return true;
+     else
+       return false;
+@@ -5140,16 +5140,16 @@ package body nvsupport is
+                         cfi_en : cfi_t;
+                         inst   : word) return boolean is
+     variable ext_zicfiss : boolean     := is_enabled(active, x_zicfiss);
+-    variable rd          : reg_t       := rd(inst);
+-    variable opcode      : opcode_type := opcode(inst);
+-    variable funct5      : funct5_type := funct5(inst);
+-    variable funct3      : funct3_type := funct3(inst);
++    variable rdv          : reg_t       := rd(inst);
++    variable opcodev      : opcode_type := opcode(inst);
++    variable funct5v      : funct5_type := funct5(inst);
++    variable funct3v      : funct3_type := funct3(inst);
+   begin
+-    if not ext_zicfiss or opcode /= OP_AMO or not cfi_en.ss then
++    if not ext_zicfiss or opcodev /= OP_AMO or not cfi_en.ss then
+       return false;
+     end if;
+ 
+-    if funct5 = R_SSAMOSWAP and (funct3 = R_WORD or funct3 = R_DOUBLE) then
++    if funct5v = R_SSAMOSWAP and (funct3v = R_WORD or funct3v = R_DOUBLE) then
+       return true;
+     else
+       return false;
+@@ -5160,16 +5160,16 @@ package body nvsupport is
+                      cfi_en : cfi_t;
+                      inst   : word) return boolean is
+     variable ext_zicfiss : boolean      := is_enabled(active, x_zicfiss);
+-    variable rd          : reg_t        := rd(inst);
++    variable rdv          : reg_t        := rd(inst);
+     variable rfa1        : reg_t        := rs1(inst);
+     variable rfa2        : reg_t        := rs2(inst);
+-    variable funct7      : funct7_type  := funct7(inst);
++    variable funct7v      : funct7_type  := funct7(inst);
+   begin
+     if not ext_zicfiss or not is_system1(inst) or not cfi_en.ss then
+       return false;
+     end if;
+ 
+-    if funct7 = F7_SSPUSH and rd = "00000" and rfa1 = "00000" and
++    if funct7v = F7_SSPUSH and rdv = "00000" and rfa1 = "00000" and
+        (rfa2 = "00001" or rfa2 = "00101") then
+       return true;
+     else
+@@ -5181,15 +5181,15 @@ package body nvsupport is
+                       cfi_en : cfi_t;
+                       inst   : word) return boolean is
+     variable ext_zicfiss : boolean      := is_enabled(active, x_zicfiss);
+-    variable rd          : reg_t        := rd(inst);
++    variable rdv          : reg_t        := rd(inst);
+     variable rfa1        : reg_t        := rs1(inst);
+-    variable funct12     : funct12_type := funct12(inst);
++    variable funct12v     : funct12_type := funct12(inst);
+   begin
+     if not ext_zicfiss or not is_system1(inst) or not cfi_en.ss then
+       return false;
+     end if;
+ 
+-    if funct12 = F12_SSRDPOPCHK and rd = "00000" and
++    if funct12v = F12_SSRDPOPCHK and rdv = "00000" and
+        (rfa1 = "00001" or rfa1 = "00101") then
+       return true;
+     else
+@@ -5201,15 +5201,15 @@ package body nvsupport is
+                     cfi_en : cfi_t;
+                     inst   : word) return boolean is
+     variable ext_zicfiss : boolean      := is_enabled(active, x_zicfiss);
+-    variable rd          : reg_t        := rd(inst);
++    variable rdv          : reg_t        := rd(inst);
+     variable rfa1        : reg_t        := rs1(inst);
+-    variable funct12     : funct12_type := funct12(inst);
++    variable funct12v     : funct12_type := funct12(inst);
+   begin
+     if not ext_zicfiss or not is_system1(inst) or not cfi_en.ss then
+       return false;
+     end if;
+ 
+-    if funct12 = F12_SSRDPOPCHK and rd /= "00000" and rfa1 = "00000" then
++    if funct12v = F12_SSRDPOPCHK and rdv /= "00000" and rfa1 = "00000" then
+       return true;
+     else
+       return false;
+@@ -5221,9 +5221,9 @@ package body nvsupport is
+   -- instruction directly.
+   -- FPU instruction that does not touch memory?
+   function is_fpu(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
++    variable opcodev : opcode_type := opcode(inst);
+   begin
+-    case opcode is
++    case opcodev is
+       when OP_FP     |
+            OP_FMADD  |
+            OP_FMSUB  |
+@@ -5235,27 +5235,27 @@ package body nvsupport is
+ 
+   -- FPU instruction that touches memory?
+   function is_fpu_mem(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
++    variable opcodev : opcode_type := opcode(inst);
+   begin
+-    return opcode = OP_LOAD_FP or opcode = OP_STORE_FP;
++    return opcodev = OP_LOAD_FP or opcodev = OP_STORE_FP;
+   end;
+ 
+   -- FPU double precision store?
+   function is_fpu_fsd(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct3v : funct3_type := funct3(inst);
+   begin
+-    return opcode = OP_STORE_FP and funct3 /= "010";
++    return opcodev = OP_STORE_FP and funct3v /= "010";
+   end;
+ 
+   -- FPU instruction with data from integer pipeline?
+   function is_fpu_from_int(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct5 : funct5_type := funct5(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct5v : funct5_type := funct5(inst);
+   begin
+-    case opcode is
++    case opcodev is
+       when OP_FP =>
+-        case funct5 is
++        case funct5v is
+         when R_FCVT_S_W |
+              R_FMV_W_X  => return true;
+         when others     => return false;
+@@ -5267,12 +5267,12 @@ package body nvsupport is
+ 
+   -- FPU instruction with FPU destination register?
+   function is_fpu_rd(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct5 : funct5_type := funct5(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct5v : funct5_type := funct5(inst);
+   begin
+-    case opcode is
++    case opcodev is
+       when OP_FP =>
+-        case funct5 is
++        case funct5v is
+         when R_FADD     |
+              R_FSUB     |
+              R_FMINMAX  |
+@@ -5297,12 +5297,12 @@ package body nvsupport is
+ 
+   -- FPU instruction can modify FPU state (including flags)?
+   function is_fpu_modify(inst : word) return boolean is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct5 : funct5_type := funct5(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct5v : funct5_type := funct5(inst);
+   begin
+-    case opcode is
++    case opcodev is
+       when OP_FP =>
+-        case funct5 is
++        case funct5v is
+         when R_FADD     |
+              R_FSUB     |
+              R_FMINMAX  |
+@@ -5333,8 +5333,8 @@ package body nvsupport is
+                   cfi_en : cfi_t;
+                   inst   : word) return std_ulogic is
+     variable op     : opcode_type := opcode(inst);
+-    variable funct5 : funct5_type := funct5(inst);
+-    variable rd     : reg_t       := rd(inst);
++    variable funct5v : funct5_type := funct5(inst);
++    variable rdv     : reg_t       := rd(inst);
+     -- Non-constant
+     variable wreg   : std_ulogic  := '1';
+   begin
+@@ -5352,7 +5352,7 @@ package body nvsupport is
+ 
+       when OP_FP =>
+         -- Most FPU operations have no rd
+-        case funct5 is
++        case funct5v is
+           when R_FCVT_W_S | R_FMV_X_W | R_FCMP =>
+             -- Conversion/move to integer, compare and class check
+           when others =>
+@@ -5387,7 +5387,7 @@ package body nvsupport is
+         -- Everything else has an rd (or are "don't care" due to being illegal).
+     end case;
+ 
+-    if rd = "00000" then
++    if rdv = "00000" then
+       wreg := '0';
+     end if;
+ 
+@@ -5401,11 +5401,11 @@ package body nvsupport is
+                    inst   : word) return reg_t is
+     variable ext_zfa     : boolean     := is_enabled(active, x_zfa);
+     variable op          : opcode_type := opcode(inst);
+-    variable funct3      : funct3_type := funct3(inst);
+-    variable funct5      : funct5_type := funct5(inst);
+-    variable rs2         : reg_t       := rs2(inst);
++    variable funct3v      : funct3_type := funct3(inst);
++    variable funct5v      : funct5_type := funct5(inst);
++    variable rs2v         : reg_t       := rs2(inst);
+     -- Non-constant
+-    variable rs1         : reg_t       := rs1(inst);
++    variable rs1v         : reg_t       := rs1(inst);
+     variable vreg        : std_ulogic  := '1';
+   begin
+     -- Check for the cases where there is no rs1
+@@ -5419,7 +5419,7 @@ package body nvsupport is
+         vreg := '0';
+         -- Except for an implicit x7 read for LPAD instruction
+         if is_lpad(active, cfi_en, inst) then
+-          rs1  := "00111";
++          rs1v  := "00111";
+           vreg := '1';
+         end if;
+ 
+@@ -5428,7 +5428,7 @@ package body nvsupport is
+         -- (non-immediate value) CSR instructions,
+         -- sfence.vma, hfence.v/gvma, hlv/hsv,
+         -- and some Zicfiss.
+-        if is_csr_access(inst) and funct3(2) = '1' then  -- I_CSRRWI, I_CSRRSI, I_CSRRCI?
++        if is_csr_access(inst) and funct3v(2) = '1' then  -- I_CSRRWI, I_CSRRSI, I_CSRRCI?
+           vreg  := '0';
+         end if;
+         if is_used_mop_rs1(active, cfi_en, inst) then
+@@ -5446,12 +5446,12 @@ package body nvsupport is
+ 
+       when OP_FP =>
+         -- Most FPU operations have no rs1
+-        case funct5 is
++        case funct5v is
+           when R_FCVT_S_W =>
+             -- Conversions from integer
+           when R_FMV_W_X =>
+             -- Mostly moves from integer (except FLI.S/D/H)
+-            if ext_zfa and rs2 = "00001" then
++            if ext_zfa and rs2v = "00001" then
+               vreg := '0';
+             end if;
+           when others =>
+@@ -5466,10 +5466,10 @@ package body nvsupport is
+     -- use forwarding when there is not a source register at all.
+     -- Relies on destination r0 being marked as invalid (.rdv = '0')!
+     if vreg = '0' then
+-      rs1 := "00000";
++      rs1v := "00000";
+     end if;
+ 
+-    return rs1;
++    return rs1v;
+   end;
+ 
+   -- Rs2 register validity check
+@@ -5481,11 +5481,11 @@ package body nvsupport is
+     variable is_rv32 : boolean     := not is_rv64;
+     variable ext_zfa : boolean     := is_enabled(active, x_zfa);
+     variable op      : opcode_type := opcode(inst);
+-    variable funct3  : funct3_type := funct3(inst);
+-    variable funct5  : funct5_type := funct5(inst);
+-    variable funct7  : funct7_type := funct7(inst);
++    variable funct3v  : funct3_type := funct3(inst);
++    variable funct5v  : funct5_type := funct5(inst);
++    variable funct7v  : funct7_type := funct7(inst);
+     -- Non-constant
+-    variable rs2     : reg_t       := rs2(inst);
++    variable rs2v     : reg_t       := rs2(inst);
+     variable vreg    : std_ulogic  := '1';
+   begin
+     -- Check for rs2 use
+@@ -5507,14 +5507,14 @@ package body nvsupport is
+ 
+       when OP_AMO =>
+         -- Most AMO instructions do have an rs2.
+-        case funct5 is
++        case funct5v is
+           when R_LR   => vreg := '0';
+           when others =>
+         end case;
+ 
+       when OP_FP =>
+         -- Only a single FPU instruction (FMVP.D.X) has an rs2.
+-        if not (ext_zfa and is_rv32 and funct7 = R_FMVP_D_X and funct3 = "000") then
++        if not (ext_zfa and is_rv32 and funct7v = R_FMVP_D_X and funct3v = "000") then
+           vreg := '0';
+         end if;
+ 
+@@ -5538,10 +5538,10 @@ package body nvsupport is
+     -- use forwarding when there is not a source register at all.
+     -- Relies on destination r0 being marked as invalid (.rdv = '0')!
+     if vreg = '0' then
+-      rs2 := "00000";
++      rs2v := "00000";
+     end if;
+ 
+-    return rs2;
++    return rs2v;
+   end;
+ 
+   function rd_gen(inst : word) return std_ulogic is
+@@ -5561,8 +5561,8 @@ package body nvsupport is
+     variable ext_zbkc : boolean     := is_enabled(active, x_zbkc);
+     variable ext_h    : boolean     := is_enabled(active, x_h);
+     variable op       : opcode_type := opcode(inst);
+-    variable funct3   : funct3_type := funct3(inst);
+-    variable funct7   : funct7_type := funct7(inst);
++    variable funct3v   : funct3_type := funct3(inst);
++    variable funct7v   : funct7_type := funct7(inst);
+   begin
+     if op = OP_STORE    or op = OP_LOAD    or
+        op = OP_STORE_FP or op = OP_LOAD_FP or
+@@ -5602,8 +5602,8 @@ package body nvsupport is
+ 
+     -- Only one CLMUL machinery - and it is in the early lane0 ALU.
+     -- R_CLMULR is not actually valid for ext_zbkc, but that does not matter here.
+-    if (ext_zbc or ext_zbkc) and op = OP_REG and funct7 = F7_MINMAXCLMUL and
+-      (funct3 = R_CLMUL or funct3 = R_CLMULH or funct3 = R_CLMULR) then
++    if (ext_zbc or ext_zbkc) and op = OP_REG and funct7v = F7_MINMAXCLMUL and
++      (funct3v = R_CLMUL or funct3v = R_CLMULH or funct3v = R_CLMULR) then
+       return true;
+     end if;
+ 
+@@ -6095,11 +6095,11 @@ package body nvsupport is
+ 
+   function csr_addr(active : extension_type; inst : word) return csratype is
+     variable ext_zicfiss : boolean      := is_enabled(active, x_zicfiss);
+-    variable funct7      : funct7_type  := funct7(inst);
+-    variable funct12     : funct12_type := funct12(inst);
++    variable funct7v      : funct7_type  := funct7(inst);
++    variable funct12v     : funct12_type := funct12(inst);
+   begin
+     if ext_zicfiss and is_system1(inst) and
+-       (funct12 = F12_SSRDPOPCHK or funct7 = F7_SSPUSH) then
++       (funct12v = F12_SSRDPOPCHK or funct7v = F7_SSPUSH) then
+       return CSR_SSP;
+     else
+       return csr_access_addr(inst);
+@@ -8060,13 +8060,13 @@ end function;
+     variable ext_zicfiss : boolean      := is_enabled(active, x_zicfiss);
+     variable ext_zicfilp : boolean      := is_enabled(active, x_zicfilp);
+     variable op          : opcode_type  := opcode(inst);
+-    variable rd          : reg_t        := rd(inst);
++    variable rdv          : reg_t        := rd(inst);
+     variable rfa1        : reg_t        := rs1(inst);
+     variable rfa2        : reg_t        := rs2(inst);
+-    variable funct3      : funct3_type  := funct3(inst);
+-    variable funct5      : funct5_type  := funct5(inst);
+-    variable funct7      : funct7_type  := funct7(inst);
+-    variable funct12     : funct12_type := funct12(inst);
++    variable funct3v      : funct3_type  := funct3(inst);
++    variable funct5v     : funct5_type  := funct5(inst);
++    variable funct7v      : funct7_type  := funct7(inst);
++    variable funct12v     : funct12_type := funct12(inst);
+     -- Non-constant
+     variable fusel       : fuseltype    := UNKNOWN;
+   begin
+@@ -8080,9 +8080,9 @@ end function;
+         end if;
+       when OP_AMO =>
+         if ext_a then
+-          if    funct5 = R_LR then
++          if    funct5v = R_LR then
+             fusel := (AMO or LD);
+-          elsif funct5 = R_SC then
++          elsif funct5v = R_SC then
+             -- The fusel code for SC gets both LD and SD set!
+             -- The reason is that SC returns a value from cctrl, even though
+             -- it did not actually read that value from memory.
+@@ -8090,25 +8090,25 @@ end function;
+             fusel := (AMO or LD or ST);
+           else
+             fusel := (AMO or LD or ST);
+-            if ext_zicfiss and funct5 = R_SSAMOSWAP then
++            if ext_zicfiss and funct5v = R_SSAMOSWAP then
+               fusel := (AMO or LD or ST or CFI);
+             end if;
+           end if;
+         end if;
+       when OP_REG | OP_32 =>
+-        if funct7 = F7_MUL then
++        if funct7v = F7_MUL then
+           fusel   := MUL;
+         else
+           fusel   := ALU;
+         end if;
+         -- R_CLMULR is not actually valid for ext_zbkc, but that does not matter here.
+-        if (ext_zbc or ext_zbkc) and op = OP_REG and funct7 = F7_MINMAXCLMUL and
+-           (funct3 = R_CLMUL or funct3 = R_CLMULH or funct3 = R_CLMULR) then
++        if (ext_zbc or ext_zbkc) and op = OP_REG and funct7v = F7_MINMAXCLMUL and
++           (funct3v = R_CLMUL or funct3v = R_CLMULH or funct3v = R_CLMULR) then
+           fusel := ALU or ALU_SPECIAL;
+         end if;
+       when OP_FP =>
+         if ext_f then
+-          if funct5 = R_FCMP or funct5 = R_FMV_X_W or funct5 = R_FCVT_W_S then
++          if funct5v = R_FCMP or funct5v = R_FMV_X_W or funct5v = R_FCVT_W_S then
+             fusel := FPU;
+           end if;
+         end if;
+@@ -8128,8 +8128,8 @@ end function;
+       when OP_BRANCH =>
+         fusel     := BRANCH;
+       when OP_SYSTEM =>
+-        if (ext_h or ext_zimop) and funct3 = "100" then
+-          case funct7 is
++        if (ext_h or ext_zimop) and funct3v = "100" then
++          case funct7v is
+             when F7_HLVB | F7_HLVH | F7_HLVW | F7_HLVD =>
+               if ext_h then
+                 fusel := LD;
+@@ -8160,7 +8160,7 @@ end function;
+               -- Nothing else is possible!
+               null;
+           end case;
+-        elsif funct3 /= "000" then
++        elsif funct3v /= "000" then
+           fusel   := ALU;
+         end if;
+       when OP_CUSTOM0 =>
+@@ -8183,14 +8183,14 @@ end function;
+   -- Selects the type of operation and the control bits for that operation.
+   function csralu_gen(inst : word) return word2 is
+     variable op     : opcode_type := opcode(inst);
+-    variable funct3 : funct3_type := funct3(inst);
++    variable funct3v      : funct3_type := funct3(inst);
+     -- Non-constant
+     variable ctrl   : word2       := CSR_BYPASS;
+   begin
+     -- Assuming the ALU is needed (based on the decoded fusel)
+     case op is
+       when OP_SYSTEM =>
+-        case funct3 is
++        case funct3v is
+           when I_CSRRS | I_CSRRSI => ctrl := CSR_SET;
+           when I_CSRRC | I_CSRRCI => ctrl := CSR_CLEAR;
+           when others             => null;             -- I_CSRRW | I_CSRRWI
+@@ -8233,9 +8233,9 @@ end function;
+     variable ext_h       : boolean     := is_enabled(active, x_h);
+     variable ext_zicbom  : boolean     := is_enabled(active, x_zicbom);
+     variable ext_zicfiss : boolean     := is_enabled(active, x_zicfiss);
+-    variable funct3      : funct3_type := funct3(inst_in);
++    variable funct3v      : funct3_type := funct3(inst_in);
+     variable rfa1        : reg_t       := rs1(inst_in);
+-    variable size        : word2       := funct3(1 downto 0);
++    variable size        : word2       := funct3v(1 downto 0);
+     -- Non-constant
+     variable xc     : std_ulogic  := '0';
+     variable cause  : cause_type  := cause_none;
+@@ -8745,12 +8745,12 @@ end function;
+     variable x_en        : boolean       := misa_in(x_ctrl) = '1';
+     variable rfa1        : reg_t         := rs1(inst_in);
+     variable rfa2        : reg_t         := rs2(inst_in);
+-    variable rd          : reg_t         := rd(inst_in);
+-    variable opcode      : opcode_type   := opcode(inst_in);
+-    variable funct3      : funct3_type   := funct3(inst_in);
+-    variable funct7      : funct7_type   := funct7(inst_in);
+-    variable funct12     : funct12_type  := funct12(inst_in);
+-    variable funct5      : funct5_type   := funct5(inst_in);
++    variable rdv          : reg_t         := rd(inst_in);
++    variable opcodev      : opcode_type   := opcode(inst_in);
++    variable funct3v      : funct3_type   := funct3(inst_in);
++    variable funct7v      : funct7_type   := funct7(inst_in);
++    variable funct12v     : funct12_type  := funct12(inst_in);
++    variable funct5v      : funct5_type   := funct5(inst_in);
+     variable diag_legal  : word16        := "0011001011001111";
+     -- Non-constant
+     variable xc_v        : std_ulogic    := '0'; -- Virtual instruction exception
+@@ -8767,7 +8767,7 @@ end function;
+     variable diag_inst   : word4;
+     variable xc_tmp      : xc_type := XC_NONE;
+   begin
+-    case opcode is
++    case opcodev is
+       when LUI | OP_JAL =>
+         -- LUI with rd = x0 are standard HINTs.
+         null;
+@@ -8778,34 +8778,34 @@ end function;
+         null;
+ 
+       when OP_JALR =>
+-        case funct3 is
++        case funct3v is
+           when I_JALR => null;
+           when others => illegal := '1';
+         end case;
+ 
+       when OP_BRANCH =>
+-        case funct3 is
++        case funct3v is
+           when B_BEQ | B_BNE  | B_BLT |
+                B_BGE | B_BLTU | B_BGEU => null;
+           when others                  => illegal := '1';
+         end case;
+ 
+       when OP_LOAD =>
+-        case funct3 is
++        case funct3v is
+           when I_LB  | I_LH  | I_LW  |
+                I_LBU | I_LHU | I_LWU | I_LD => null;
+           when others                       => illegal := '1';
+         end case;
+-        if is_rv32 and (funct3 = I_LD or funct3 = I_LWU) then
++        if is_rv32 and (funct3v = I_LD or funct3v = I_LWU) then
+           illegal := '1';
+         end if;
+ 
+       when OP_STORE =>
+-        case funct3 is
++        case funct3v is
+           when S_SB | S_SH | S_SW | S_SD => null;
+           when others                    => illegal := '1';
+         end case;
+-        if is_rv32 and funct3 = S_SD then
++        if is_rv32 and funct3v = S_SD then
+           illegal := '1';
+         end if;
+ 
+@@ -8813,7 +8813,7 @@ end function;
+         illegal := not to_bit(alu_ok);
+ 
+       when OP_REG =>
+-        if funct7 = F7_MUL then
++        if funct7v = F7_MUL then
+           if ext_m then
+             -- No need to check funct3 here!
+             -- R_MUL / R_MULH / R_MULHSU / R_MULHU and
+@@ -8826,9 +8826,9 @@ end function;
+         end if;
+ 
+       when OP_32 =>
+-        if funct7 = F7_MUL then
++        if funct7v = F7_MUL then
+           if ext_m and is_rv64 then
+-            case funct3 is
++            case funct3v is
+               when R_MULW | R_DIVW | R_DIVUW | R_REMW | R_REMUW => null;
+               when others => illegal := '1';
+             end case;
+@@ -8840,7 +8840,7 @@ end function;
+         end if;
+ 
+       when OP_FENCE =>
+-        case funct3 is
++        case funct3v is
+           when I_FENCE =>
+               --   28   24   20    15  12     7
+               -- __fm pred succ __rs1 000 ___rd 0001111
+@@ -8854,12 +8854,12 @@ end function;
+ 
+           when I_CBO =>
+             -- RD is zero for all cbo instructions.
+-            if u2i(rd) = 0 then
+-              if    ext_zicbom and (u2i(funct12) = 1 or u2i(funct12) = 2) then -- cbo.clean/flush
++            if u2i(rdv) = 0 then
++              if    ext_zicbom and (u2i(funct12v) = 1 or u2i(funct12v) = 2) then -- cbo.clean/flush
+                 xc_tmp := require_envcfg(mode_s, prv_in, v_in, menvcfg.cbcfe, henvcfg.cbcfe, senvcfg.cbcfe);
+-              elsif ext_zicbom and u2i(funct12) = 0 then -- cbo.inval
++              elsif ext_zicbom and u2i(funct12v) = 0 then -- cbo.inval
+                 xc_tmp := require_envcfg(mode_s, prv_in, v_in, menvcfg.cbie(0), henvcfg.cbie(0), senvcfg.cbie(0));
+-              elsif ext_zicboz and u2i(funct12) = 4 then -- cbo.zero
++              elsif ext_zicboz and u2i(funct12v) = 4 then -- cbo.zero
+                 xc_tmp := require_envcfg(mode_s, prv_in, v_in, menvcfg.cbze, henvcfg.cbze, senvcfg.cbze);
+               else
+                 illegal := '1';
+@@ -8879,12 +8879,12 @@ end function;
+         end case;
+ 
+       when OP_SYSTEM =>
+-        case funct3 is
++        case funct3v is
+           when "000" =>
+-            if rd /= "00000" then
++            if rdv /= "00000" then
+               illegal   := '1';
+             else
+-              case funct7 is
++              case funct7v is
+                 when F7_URET => -- ECALL, EBREAK, URET (not supported)
+                   if rfa1 = "00000" then
+                     case rfa2 is
+@@ -9000,7 +9000,7 @@ end function;
+                     illegal := '1';
+                   end if;
+ 
+-                  if not ext_svinval and funct7 = F7_SINVAL_VMA then
++                  if not ext_svinval and funct7v = F7_SINVAL_VMA then
+                     illegal := '1';
+                     xc_v    := '0';
+                   end if;
+@@ -9035,7 +9035,7 @@ end function;
+                     illegal := '1';
+                   end if;
+ 
+-                  if not ext_svinval and funct7 = F7_HINVAL_VVMA then
++                  if not ext_svinval and funct7v = F7_HINVAL_VVMA then
+                     illegal   := '1';
+                     xc_v      := '0';
+                   end if;
+@@ -9058,7 +9058,7 @@ end function;
+                     illegal := '1';
+                   end if;
+ 
+-                  if not ext_svinval and funct7 = F7_HINVAL_GVMA then
++                  if not ext_svinval and funct7v = F7_HINVAL_GVMA then
+                     illegal     := '1';
+                     xc_v        := '0';
+                   end if;
+@@ -9069,7 +9069,7 @@ end function;
+             end if;
+ 
+           when "100" =>
+-            case funct7 is
++            case funct7v is
+               when F7_HLVB =>
+                 hv_op := '1';
+                 if rfa2 = "00000" or rfa2 = "00001" then
+@@ -9096,7 +9096,7 @@ end function;
+ 
+               when F7_HSVB | F7_HSVH | F7_HSVW | F7_HSVD =>
+                 hv_op := '1';
+-                if rd = "00000" then
++                if rdv = "00000" then
+                   hv_valid := '1';
+                 end if;
+ 
+@@ -9142,8 +9142,8 @@ end function;
+ 
+       when OP_AMO =>
+         if ext_a then
+-          if funct3 = R_WORD or funct3 = R_DOUBLE then
+-            case funct5 is
++          if funct3v = R_WORD or funct3v = R_DOUBLE then
++            case funct5v is
+               when R_LR =>
+                 if not all_0(rfa2) then
+                   illegal := '1';
+@@ -9168,7 +9168,7 @@ end function;
+         else
+           illegal   := '1';
+         end if;
+-        if is_rv32 and funct3 = R_DOUBLE then
++        if is_rv32 and funct3v = R_DOUBLE then
+           illegal := '1';
+         end if;
+ 
+@@ -9178,18 +9178,18 @@ end function;
+         illegal := not to_bit(fpu_en and fpu_ok);
+ 
+       when OP_CUSTOM0 =>
+-        case funct7 is
++        case funct7v is
+           when F7_BASE => -- Custom diagnostic instructions
+             -- rv32: support 32-bit access
+             -- rv64: support 32 and 64-bit access
+-            if (is_rv32 and funct3(1 downto 0) /= "10") or
+-               (is_rv64 and (funct3(1 downto 0) /= "10" and funct3(1 downto 0) /= "11")) then
++            if (is_rv32 and funct3v(1 downto 0) /= "10") or
++               (is_rv64 and (funct3v(1 downto 0) /= "10" and funct3v(1 downto 0) /= "11")) then
+               illegal := '1';
+             end if;
+             if not ext_noelv or not x_en then
+               illegal := '1';
+             end if;
+-            if get_hi(funct3) = '0' then
++            if get_hi(funct3v) = '0' then
+               diag_inst := inst_in(23 downto 20);  -- Diagnostic load (rs2)
+               if inst_in(24) = '1' then
+                 illegal := '1';
+@@ -12194,7 +12194,7 @@ end function;
+                           jump_out  : out std_ulogic;
+                           addr_out  : out std_logic_vector) is  -- pctype
+     subtype pctype is std_logic_vector(target_in'range);
+-    variable opcode   : opcode_type := opcode(inst_in);
++    variable opcodev   : opcode_type := opcode(inst_in);
+     -- Non-constant
+     variable target : pctype        := target_in;
+     variable xc     : std_ulogic    := '0';
+@@ -12207,14 +12207,14 @@ end function;
+ 
+     -- Generate Misprediction Signal due to wrong instruction.
+     if (taken_in and hit_in and valid_in) = '1' and xc_in = '0' then
+-      if opcode /= OP_JAL and opcode /= OP_BRANCH then
++      if opcodev /= OP_JAL and opcodev /= OP_BRANCH then
+         mis     := '1';
+         target  := next_in;
+       end if;
+     end if;
+ 
+     -- Generate Jump Signal
+-    if valid_in = '1' and xc_in = '0' and opcode = OP_JAL and (taken_in and hit_in) = '0' then
++    if valid_in = '1' and xc_in = '0' and opcodev = OP_JAL and (taken_in and hit_in) = '0' then
+       jump      := '1';
+     end if;
+ 
+@@ -12372,8 +12372,8 @@ end function;
+                        hold_in        : in  std_ulogic;
+                        rstate         : in  core_state;
+                        ras_out        : out nv_ras_in_type) is
+-    variable rd       : reg_t          := rd(inst_in);
+-    variable rs1      : reg_t          := rs1(inst_in);
++    variable rdv       : reg_t          := rd(inst_in);
++    variable rs1v      : reg_t          := rs1(inst_in);
+     -- Non-constant
+     variable ras      : nv_ras_in_type := nv_ras_in_none;
+   begin
+@@ -12399,23 +12399,23 @@ end function;
+     if v_fusel_eq(fusel_in, FLOW) and speculative_in = 1 then
+       if v_fusel_eq(fusel_in, JAL) then
+         -- On JAL instruction we should request a push.
+-        if rdv_in = '1' and (rd = GPR_RA or rd = GPR_T0) then
++        if rdv_in = '1' and (rdv = GPR_RA or rdv = GPR_T0) then
+           ras.push       := '1';
+         end if;
+       else -- JALR
+         -- Please follow table above.
+-        case rs1 is
++        case rs1v is
+           when GPR_RA | GPR_T0 =>
+-            if rd = rs1 then
++            if rdv = rs1v then
+               ras.push   := '1';
+             else
+               ras.pop    := '1';
+-              if rdv_in = '1' and (rd = GPR_RA or rd = GPR_T0) then
++              if rdv_in = '1' and (rdv = GPR_RA or rdv = GPR_T0) then
+                 ras.push := '1';
+               end if;
+             end if;
+           when others =>
+-            if rdv_in = '1' and (rd = GPR_RA or rd = GPR_T0) then
++            if rdv_in = '1' and (rdv = GPR_RA or rdv = GPR_T0) then
+               ras.push   := '1';
+             end if;
+         end case; -- rs1
+@@ -12472,7 +12472,7 @@ end function;
+                         xc_out    : out std_ulogic;
+                         cause_out : out cause_type;
+                         tval_out  : out wordx) is
+-    variable rd       : reg_t           := rd(inst_in);
++    variable rdv       : reg_t           := rd(inst_in);
+     variable tval     : wordx           := ras_in.rdata;
+     -- Non-constant
+     variable ras      : nv_ras_out_type := nv_ras_out_none;
+@@ -12500,7 +12500,7 @@ end function;
+     if valid_in = '1' and xc_in = '0' and v_fusel_eq(fusel_in, JALR) then
+       if ras_in.hit = '1' then
+         if rs1_in = GPR_T0 or rs1_in = GPR_RA then -- link registers
+-          if not (rdv_in = '1' and rd = rs1_in) then -- not if equal
++          if not (rdv_in = '1' and rdv = rs1_in) then -- not if equal
+             ras.hit := '1';
+           end if;
+         end if;

@@ -24,7 +24,7 @@ entity noelv_chs_wrap is
         manf      : integer range 0 to 2047 := 1753;
         part      : integer range 0 to 65535 := 50661;
         ver       : integer range 0 to 15 := 1;
-        tech      : integer range 0 to 69
+        tech      : integer range 0 to 69 := 0
     );
     port (
         clk_i       : in std_ulogic;

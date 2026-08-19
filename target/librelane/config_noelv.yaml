@@ -371,135 +371,6 @@ VERILOG_FILES:
 - ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/include/cv64a6_imafdc_sv39_hpdcache_wb_config_pkg.sv
 - ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/include/riscv_pkg.sv
 - ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/include/ariane_pkg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/include/build_config_pkg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cva6_accel_first_pass_decoder_stub.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/include/wt_cache_pkg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/include/std_cache_pkg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/include/aes_pkg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cvxif_example/include/cvxif_instr_pkg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cvxif_fu.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cvxif_issue_register_commit_if_driver.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cvxif_compressed_if_driver.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cvxif_example/cvxif_example_coprocessor.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cvxif_example/instr_decoder.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cva6_rvfi_probes.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cva6_fifo_v3.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cva6.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/aes.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/alu.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/alu_wrapper.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/fpu_wrap.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/branch_unit.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/compressed_decoder.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/controller.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/csr_buffer.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/csr_regfile.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/decoder.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/ex_stage.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/acc_dispatcher.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/instr_realign.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/id_stage.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/issue_read_operands.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/issue_stage.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/load_unit.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/load_store_unit.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/lsu_bypass.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/mult.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/multiplier.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/serdiv.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/perf_counters.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/ariane_regfile_ff.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/ariane_regfile_fpga.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/scoreboard.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/raw_checker.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/store_buffer.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/amo_buffer.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/store_unit.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/commit_stage.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/axi_shim.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/frontend/btb.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/frontend/bht.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/frontend/bht2lvl.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/frontend/ras.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/frontend/instr_scan.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/frontend/instr_queue.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/frontend/frontend.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cva6_mmu/cva6_tlb.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cva6_mmu/cva6_shared_tlb.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cva6_mmu/cva6_mmu.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cva6_mmu/cva6_ptw.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/wt_dcache_ctrl.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/wt_dcache_mem.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/wt_dcache_missunit.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/wt_dcache_wbuffer.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/wt_dcache.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/wt_cache_subsystem.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/wt_axi_adapter.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/cva6_icache.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/tag_cmp.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/cva6_icache_axi_wrapper.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/axi_adapter.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/miss_handler.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/cache_ctrl.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/std_nbdcache.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/std_cache_subsystem.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_pkg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_resp_demux.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_to_axi_read.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_to_axi_write.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_req_read_arbiter.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/utils/hpdcache_mem_req_write_arbiter.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_demux.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_lfsr.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_sync_buffer.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_fifo_reg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_fifo_reg_initialized.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_fxarb.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_rrarb.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_mux.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_decoder.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_1hot_to_binary.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_prio_1hot_encoder.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_sram.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_sram_wbyteenable.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_sram_wmask.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_regbank_wbyteenable_1rw.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_regbank_wmask_1rw.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_data_downsize.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_data_upsize.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/common/hpdcache_data_resize.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hwpf_stride/hwpf_stride_pkg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hwpf_stride/hwpf_stride.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hwpf_stride/hwpf_stride_arb.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hwpf_stride/hwpf_stride_wrapper.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_amo.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_cmo.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_core_arbiter.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_ctrl.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_ctrl_pe.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_memctrl.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_miss_handler.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_mshr.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_rtab.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_uncached.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_victim_plru.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_victim_random.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_victim_sel.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_wbuf.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/hpdcache/rtl/src/hpdcache_flush.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/cva6_hpdcache_if_adapter.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/cva6_hpdcache_subsystem_axi_arbiter.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/cva6_hpdcache_subsystem.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/cache_subsystem/cva6_hpdcache_wrapper.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/pmp/src/pmp.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/pmp/src/pmp_entry.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/pmp/src/pmp_data_if.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/common/local/util/sram.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/common/local/util/sram_cache.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/common/local/util/tc_sram_wrapper_cache_techno.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/core/include/instr_tracer_pkg.sv
-- ../../.bender/git/checkouts/cva6-7b729dce775b20ea/common/local/util/instr_tracer.sv
 
 
 - ../../.bender/git/checkouts/irq_router-376b3d113c15d0ef/rtl/irq_router_reg_pkg.sv
@@ -510,7 +381,12 @@ VERILOG_FILES:
 - ../../.bender/git/checkouts/core_tile-deb0d7d9d14cff74/rtl/core/sargantana/includes/drac_pkg.sv
 - ../../.bender/git/checkouts/core_tile-deb0d7d9d14cff74/rtl/core/sargantana/rtl/mmu/includes/mmu_pkg.sv
 - ../../.bender/git/checkouts/core_tile-deb0d7d9d14cff74/rtl/icache/includes/sargantana_icache_pkg.sv
-- ../../hw/noelv/noelv_chs_axi_wrap.sv
+
+
+- ./vhdl/synth/noelv_chs_wrap_post.v
+- ./noelv_chs_axi_wrap.sv
+
+
 - ../../.bender/git/checkouts/opentitan_peripherals-7b624fb57f78de9a/src/prim/prim_pulp_platform/prim_flop_2sync.sv
 - ../../.bender/git/checkouts/opentitan_peripherals-7b624fb57f78de9a/src/prim/prim_pulp_platform/prim_flop_en.sv
 - ../../.bender/git/checkouts/opentitan_peripherals-7b624fb57f78de9a/src/prim/rtl/prim_fifo_sync_cnt.sv
@@ -606,6 +482,7 @@ ERROR_ON_SYNTH_CHECKS: False
 # Enable plugin for better SystemVerilog support
 USE_SLANG: True
 SLANG_ARGUMENTS: ['--keep-hierarchy','--allow-use-before-declare','--ignore-unknown-modules','--ignore-assertions', '--ignore-timing']
+
 SYNTH_KEEP_HIERARCHY_MODULES: [
     'cheshire_soc$*',
     'c910_axi_wrap$*',
@@ -624,11 +501,17 @@ SYNTH_KEEP_HIERARCHY_MODULES: [
     'spi_host$*',
     'spi_host_fsm$*',
     'serial_link$*',
-    'tc_clk*$*',
-    'tc_sram$*'
+    'noelvcpu*$*',
+    'ahbctrl*$*',
+    'ahb2axi4b*$*',
+    'dmnv*$*',
+    'ahbjtagrv*$*',
+    'cctrl5nv*$*',
+    'iunv*$*',
+    'gf22fdx_syncram*$*',
+    'gf22fdx_syncram_2p*$*',
+    'RM_IHPSG13*$*',
 ]
-
-SYNTH_KEEP_HIERARCHY_MIN_COST: 10000
 
 # Valid values are AREA 0-3 and DELAY 0-4
 # DELAY 4 = fastest, but largest area
@@ -645,8 +528,8 @@ CLOCK_PORT: [clk_i, rtc_i, jtag_tck_i]
 CLOCK_PERIOD: 35
 
 # Floorplan
-DIE_AREA: [0, 0, 9000, 5000]
-CORE_AREA: [50, 50, 8950, 4950]
+DIE_AREA: [0, 0, 9000, 5500]
+CORE_AREA: [50, 50, 8950, 5450]
 IO_PIN_ORDER_CFG: dir::pin_order.cfg
 FP_SIZING: absolute
 
@@ -667,7 +550,7 @@ PDN_CFG: dir::pdn_cfg.tcl
 PL_TARGET_DENSITY_PCT: 50
 PL_TIMING_DRIVEN: False
 PL_ROUTABILITY_DRIVEN: True
-PL_ROUTABILITY_OVERFLOW_THRESHOLD: 0.3
+PL_ROUTABILITY_OVERFLOW_THRESHOLD: 0.35
 
 # CTS
 RUN_CTS: true
@@ -707,149 +590,235 @@ RUN_MAGIC_DRC: False
 RUN_KLAYOUT_DRC: False
 
 MACROS:
-  RM_IHPSG13_1P_256x64_c2_bm_bist:
+  RM_IHPSG13_1P_256x32_c2_bm_bist:
     gds:
-      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_256x64_c2_bm_bist.gds
+      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_256x32_c2_bm_bist.gds
     lef:
-      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_256x64_c2_bm_bist.lef
+      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_256x32_c2_bm_bist.lef
     vh:
-      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_256x64_c2_bm_bist.v
+      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_256x32_c2_bm_bist.v
       - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_core_behavioral_bm_bist.v
     lib:
       "*_typ_1p20V_25C":
-        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x64_c2_bm_bist_typ_1p20V_25C.lib
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x32_c2_bm_bist_typ_1p20V_25C.lib
       "*_fast_1p32V_m40C":
-        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x64_c2_bm_bist_fast_1p32V_m55C.lib
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x32_c2_bm_bist_fast_1p32V_m55C.lib
       "*_slow_1p08V_125C":
-        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x64_c2_bm_bist_slow_1p08V_125C.lib
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x32_c2_bm_bist_slow_1p08V_125C.lib
     instances:
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[3].data_sram.genblk1.data_sram.gen_cut[1].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*0", 200]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.smem1.dtagconf02_dtagloop_3__dtagsmem.gf22x_x0/d32_a7d32_id0:
+        location: ["expr::300+1100*0", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[3].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*1", 200]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.smem1.dtagconf02_dtagloop_2__dtagsmem.gf22x_x0/d32_a7d32_id0:
+        location: ["expr::300+1100*1", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[3].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*2", 200]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.smem1.dtagconf02_dtagloop_1__dtagsmem.gf22x_x0/d32_a7d32_id0:
+        location: ["expr::300+1100*2", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[2].data_sram.genblk1.data_sram.gen_cut[1].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*3", 200]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.smem1.dtagconf02_dtagloop_0__dtagsmem.gf22x_x0/d32_a7d32_id0:
+        location: ["expr::300+1100*3", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[2].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*4", 200]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.itagloop_3__itagmem.gf22x_x0/d32_a7d32_id0:
+        location: ["expr::300+1100*4", 1100]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[2].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*5", 200]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.itagloop_2__itagmem.gf22x_x0/d32_a7d32_id0:
+        location: ["expr::300+1100*5", 1100]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[1].data_sram.genblk1.data_sram.gen_cut[1].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*0", 500]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.itagloop_1__itagmem.gf22x_x0/d32_a7d32_id0:
+        location: ["expr::300+1100*6", 1100]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[1].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*1", 500]
-        orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[1].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*2", 500]
-        orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[0].data_sram.genblk1.data_sram.gen_cut[1].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*3", 500]
-        orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[0].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*4", 500]
-        orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[0].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*5", 500]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.itagloop_0__itagmem.gf22x_x0/d32_a7d32_id0:
+        location: ["expr::300+1100*7", 1100]
         orientation: S
 
-  RM_IHPSG13_1P_256x48_c2_bm_bist:
+
+  RM_IHPSG13_2P_256x32_c2_bm_bist:
     gds:
-      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_256x48_c2_bm_bist.gds
+      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_2P_256x32_c2_bm_bist.gds
     lef:
-      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_256x48_c2_bm_bist.lef
+      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_2P_256x32_c2_bm_bist.lef
     vh:
-      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_256x48_c2_bm_bist.v
-      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_core_behavioral_bm_bist.v
+      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_2P_256x32_c2_bm_bist.v
+      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_2P_core_behavioral_bm_bist_ideal.v
     lib:
       "*_typ_1p20V_25C":
-        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x48_c2_bm_bist_typ_1p20V_25C.lib
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_2P_256x32_c2_bm_bist_typ_1p20V_25C.lib
       "*_fast_1p32V_m40C":
-        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x48_c2_bm_bist_fast_1p32V_m55C.lib
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_2P_256x32_c2_bm_bist_fast_1p32V_m55C.lib
       "*_slow_1p08V_125C":
-        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x48_c2_bm_bist_slow_1p08V_125C.lib
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_2P_256x32_c2_bm_bist_slow_1p08V_125C.lib
     instances:
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[0].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*0+420", 4300]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.dtagconf0_dtagloop_3__dtagcmem.gf22x_x0/d32_2p_a7d32_id0:
+        location: ["expr::300+1100*4", 200]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.dtagconf0_dtagloop_2__dtagcmem.gf22x_x0/d32_2p_a7d32_id0:
+        location: ["expr::300+1100*5", 200]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.dtagconf0_dtagloop_1__dtagcmem.gf22x_x0/d32_2p_a7d32_id0:
+        location: ["expr::300+1100*6", 200]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.dtagconf0_dtagloop_0__dtagcmem.gf22x_x0/d32_2p_a7d32_id0:
+        location: ["expr::300+1100*7", 200]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.bht0.phtable.gf22x_x0/d64_2p_a7d40_id0:
+        location: ["expr::300+1100*5", 4600]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[1].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*1+420", 4300]
-        orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[2].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*2+420", 4300]
-        orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[3].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*3+420", 4300]
-        orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[4].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*4+420", 4300]
-        orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[5].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*5+420", 4300]
-        orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[6].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*6+420", 4300]
-        orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[7].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*7+420", 4300]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.bht0.phtable.gf22x_x0/d64_2p_a7d40_id1:
+        location: ["expr::300+1100*6", 4600]
         orientation: N
 
-  RM_IHPSG13_1P_512x64_c2_bm_bist:
+  
+  RM_IHPSG13_1P_512x32_c2_bm_bist:
     gds:
-      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_512x64_c2_bm_bist.gds
+      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_512x32_c2_bm_bist.gds
     lef:
-      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_512x64_c2_bm_bist.lef
+      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_512x32_c2_bm_bist.lef
     vh:
-      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_512x64_c2_bm_bist.v
+      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_512x32_c2_bm_bist.v
       - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_core_behavioral_bm_bist.v
     lib:
       "*_typ_1p20V_25C":
-        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x64_c2_bm_bist_typ_1p20V_25C.lib
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x32_c2_bm_bist_typ_1p20V_25C.lib
       "*_fast_1p32V_m40C":
-        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x64_c2_bm_bist_fast_1p32V_m55C.lib
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x32_c2_bm_bist_fast_1p32V_m55C.lib
       "*_slow_1p08V_125C":
-        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x64_c2_bm_bist_slow_1p08V_125C.lib
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x32_c2_bm_bist_slow_1p08V_125C.lib
     instances:
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[0].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_0:
-        location: ["expr::1050*0+350", 4650]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_3__idatameml.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*0", 800]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_3__idatamemh.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*1", 800]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_2__idatameml.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*2", 800]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_2__idatamemh.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*3", 800]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_1__idatameml.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*4", 800]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_1__idatamemh.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*5", 800]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_0__idatameml.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*6", 800]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_0__idatamemh.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*7", 800]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_3__ddatameml.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*0", 500]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_3__ddatamemh.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*1", 500]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_2__ddatameml.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*2", 500]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_2__ddatamemh.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*3", 500]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_1__ddatameml.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*4", 500]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_1__ddatamemh.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*5", 500]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_0__ddatameml.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*6", 500]
+        orientation: S
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_0__ddatamemh.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+        location: ["expr::300+1100*7", 500]
+        orientation: S
+
+
+  RM_IHPSG13_1P_64x64_c2_bm_bist:
+    gds:
+      - pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_64x64_c2_bm_bist.gds
+    lef:
+      - pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_64x64_c2_bm_bist.lef
+    vh:
+      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_64x64_c2_bm_bist.v
+      - pdk_dir::libs.ref/sg13g2_sram/verilog/RM_IHPSG13_1P_core_behavioral_bm_bist.v
+    lib:
+      "*_typ_1p20V_25C":
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_64x64_c2_bm_bist_typ_1p20V_25C.lib
+      "*_fast_1p32V_m40C":
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_64x64_c2_bm_bist_fast_1p32V_m55C.lib
+      "*_slow_1p08V_125C":
+        - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_64x64_c2_bm_bist_slow_1p08V_125C.lib
+    instances:
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_7__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*0", 5200]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[0].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_1:
-        location: ["expr::1050*1+350", 4650]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_7__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*1", 5200]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[1].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_0:
-        location: ["expr::1050*2+350", 4650]        
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_6__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*2", 5200]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[1].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_1:
-        location: ["expr::1050*3+350", 4650]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_6__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*3", 5200]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[2].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_0:
-        location: ["expr::1050*4+350", 4650]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_5__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*4", 5200]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[2].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_1:
-        location: ["expr::1050*5+350", 4650]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_5__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*5", 5200]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[3].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_0:
-        location: ["expr::1050*6+350", 4650]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_4__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*6", 5200]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[3].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_1:
-        location: ["expr::1050*7+350", 4650]
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_4__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*7", 5200]
         orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_3__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*0", 4900]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_3__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*1", 4900]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_2__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*2", 4900]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_2__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*3", 4900]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_1__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*4", 4900]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_1__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*5", 4900]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_0__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*6", 4900]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_0__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*7", 4900]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_4__ram0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*0", 4600]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_3__ram0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*1", 4600]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_2__ram0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*2", 4600]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_1__ram0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*3", 4600]
+        orientation: N
+      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_0__ram0.gf22x_x0/d32_a6d32_id0:
+        location: ["expr::300+1100*4", 4600]
+        orientation: N
+
 
 # This is an alternative method compared to
 # specifying the power connections in the RTL
 PDN_MACRO_CONNECTIONS:
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache.gen_sram.*/gen_256x64xBx1.i_cut VDD VSS VDDARRAY! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache.gen_sram.*/gen_256x64xBx1.i_cut VDD VSS VDD! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache.i_hpdcache.hpdcache_ctrl_i.hpdcache_memctrl_i.gen_dir_sram.*/gen_256x48xBx1.i_cut VDD VSS VDDARRAY! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache.i_hpdcache.hpdcache_ctrl_i.hpdcache_memctrl_i.gen_dir_sram.*/gen_256x48xBx1.i_cut VDD VSS VDD! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache.i_hpdcache.hpdcache_ctrl_i.hpdcache_memctrl_i.gen_data_sram_row.*/gen_512x128xBx1.i_cut_0 VDD VSS VDDARRAY! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache.i_hpdcache.hpdcache_ctrl_i.hpdcache_memctrl_i.gen_data_sram_row.*/gen_512x128xBx1.i_cut_0 VDD VSS VDD! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache.i_hpdcache.hpdcache_ctrl_i.hpdcache_memctrl_i.gen_data_sram_row.*/gen_512x128xBx1.i_cut_1 VDD VSS VDDARRAY! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache.i_hpdcache.hpdcache_ctrl_i.hpdcache_memctrl_i.gen_data_sram_row.*/gen_512x128xBx1.i_cut_1 VDD VSS VDD! VSS!
+- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.*gf22x_x0.*_id0 VDD VSS VDDARRAY! VSS!
+- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.*gf22x_x0.*_id0 VDD VSS VDD! VSS!
+- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.*gf22x_x0.*_id1 VDD VSS VDDARRAY! VSS!
+- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.*gf22x_x0.*_id1 VDD VSS VDD! VSS!

@@ -139,7 +139,7 @@ $(CHS_ROOT)/hw/noelv/grlib-gpl-2025.2-b4298:
 	wget https://download.gaisler.com/products/GRLIB/bin/grlib-gpl-2025.2-b4298.tar.gz
 	tar -xvf grlib-gpl-2025.2-b4298.tar.gz -C $(CHS_ROOT)/hw/noelv
 	rm grlib-gpl-2025.2-b4298.tar.gz
-	cd $(CHS_ROOT)/hw/noelv && git apply cfg.patch noelv.patch axi.patch ras.patch
+	cd $(CHS_ROOT)/hw/noelv && git apply cfg.patch noelv.patch axi.patch ras.patch fputilnv.patch iunv.patch nvsupport.patch
 
 CHS_HW_ALL += $(IDMA_FULL_RTL)
 CHS_HW_ALL += $(CHS_ROOT)/hw/regs/cheshire_reg_pkg.sv $(CHS_ROOT)/hw/regs/cheshire_reg_top.sv

@@ -998,8 +998,8 @@ CLOCK_PORT: [clk_i, rtc_i, jtag_tck_i]
 CLOCK_PERIOD: 35
 
 # Floorplan
-DIE_AREA: [0, 0, 15000, 9000]
-CORE_AREA: [50, 50, 14950, 8950]
+DIE_AREA: [0, 0, 22000, 15000]
+CORE_AREA: [50, 50, 21950,14950]
 IO_PIN_ORDER_CFG: dir::pin_order.cfg
 FP_SIZING: absolute
 
@@ -1017,10 +1017,10 @@ PDN_CORE_RING: True
 PDN_CFG: dir::pdn_cfg.tcl
 
 # Placement 
-PL_TARGET_DENSITY_PCT: 30
+PL_TARGET_DENSITY_PCT: 10
 PL_TIMING_DRIVEN: False
 PL_ROUTABILITY_DRIVEN: True
-PL_ROUTABILITY_OVERFLOW_THRESHOLD: 0.35
+PL_ROUTABILITY_OVERFLOW_THRESHOLD: 0.45
 
 # CTS
 RUN_CTS: true
@@ -1029,9 +1029,11 @@ CTS_CLK_BUFFERS: ["sg13g2_buf_2","sg13g2_buf_4","sg13g2_buf_8","sg13g2_buf_16"]
 
 # Routing
 GRT_ALLOW_CONGESTION: true
+GRT_OVERFLOW_ITERS: 25
 GRT_ANTENNA_REPAIR_MARGIN: 30
 RT_MAX_LAYER: TopMetal1
 RT_CLOCK_MAX_LAYER: TopMetal1
+GRT_LAYER_ADJUSTMENTS: [0, 0.2, 0.2, 0, 0, 0, 0]
 # Potentially leave some antennas after DRT to avoid pin access error bug
 DRT_ANTENNA_REPAIR_ITERS: 0
 
@@ -1039,7 +1041,7 @@ DRT_ANTENNA_REPAIR_ITERS: 0
 DESIGN_REPAIR_REMOVE_BUFFERS: True
 RUN_POST_CTS_RESIZER_TIMING: True
 RUN_POST_GRT_RESIZER_TIMING: True
-RUN_POST_GRT_DESIGN_REPAIR: True
+RUN_POST_GRT_DESIGN_REPAIR: False
 DESIGN_REPAIR_MAX_SLEW_PCT: 20
 GRT_DESIGN_REPAIR_MAX_SLEW_PCT: 20
 # Fix setup violations
@@ -1050,6 +1052,8 @@ GRT_RESIZER_SETUP_REPAIR_TNS_PCT: 100
 GRT_RESIZER_SETUP_SLACK_MARGIN: 0.35
 GRT_RESIZER_SETUP_MAX_BUFFER_PCT: 100
 # Fix hold violations
+PL_RESIZER_ALLOW_SETUP_VIOS: True
+GRT_RESIZER_ALLOW_SETUP_VIOS: True
 PL_RESIZER_HOLD_REPAIR_TNS_PCT: 100
 PL_RESIZER_HOLD_SLACK_MARGIN: 0.1
 GRT_RESIZER_HOLD_SLACK_MARGIN: 0.05
@@ -1076,13 +1080,13 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x64_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_st_tag_array.x_ct_spsram_512x52.i_tc_sram/gen_512x64xBx1.i_cut:
-        location: ["expr::600+1300*0", 8300] # d$
+        location: ["expr::1900+1700*0", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_ld_tag_array.x_ct_spsram_512x54.i_tc_sram/gen_512x64xBx1.i_cut:
-        location: ["expr::600+1300*1", 8300] # d$
+        location: ["expr::1900+1700*1", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_tag_array.x_ct_spsram_512x59.i_tc_sram/gen_512x64xBx1.i_cut:
-        location: ["expr::600+1300*0", 300] # i$
+        location: ["expr::1900+1700*0", 300] # i$
         orientation: S
 
   RM_IHPSG13_1P_512x32_c2_bm_bist:
@@ -1102,16 +1106,16 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x32_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_btb.x_ct_ifu_btb_data_array.x_ct_spsram_512x44_bank1.i_tc_sram/gen_512x44xBx1.i_cut_0:
-        location: ["expr::600+1300*2", 850] # btb
+        location: ["expr::1900+1700*2", 850] # btb
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_btb.x_ct_ifu_btb_data_array.x_ct_spsram_512x44_bank0.i_tc_sram/gen_512x44xBx1.i_cut_0:
-        location: ["expr::600+1300*4", 850] # btb
+        location: ["expr::1900+1700*4", 850] # btb
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_btb.x_ct_ifu_btb_tag_array.x_ct_spsram_512x22_bank1.i_tc_sram/gen_512x22xBx1.i_cut:
-        location: ["expr::600+1300*6", 850] # btb
+        location: ["expr::1900+1700*6", 850] # btb
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_btb.x_ct_ifu_btb_tag_array.x_ct_spsram_512x22_bank0.i_tc_sram/gen_512x22xBx1.i_cut:
-        location: ["expr::600+1300*7", 850] # btb
+        location: ["expr::1900+1700*7", 850] # btb
         orientation: S
 
   RM_IHPSG13_1P_512x16_c2_bm_bist:
@@ -1131,10 +1135,10 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x16_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_btb.x_ct_ifu_btb_data_array.x_ct_spsram_512x44_bank1.i_tc_sram/gen_512x44xBx1.i_cut_1:
-        location: ["expr::600+1300*3", 850] # btb
+        location: ["expr::1900+1700*3", 850] # btb
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_btb.x_ct_ifu_btb_data_array.x_ct_spsram_512x44_bank0.i_tc_sram/gen_512x44xBx1.i_cut_1:
-        location: ["expr::600+1300*5", 850] # btb
+        location: ["expr::1900+1700*5", 850] # btb
         orientation: S
 
   RM_IHPSG13_1P_512x8_c3_bm_bist:
@@ -1154,7 +1158,7 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x8_c3_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_st_dirty_array.x_ct_spsram_512x7.i_tc_sram/gen_512x7xBx1.i_cut:
-        location: ["expr::600+1300*2", 8300] # d$
+        location: ["expr::1900+1700*2", 14300] # d$
         orientation: N
 
   RM_IHPSG13_1P_256x64_c2_bm_bist:
@@ -1174,19 +1178,19 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x64_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_mmu_top.x_ct_mmu_jtlb.x_ct_mmu_jtlb_tag_array.x_ct_spsram_256x196.i_tc_sram/gen_256x196xBx1.i_cut_0:
-        location: ["expr::600+1300*0", 7900] # tlb
+        location: ["expr::1900+1700*0", 13900] # tlb
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_mmu_top.x_ct_mmu_jtlb.x_ct_mmu_jtlb_tag_array.x_ct_spsram_256x196.i_tc_sram/gen_256x196xBx1.i_cut_1:
-        location: ["expr::600+1300*1", 7900] # tlb
+        location: ["expr::1900+1700*1", 13900] # tlb
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_mmu_top.x_ct_mmu_jtlb.x_ct_mmu_jtlb_tag_array.x_ct_spsram_256x196.i_tc_sram/gen_256x196xBx1.i_cut_2:
-        location: ["expr::600+1300*2", 7900] # tlb
+        location: ["expr::1900+1700*2", 13900] # tlb
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_mmu_top.x_ct_mmu_jtlb.x_ct_mmu_jtlb_data_array.x_ct_spsram_256x84_bank1.i_tc_sram/gen_256x84xBx1.i_cut_0:
-        location: ["expr::600+1300*4", 7900] # tlb
+        location: ["expr::1900+1700*4", 13900] # tlb
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_mmu_top.x_ct_mmu_jtlb.x_ct_mmu_jtlb_data_array.x_ct_spsram_256x84_bank0.i_tc_sram/gen_256x84xBx1.i_cut_0:
-        location: ["expr::600+1300*6", 7900] # tlb
+        location: ["expr::1900+1700*6", 13900] # tlb
         orientation: N
 
   RM_IHPSG13_1P_256x32_c2_bm_bist:
@@ -1206,13 +1210,13 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x32_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_mmu_top.x_ct_mmu_jtlb.x_ct_mmu_jtlb_data_array.x_ct_spsram_256x84_bank1.i_tc_sram/gen_256x84xBx1.i_cut_1:
-        location: ["expr::600+1300*5", 7900] # tlb
+        location: ["expr::1900+1700*5", 13900] # tlb
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_mmu_top.x_ct_mmu_jtlb.x_ct_mmu_jtlb_data_array.x_ct_spsram_256x84_bank0.i_tc_sram/gen_256x84xBx1.i_cut_1:
-        location: ["expr::600+1300*7", 7900] # tlb
+        location: ["expr::1900+1700*7", 13900] # tlb
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_ind_btb.x_ct_ifu_ind_btb_array.x_ct_spsram_256x23.i_tc_sram/gen_256x32xBx1.i_cut:
-        location: ["expr::600+1300*8", 850] # btb
+        location: ["expr::1900+1700*8", 850] # btb
         orientation: S
 
   RM_IHPSG13_1P_256x16_c2_bm_bist:
@@ -1232,7 +1236,7 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x16_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_bht.x_ct_ifu_bht_sel_array.x_ct_spsram_128x16.i_tc_sram/gen_128x16xBx1.i_cut:
-        location: ["expr::600+1300*1", 850] # bht
+        location: ["expr::1900+1700*1", 850] # bht
         orientation: S
 
   RM_IHPSG13_1P_256x8_c3_bm_bist:
@@ -1252,7 +1256,7 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x8_c3_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_mmu_top.x_ct_mmu_jtlb.x_ct_mmu_jtlb_tag_array.x_ct_spsram_256x196.i_tc_sram/gen_256x196xBx1.i_cut_3:
-        location: ["expr::600+1300*3", 7900] # tlb
+        location: ["expr::1900+1700*3", 13900] # tlb
         orientation: N
 
   RM_IHPSG13_1P_1024x64_c2_bm_bist:
@@ -1272,61 +1276,61 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_1024x64_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_ld_data_bank7_array.x_ct_spsram_2048x32.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*3", 8300] # d$
+        location: ["expr::1900+1700*3", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_ld_data_bank6_array.x_ct_spsram_2048x32.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*4", 8300] # d$
+        location: ["expr::1900+1700*4", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_ld_data_bank5_array.x_ct_spsram_2048x32.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*5", 8300] # d$
+        location: ["expr::1900+1700*5", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_ld_data_bank4_array.x_ct_spsram_2048x32.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*6", 8300] # d$
+        location: ["expr::1900+1700*6", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_ld_data_bank3_array.x_ct_spsram_2048x32.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*7", 8300] # d$
+        location: ["expr::1900+1700*7", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_ld_data_bank2_array.x_ct_spsram_2048x32.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*8", 8300] # d$
+        location: ["expr::1900+1700*8", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_ld_data_bank1_array.x_ct_spsram_2048x32.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*9", 8300] # d$
+        location: ["expr::1900+1700*9", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_lsu_top.x_ct_lsu_dcache_top/x_ct_lsu_dcache_ld_data_bank0_array.x_ct_spsram_2048x32.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*10", 8300] # d$
+        location: ["expr::1900+1700*10", 14300] # d$
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_predecd_array1.x_ct_spsram_2048x32_split.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*1", 300] # i$
+        location: ["expr::1900+1700*1", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_predecd_array0.x_ct_spsram_2048x32_split.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*2", 300] # i$
+        location: ["expr::1900+1700*2", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_data_array1.x_ct_spsram_2048x32_bank3.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*3", 300] # i$
+        location: ["expr::1900+1700*3", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_data_array1.x_ct_spsram_2048x32_bank2.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*4", 300] # i$
+        location: ["expr::1900+1700*4", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_data_array1.x_ct_spsram_2048x32_bank1.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*5", 300] # i$
+        location: ["expr::1900+1700*5", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_data_array1.x_ct_spsram_2048x32_bank0.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*6", 300] # i$
+        location: ["expr::1900+1700*6", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_data_array0.x_ct_spsram_2048x32_bank3.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*7", 300] # i$
+        location: ["expr::1900+1700*7", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_data_array0.x_ct_spsram_2048x32_bank2.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*8", 300] # i$
+        location: ["expr::1900+1700*8", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_data_array0.x_ct_spsram_2048x32_bank1.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*9", 300] # i$
+        location: ["expr::1900+1700*9", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_icache_if/x_ct_ifu_icache_data_array0.x_ct_spsram_2048x32_bank0.i_tc_sram/gen_2048x32xBx1.i_cut:
-        location: ["expr::600+1300*10", 300] # i$
+        location: ["expr::1900+1700*10", 300] # i$
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_c910_core.i_c910_axi_wrap/cpu_sub_system_axi_i.x_rv_integration_platform.x_cpu_top.x_ct_top_0.x_ct_core.x_ct_ifu_top.x_ct_ifu_bht.x_ct_ifu_bht_pre_array.x_ct_spsram_1024x64.i_tc_sram/gen_1024x64xBx1.i_cut:
-        location: ["expr::600+1300*0", 850] # bht
+        location: ["expr::1900+1700*0", 850] # bht
         orientation: S
 
 # This is an alternative method compared to

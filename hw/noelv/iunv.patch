@@ -1,0 +1,94 @@
+diff --git a/./../../grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/iunv.vhd b/./hw/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/iunv.vhd
+index 40849c8..0b76266 100644
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/iunv.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/iunv.vhd
+@@ -1985,9 +1985,9 @@ architecture rtl of iunv is
+   end;
+ 
+   function csr_addr(r : registers; stage : stage_type) return csratype is
+-    variable csr : csr_type := csr(r, stage);
++    variable csrv : csr_type := csr(r, stage);
+   begin
+-    return csr.addr;
++    return csrv.addr;
+   end;
+ 
+   function csr_access_addr(r : registers; stage : stage_type) return csratype is
+@@ -2119,11 +2119,11 @@ architecture rtl of iunv is
+   -- Assumes it is already known that inst is a CSR instruction.
+   function csr_immediate(r : registers; stage : stage_type) return boolean is
+     variable c      : pipeline_ctrl_type := ctrl(r, stage, csr_lane);
+-    variable funct3 : funct3_type        := funct3(c.inst);
++    variable funct3v : funct3_type        := funct3(c.inst);
+   begin
+     -- Since CSR instruction is assumed, the following is equivalent to
+     -- funct3 = I_CSRRWI or funct3 = I_CSRRSI or funct3 = I_CSRRCI
+-    return get_hi(funct3) = '1';
++    return get_hi(funct3v) = '1';
+   end;
+ 
+ 
+@@ -3986,7 +3986,7 @@ architecture rtl of iunv is
+                        vsum_in     : in  std_ulogic;
+                        wpnull_out  : out std_ulogic;
+                        dci_out     : out dcache_in_type) is
+-    variable funct3 : funct3_type    := funct3(inst_in);
++    variable funct3v : funct3_type    := funct3(inst_in);
+     -- Non-constant
+     variable x0_rs1 : std_ulogic;
+     variable x0_rs2 : std_ulogic;
+@@ -3997,8 +3997,8 @@ architecture rtl of iunv is
+     x0_rs2 := all_0(rs2(inst_in));  -- in the variable declaration above, for some reason.
+ 
+     -- Drive Cache Signal
+-    dci.signed  := not funct3(2);   -- Used in IUNV to sign extend read data
+-    dci.size    := funct3(1 downto 0);
++    dci.signed  := not funct3v(2);   -- Used in IUNV to sign extend read data
++    dci.size    := funct3v(1 downto 0);
+     -- During normal operation, the LEON5 processor accesses instructions
+     -- and data using ASI 0x8 - 0xB, so we do the same.
+     dci.asi     := x"0A";
+@@ -4418,10 +4418,10 @@ architecture rtl of iunv is
+   function trigger_textra_match(tdata3    : wordx;
+                                 mhcontext : csr_mhcontext_type;
+                                 scontext  : csr_scontext_type;
++                                vmode_i     : std_logic;
+                                 hgatp     : atp_type;
+                                 satp      : atp_type;
+-                                vsatp     : atp_type;
+-                                vmode     : std_logic) return std_logic is
++                                vsatp     : atp_type) return std_ulogic is
+     variable X64       : integer := b2i(XLEN = 64);
+     -- Non-constant
+     -- tdata3
+@@ -4471,7 +4471,7 @@ architecture rtl of iunv is
+             end if;
+           end loop;
+         when "10" =>
+-          if vmode = '1' then
++          if vmode_i = '1' then
+             ASID := vsatp.id;
+           else
+             ASID := satp.id;
+@@ -4515,7 +4515,7 @@ architecture rtl of iunv is
+             end if;
+           end loop;
+         when "10" =>
+-          if vmode = '1' then
++          if vmode_i = '1' then
+             ASID := vsatp.id;
+           else
+             ASID := satp.id;
+@@ -8659,10 +8659,10 @@ architecture rtl of iunv is
+         conthit_out(i) := trigger_textra_match(tdata3    => tdata3,
+                                                mhcontext => tcsr.mhcontext,
+                                                scontext  => tcsr.scontext,
++                                               vmode_i   => csr_file.v,
+                                                hgatp     => csr_file.hgatp,
+                                                satp      => csr_file.satp,
+-                                               vsatp     => csr_file.vsatp,
+-                                               vmode     => csr_file.v);
++                                               vsatp     => csr_file.vsatp);
+       end loop;
+ 
+       -- Check if mcontrol6 or instruction count triggers hit

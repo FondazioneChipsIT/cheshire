@@ -1,0 +1,197 @@
+diff --git a/./../../grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/fputilnv.vhd b/./hw/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/fputilnv.vhd
+index e751c13..9423fa9 100644
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/fputilnv.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/fputilnv.vhd
+@@ -250,11 +250,11 @@ package body fputilnv is
+     variable ext_zfhmin  : boolean      := is_enabled(active, x_zfhmin);
+     variable ext_zfbfmin : boolean      := is_enabled(active, x_zfbfmin);
+     variable no_muladd   : boolean      := not is_enabled(active, x_muladd);
+-    variable opcode      : opcode_type  := opcode(inst_in);
++    variable opcodev      : opcode_type  := opcode(inst_in);
+     variable rfa2        : reg_t        := rs2(inst_in);
+-    variable funct3      : funct3_type  := funct3(inst_in);
+-    variable funct7      : funct7_type  := funct7(inst_in);
+-    variable funct5      : funct5_type  := funct5(inst_in);
++    variable funct3v      : funct3_type  := funct3(inst_in);
++    variable funct7v      : funct7_type  := funct7(inst_in);
++    variable funct5v      : funct5_type  := funct5(inst_in);
+     variable fmt         : word2        := inst_in(26 downto 25);
+     variable conversion  : word4        := fmt & rfa2(1 downto 0);
+     -- Non-constant
+@@ -263,17 +263,17 @@ package body fputilnv is
+     variable illegal_fmt : boolean      := false;
+   begin
+     -- Illegal rounding mode?
+-    if funct3 = "101" or funct3 = "110" then
++    if funct3v = "101" or funct3v = "110" then
+       illegal_rm := true;
+     end if;
+-    if funct3 = "111" and
++    if funct3v = "111" and
+        (frm = "101" or frm = "110" or frm = "111") then
+       illegal_rm := true;
+     end if;
+ 
+-    case opcode is
++    case opcodev is
+       when OP_LOAD_FP | OP_STORE_FP =>
+-        case funct3 is
++        case funct3v is
+           when R_WORD   => illegal := not ext_f;
+           when R_DOUBLE => illegal := not ext_d;
+           when R_HALF   => illegal := not (ext_f and (ext_zfhmin or ext_zfbfmin));
+@@ -295,7 +295,7 @@ package body fputilnv is
+           when "00"   => illegal := not ext_f;
+           when "01"   => illegal := not ext_d;
+           when "10"   =>  -- Half precision float
+-            case funct5 is
++            case funct5v is
+               when R_FADD     | R_FSUB | R_FMUL | R_FDIV  |
+                    R_FMINMAX  | R_FCMP | R_FSGN | R_FSQRT |
+                    R_FCVT_W_S | R_FCVT_S_W =>
+@@ -308,7 +308,7 @@ package body fputilnv is
+             end case;
+           when others => illegal := true;
+         end case;
+-        case funct5 is
++        case funct5v is
+           when R_FADD | R_FSUB | R_FMUL | R_FDIV =>
+             illegal := illegal or illegal_rm;
+           when R_FSQRT =>
+@@ -317,18 +317,18 @@ package body fputilnv is
+             end if;
+             illegal := illegal or illegal_rm;
+           when R_FSGN =>
+-            case funct3 is
++            case funct3v is
+               when R_FSGNJ | R_FSGNJN | R_FSGNJX => null;
+               when others                        => illegal := true;
+             end case;
+           when R_FMINMAX =>
+-            case funct3 is
++            case funct3v is
+               when R_FMAX  | R_FMIN  => null;
+               when R_FMAXM | R_FMINM => illegal := illegal or not ext_zfa;
+               when others            => illegal := true;
+             end case;
+           when R_FCMP =>
+-            case funct3 is
++            case funct3v is
+               when R_FEQ  | R_FLT | R_FLE => null;
+               when R_FLTQ | R_FLEQ        => illegal := illegal or not ext_zfa;
+               when others                 => illegal := true;
+@@ -337,7 +337,7 @@ package body fputilnv is
+           when R_FCVT_W_S | R_FCVT_S_W => -- R_FCVT_L_S, R_FCVT_S_L (and _D_ variants)
+             -- FCVTMOD.W.D
+             if ext_d and ext_zfa and rfa2 = "01000" and
+-               funct3 = R_ZERO and fmt = "01" then
++               funct3v = R_ZERO and fmt = "01" then
+               null;
+             -- Only four modes available
+             elsif rfa2(4 downto 2) /= "000" then
+@@ -349,17 +349,17 @@ package body fputilnv is
+             illegal := illegal or illegal_rm;
+           -- Mainly moves to/from integer
+           when R_FMV_X_W | R_FMV_W_X => -- R_FCLASS (and _D_ variants)
+-            case funct3 is
++            case funct3v is
+               when "000" =>
+                 -- The move instructions only work for 16/32 bit float on RV32.
+                 if fmt = "10" then
+                   illegal_fmt := not (ext_zfhmin or ext_zfbfmin);
+                 end if;
+                 -- FLI.S/D/H
+-                if ext_zfa and rfa2 = "00001" and funct5 = R_FMV_W_X then
++                if ext_zfa and rfa2 = "00001" and funct5v = R_FMV_W_X then
+                   illegal := illegal or illegal_fmt;
+                 -- FMVH.X.D
+-                elsif is_rv32 and ext_zfa and rfa2 = "00001" and funct7 = R_FMVH_X_D then
++                elsif is_rv32 and ext_zfa and rfa2 = "00001" and funct7v = R_FMVH_X_D then
+                   null;
+                 elsif rfa2 /= "00000" then
+                   illegal := true;
+@@ -405,7 +405,7 @@ package body fputilnv is
+             illegal := illegal or illegal_rm;
+           when others =>
+             -- FMVP.D.X
+-            if ext_zfa and funct7 = R_FMVP_D_X and funct3 = "000" then
++            if ext_zfa and funct7v = R_FMVP_D_X and funct3v = "000" then
+               null;
+             else
+               illegal := true;
+@@ -629,12 +629,12 @@ package body fputilnv is
+ 
+   -- Partial decode of FPU operation
+   function fpuop(inst : word) return fpuop_t is
+-    variable opcode : opcode_type := opcode(inst);
+-    variable funct5 : funct5_type := funct5(inst);
++    variable opcodev : opcode_type := opcode(inst);
++    variable funct5v : funct5_type := funct5(inst);
+   begin
+-    case opcode is
++    case opcodev is
+       when OP_FP       =>
+-        case funct5 is
++        case funct5v is
+         when R_FADD     => return FPU_ADD;
+         when R_FSUB     => return FPU_SUB;
+         when R_FMINMAX  => return FPU_MIN;
+@@ -667,10 +667,10 @@ package body fputilnv is
+                     op_out      : out fpunv_op) is
+     variable funct3   : funct3_type := inst(14 downto 12);
+     variable fmt      : word2       := inst(26 downto 25);
+-    variable rs1      : reg_t       := rs1(inst);
+-    variable rs2      : reg_t       := rs2(inst);
+-    variable rs3      : reg_t       := rs3(inst);
+-    variable rd       : reg_t       := rd(inst);
++    variable rs1v      : reg_t       := rs1(inst);
++    variable rs2v      : reg_t       := rs2(inst);
++    variable rs3v      : reg_t       := rs3(inst);
++    variable rdv       : reg_t       := rd(inst);
+     -- Non-constant
+     variable op       : fpuop_t     := fpuop(inst);
+     variable valid    : std_ulogic  := valid_in and to_bit(op /= FPU_UNKNOWN);
+@@ -699,14 +699,14 @@ package body fputilnv is
+ 
+     -- assert op /= FPU_UNKNOWN report "Not supported FPU opcode" severity failure; --//TODO
+ 
+-    op_out := (valid, op, funct3, rm, fmt, rd, (rs1, rs2, rs3), ren);
++    op_out := (valid, op, funct3, rm, fmt, rdv, (rs1v, rs2v, rs3v), ren);
+   end;
+ 
+   -- Fs1 register validity check
+   -- Returns '1' if the instruction has a valid FPU fs1 field.
+   function fs1_gen(inst : word) return std_ulogic is
+     variable op     : opcode_type := opcode(inst);
+-    variable funct5 : funct5_type := funct5(inst);
++    variable funct5v : funct5_type := funct5(inst);
+     -- Non-constant
+     variable vreg   : std_ulogic  := '1';
+   begin
+@@ -714,7 +714,7 @@ package body fputilnv is
+       when OP_FMADD  | OP_FMSUB |
+            OP_FNMSUB | OP_FNMADD =>
+       when OP_FP =>
+-        case funct5 is
++        case funct5v is
+           when R_FCVT_S_W |
+                R_FMV_W_X         => vreg := '0';
+           when others            =>
+@@ -729,7 +729,7 @@ package body fputilnv is
+   -- Returns '1' if the instruction has a valid FPU fs2 field.
+   function fs2_gen(inst : word) return std_ulogic is
+     variable op     : opcode_type := opcode(inst);
+-    variable funct5 : funct5_type := funct5(inst);
++    variable funct5v : funct5_type := funct5(inst);
+     -- Non-constant
+     variable vreg   : std_ulogic  := '1';
+   begin
+@@ -738,7 +738,7 @@ package body fputilnv is
+            OP_FMADD    | OP_FMSUB |
+            OP_FNMSUB   | OP_FNMADD =>
+       when OP_FP =>
+-        case funct5 is
++        case funct5v is
+           when R_FCVT_S_W | R_FMV_W_X |
+                R_FCVT_W_S | R_FMV_X_W |  -- Latter includes R_FCLASS
+                R_FCVT_S_D |              -- Includes R_FCVT_D_S
