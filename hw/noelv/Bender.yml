@@ -38,7 +38,6 @@ sources:
       - grlib-gpl-2025.2-b4298/lib/grlib/riscv/riscv.vhd
       - grlib-gpl-2025.2-b4298/lib/grlib/riscv/riscv_disas.vhd
       - grlib-gpl-2025.2-b4298/lib/grlib/riscv/cpu_disas.vhd
-    library: grlib
 
   - files:
       - grlib-gpl-2025.2-b4298/lib/techmap/gencomp/gencomp.vhd
@@ -60,7 +59,6 @@ sources:
       - grlib-gpl-2025.2-b4298/lib/techmap/maps/tap.vhd
       - grlib-gpl-2025.2-b4298/lib/techmap/maps/techbuf.vhd
       - grlib-gpl-2025.2-b4298/lib/techmap/maps/grgates.vhd
-    library: techmap
 
   - files:
       - grlib-gpl-2025.2-b4298/lib/gaisler/misc/misc.vhd
@@ -165,11 +163,13 @@ sources:
       - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/dm/dmnvx.vhd
       - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/dm/dmnv.vhd
       - grlib-gpl-2025.2-b4298/lib/gaisler/noelv/subsys/noelvcpu.vhd
-    library: gaisler
 
   - files:
       - jtag_tap_wrap.vhd
       - noelv_chs_wrap.vhd
+
+  - target: not(verilator)
+    files:
       - noelv_chs_axi_wrap.sv
 
   - target: all(fpga, xilinx)

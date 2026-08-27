@@ -65,3 +65,11 @@ sources:
       - target/xilinx/src/regs/chs_xilinx_reg_pkg.sv
       - target/xilinx/src/regs/chs_xilinx_reg_top.sv
       - target/xilinx/src/cheshire_top_xilinx.sv
+      
+  - target: any(verilator)
+    files:
+      - target/librelane/vhdl/synth/noelv_chs_wrap_post.v
+      - target/sim/verilator/src/noelv_chs_axi_wrap.sv
+      - target/sim/verilator/src/verilator_ram.sv
+      - target/sim/verilator/src/verilator_uart_rx.sv
+      - target/sim/verilator/src/cheshire_soc_wrapper.sv

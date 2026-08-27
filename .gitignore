@@ -56,3 +56,11 @@ vivado*
 
 # NOEL-V grlib
 hw/noelv/grlib*
+
+# Verilator generated files
+target/sim/verilator/obj_dir/
+target/sim/verilator/*.flist
+verilator*.log
+*.vcd
+*.dasm
+*.fst
