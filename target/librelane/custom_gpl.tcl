@@ -49,10 +49,10 @@ lappend GPL_ARGS -density [expr $::env(PL_TARGET_DENSITY_PCT) / 100.0]
 
 set GPL2_ARGS { -routability_driven
                 -routability_inflation_ratio_coef 1.2
-                -routability_max_inflation_ratio 1.2
-                -max_phi_coef 1.02 }
+                -routability_max_inflation_ratio 1.2 }
 
 lappend GPL2_ARGS -density [expr $::env(PL_TARGET_DENSITY_PCT) / 100.0]
+lappend GPL2_ARGS -max_phi_coef $::env(PL_MAX_PHI_COEFFICIENT)
 
 lappend GPL2_ARGS -routability_check_overflow $::env(PL_ROUTABILITY_OVERFLOW_THRESHOLD)
 

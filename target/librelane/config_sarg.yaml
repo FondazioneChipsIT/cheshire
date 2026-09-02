@@ -688,8 +688,6 @@ SYNTH_KEEP_HIERARCHY_MODULES: [
 # AREA 3 = slowest, but smallest area
 SYNTH_STRATEGY: DELAY 4
 
-#SYNTH_EXTRA_MAPPING_FILE: yosys_mapping.v
-
 # SDC files
 PNR_SDC_FILE: dir::base.sdc
 SIGNOFF_SDC_FILE: dir::base.sdc
@@ -697,11 +695,11 @@ FALLBACK_SDC: dir::base.sdc
 
 # Clock
 CLOCK_PORT: [clk_i, rtc_i, jtag_tck_i]
-CLOCK_PERIOD: 40
+CLOCK_PERIOD: 50
 
 # Floorplan
-DIE_AREA: [0, 0, 13000, 8000]
-CORE_AREA: [50, 50, 12950, 7950]
+DIE_AREA: [0, 0, 11000, 6500]
+CORE_AREA: [50, 50, 10950, 6450]
 IO_PIN_ORDER_CFG: dir::pin_order.cfg
 FP_SIZING: absolute
 
@@ -719,10 +717,11 @@ PDN_CORE_RING: True
 PDN_CFG: dir::pdn_cfg.tcl
 
 # Placement 
-PL_TARGET_DENSITY_PCT: 30
+PL_TARGET_DENSITY_PCT: 50
 PL_TIMING_DRIVEN: False
 PL_ROUTABILITY_DRIVEN: True
 PL_ROUTABILITY_OVERFLOW_THRESHOLD: 0.35
+PL_MAX_PHI_COEFFICIENT: 1.02
 
 # CTS
 RUN_CTS: true
@@ -734,6 +733,7 @@ GRT_ALLOW_CONGESTION: true
 GRT_ANTENNA_REPAIR_MARGIN: 30
 RT_MAX_LAYER: TopMetal1
 RT_CLOCK_MAX_LAYER: TopMetal1
+GRT_LAYER_ADJUSTMENTS: [0, 0.1, 0.1, 0, 0, 0.25, 0]
 # Potentially leave some antennas after DRT to avoid pin access error bug
 DRT_ANTENNA_REPAIR_ITERS: 0
 
@@ -741,7 +741,7 @@ DRT_ANTENNA_REPAIR_ITERS: 0
 DESIGN_REPAIR_REMOVE_BUFFERS: True
 RUN_POST_CTS_RESIZER_TIMING: True
 RUN_POST_GRT_RESIZER_TIMING: True
-RUN_POST_GRT_DESIGN_REPAIR: True
+RUN_POST_GRT_DESIGN_REPAIR: False
 DESIGN_REPAIR_MAX_SLEW_PCT: 20
 GRT_DESIGN_REPAIR_MAX_SLEW_PCT: 20
 # Fix setup violations
@@ -755,9 +755,9 @@ GRT_RESIZER_SETUP_MAX_BUFFER_PCT: 100
 PL_RESIZER_ALLOW_SETUP_VIOS: True
 GRT_RESIZER_ALLOW_SETUP_VIOS: True
 PL_RESIZER_HOLD_REPAIR_TNS_PCT: 100
-PL_RESIZER_HOLD_SLACK_MARGIN: 0.1
+PL_RESIZER_HOLD_SLACK_MARGIN: 0.15
 GRT_RESIZER_HOLD_REPAIR_TNS_PCT: 100
-GRT_RESIZER_HOLD_SLACK_MARGIN: 0.05
+GRT_RESIZER_HOLD_SLACK_MARGIN: 0.1
 
 RUN_MAGIC_DRC: False
 RUN_KLAYOUT_DRC: False
@@ -786,112 +786,112 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x64_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*0", 200]
+        location: ["expr::400+1200*0", 150]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*1", 200]
+        location: ["expr::400+1200*1", 150]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[1].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*2", 200]
+        location: ["expr::400+1200*2", 150]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[1].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*3", 200]
+        location: ["expr::400+1200*3", 150]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[2].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*4", 200]
+        location: ["expr::400+1200*4", 150]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[2].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*5", 200]
+        location: ["expr::400+1200*5", 150]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[3].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*6", 200]
+        location: ["expr::400+1200*6", 150]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[3].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*7", 200]
+        location: ["expr::400+1200*7", 150]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[4].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*0", 500]
+        location: ["expr::400+1200*0", 550]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[4].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*1", 500]
+        location: ["expr::400+1200*1", 550]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[5].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*2", 500]
+        location: ["expr::400+1200*2", 550]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[5].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*3", 500]
+        location: ["expr::400+1200*3", 550]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[6].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*4", 500]
+        location: ["expr::400+1200*4", 550]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[6].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*5", 500]
+        location: ["expr::400+1200*5", 550]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[7].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*6", 500]
+        location: ["expr::400+1200*6", 550]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[0].gen_data_sram_col[7].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*7", 500]
+        location: ["expr::400+1200*7", 550]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*0", 800]
+        location: ["expr::400+1200*0", 950]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*1", 800]
+        location: ["expr::400+1200*1", 950]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[1].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*2", 800]
+        location: ["expr::400+1200*2", 950]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[1].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*3", 800]
+        location: ["expr::400+1200*3", 950]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[2].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*4", 800]
+        location: ["expr::400+1200*4", 950]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[2].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*5", 800]
+        location: ["expr::400+1200*5", 950]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[3].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*6", 800]
+        location: ["expr::400+1200*6", 950]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[3].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*7", 800]
+        location: ["expr::400+1200*7", 950]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[4].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*0", 1200.15] # off grid
+        location: ["expr::400+1200*0", 1350]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[4].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*1", 1200.15] # off grid
+        location: ["expr::400+1200*1", 1350]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[5].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*2", 1200.15] # off grid
+        location: ["expr::400+1200*2", 1350]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[5].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*3", 1200.15] # off grid
+        location: ["expr::400+1200*3", 1350]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[6].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*4", 1200.15] # off grid
+        location: ["expr::400+1200*4", 1350]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[6].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*5", 1200.15] # off grid
+        location: ["expr::400+1200*5", 1350]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[7].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_0:
-        location: ["expr::700+1350*6", 1200.15] # off grid
+        location: ["expr::400+1200*6", 1350]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_data_sram_row[1].gen_data_sram_col[7].gen_data_sram_wbyteenable.data_sram.i_tc_sram/gen_128x128xBx1.i_cut_1:
-        location: ["expr::700+1350*7", 1200.15] # off grid
+        location: ["expr::400+1200*7", 1350]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_dir_sram[0].dir_sram.i_tc_sram/gen_128x64xBx1.i_cut:
-        location: ["expr::700+1350*8", 200]
+        location: ["expr::400+1200*8", 150]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_dir_sram[1].dir_sram.i_tc_sram/gen_128x64xBx1.i_cut:
-        location: ["expr::700+1350*8", 500]
+        location: ["expr::400+1200*8", 550]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_dir_sram[2].dir_sram.i_tc_sram/gen_128x64xBx1.i_cut:
-        location: ["expr::700+1350*8", 800]
+        location: ["expr::400+1200*8", 950]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_ctrl_sarg_i.hpdcache_memctrl_sarg_i.gen_dir_sram[3].dir_sram.i_tc_sram/gen_128x64xBx1.i_cut:
-        location: ["expr::700+1350*8", 1200.15]
+        location: ["expr::400+1200*8", 1350]
         orientation: S
 
 
@@ -912,115 +912,115 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_64x64_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_miss_handler_sarg_i.hpdcache_mshr_sarg_i.gen_mshr_wmask.gen_mshr_sram.mshr_mem.i_tc_sram/gen_32x106xBx1.i_cut_0:
-        location: ["expr::700+1350*8", 1450.3]
+        location: ["expr::400+1200*8", 1750]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.dcache.hpdcache_miss_handler_sarg_i.hpdcache_mshr_sarg_i.gen_mshr_wmask.gen_mshr_sram.mshr_mem.i_tc_sram/gen_32x106xBx1.i_cut_1:
-        location: ["expr::700+1350*8", 1650.25]
+        location: ["expr::400+1200*8", 2050]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[0].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[0].i_cut:
-        location: ["expr::900+1300*0", 7700.15]
+        location: ["expr::600+1150*0", 6200]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[0].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[1].i_cut:
-        location: ["expr::900+1300*1", 7700.15]
+        location: ["expr::600+1150*1", 6200]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[0].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[2].i_cut:
-        location: ["expr::900+1300*0", 7400.3]
+        location: ["expr::600+1150*0", 5900]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[0].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[3].i_cut:
-        location: ["expr::900+1300*1", 7400.3]
+        location: ["expr::600+1150*1", 5900]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[0].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[4].i_cut:
-        location: ["expr::900+1300*0", 7100]
+        location: ["expr::600+1150*0", 5600]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[0].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[5].i_cut:
-        location: ["expr::900+1300*1", 7100]
+        location: ["expr::600+1150*1", 5600]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[0].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[6].i_cut:
-        location: ["expr::900+1300*0", 6800]
+        location: ["expr::600+1150*0", 5300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[0].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[7].i_cut:
-        location: ["expr::900+1300*1", 6800]
+        location: ["expr::600+1150*1", 5300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[1].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[0].i_cut:
-        location: ["expr::900+1300*2", 7700.15]
+        location: ["expr::600+1150*2", 6200]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[1].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[1].i_cut:
-        location: ["expr::900+1300*3", 7700.15]
+        location: ["expr::600+1150*3", 6200]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[1].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[2].i_cut:
-        location: ["expr::900+1300*2", 7400.3]
+        location: ["expr::600+1150*2", 5900]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[1].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[3].i_cut:
-        location: ["expr::900+1300*3", 7400.3]
+        location: ["expr::600+1150*3", 5900]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[1].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[4].i_cut:
-        location: ["expr::900+1300*2", 7100]
+        location: ["expr::600+1150*2", 5600]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[1].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[5].i_cut:
-        location: ["expr::900+1300*3", 7100]
+        location: ["expr::600+1150*3", 5600]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[1].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[6].i_cut:
-        location: ["expr::900+1300*2", 6800]
+        location: ["expr::600+1150*2", 5300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[1].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[7].i_cut:
-        location: ["expr::900+1300*3", 6800]
+        location: ["expr::600+1150*3", 5300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[2].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[0].i_cut:
-        location: ["expr::900+1300*4", 7700.15]
+        location: ["expr::600+1150*4", 6200]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[2].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[1].i_cut:
-        location: ["expr::900+1300*5", 7700.15]
+        location: ["expr::600+1150*5", 6200]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[2].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[2].i_cut:
-        location: ["expr::900+1300*4", 7400.3]
+        location: ["expr::600+1150*4", 5900]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[2].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[3].i_cut:
-        location: ["expr::900+1300*5", 7400.3]
+        location: ["expr::600+1150*5", 5900]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[2].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[4].i_cut:
-        location: ["expr::900+1300*4", 7100]
+        location: ["expr::600+1150*4", 5600]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[2].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[5].i_cut:
-        location: ["expr::900+1300*5", 7100]
+        location: ["expr::600+1150*5", 5600]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[2].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[6].i_cut:
-        location: ["expr::900+1300*4", 6800]
+        location: ["expr::600+1150*4", 5300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[2].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[7].i_cut:
-        location: ["expr::900+1300*5", 6800]
+        location: ["expr::600+1150*5", 5300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[3].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[0].i_cut:
-        location: ["expr::900+1300*6", 7700.15]
+        location: ["expr::600+1150*6", 6200]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[3].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[1].i_cut:
-        location: ["expr::900+1300*7", 7700.15]
+        location: ["expr::600+1150*7", 6200]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[3].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[2].i_cut:
-        location: ["expr::900+1300*6", 7400.3]
+        location: ["expr::600+1150*6", 5900]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[3].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[3].i_cut:
-        location: ["expr::900+1300*7", 7400.3]
+        location: ["expr::600+1150*7", 5900]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[3].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[4].i_cut:
-        location: ["expr::900+1300*6", 7100]
+        location: ["expr::600+1150*6", 5600]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[3].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[5].i_cut:
-        location: ["expr::900+1300*7", 7100]
+        location: ["expr::600+1150*7", 5600]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[3].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[6].i_cut:
-        location: ["expr::900+1300*6", 6800]
+        location: ["expr::600+1150*6", 5300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.idata_memory.n_way[3].way.i_tc_sram/gen_64x512xBx1.gen_64x512_cuts[7].i_cut:
-        location: ["expr::900+1300*7", 6800]
+        location: ["expr::600+1150*7", 5300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.itag_memory.i_tc_sram/gen_64x144xBx1.gen_64x144_cuts[0].i_cut:
-        location: ["expr::900+1300*8", 7400.3]
+        location: ["expr::600+1150*8", 5900]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.itag_memory.i_tc_sram/gen_64x144xBx1.gen_64x144_cuts[1].i_cut:
-        location: ["expr::900+1300*8", 7100]
+        location: ["expr::600+1150*8", 5600]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_sargantana_core.i_core_sargantana/u_core_tile.icache.icache_memory.itag_memory.i_tc_sram/gen_64x144xBx1.gen_64x144_cuts[2].i_cut:
-        location: ["expr::900+1300*8", 6800]
+        location: ["expr::600+1150*8", 5300]
         orientation: N
 
 

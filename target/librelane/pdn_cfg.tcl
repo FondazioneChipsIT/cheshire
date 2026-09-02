@@ -209,9 +209,9 @@ add_pdn_stripe \
     -grid sram_NS \
     -layer Metal5 \
     -width 2.81 \
-    -pitch 44.96 \
+    -pitch 11.24 \
     -offset 2.81 \
-    -spacing 19.67 \
+    -spacing 2.81 \
     -nets "VSS VDD" \
     -starts_with POWER
 

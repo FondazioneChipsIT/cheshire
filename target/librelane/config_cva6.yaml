@@ -642,11 +642,11 @@ FALLBACK_SDC: dir::base.sdc
 
 # Clock
 CLOCK_PORT: [clk_i, rtc_i, jtag_tck_i]
-CLOCK_PERIOD: 35
+CLOCK_PERIOD: 40
 
 # Floorplan
-DIE_AREA: [0, 0, 9000, 5000]
-CORE_AREA: [50, 50, 8950, 4950]
+DIE_AREA: [0, 0, 8500, 5000]
+CORE_AREA: [50, 50, 8450, 4950]
 IO_PIN_ORDER_CFG: dir::pin_order.cfg
 FP_SIZING: absolute
 
@@ -664,10 +664,11 @@ PDN_CORE_RING: True
 PDN_CFG: dir::pdn_cfg.tcl
 
 # Placement 
-PL_TARGET_DENSITY_PCT: 50
+PL_TARGET_DENSITY_PCT: 60
 PL_TIMING_DRIVEN: False
 PL_ROUTABILITY_DRIVEN: True
 PL_ROUTABILITY_OVERFLOW_THRESHOLD: 0.3
+PL_MAX_PHI_COEFFICIENT: 1.03
 
 # CTS
 RUN_CTS: true
@@ -679,7 +680,7 @@ GRT_ALLOW_CONGESTION: true
 GRT_ANTENNA_REPAIR_MARGIN: 30
 RT_MAX_LAYER: TopMetal1
 RT_CLOCK_MAX_LAYER: TopMetal1
-GRT_LAYER_ADJUSTMENTS: [0, 0.2, 0.2, 0, 0, 0, 0]
+GRT_LAYER_ADJUSTMENTS: [0, 0.1, 0.1, 0, 0, 0.35, 0]
 # Potentially leave some antennas after DRT to avoid pin access error bug
 DRT_ANTENNA_REPAIR_ITERS: 0
 
@@ -687,7 +688,7 @@ DRT_ANTENNA_REPAIR_ITERS: 0
 DESIGN_REPAIR_REMOVE_BUFFERS: True
 RUN_POST_CTS_RESIZER_TIMING: True
 RUN_POST_GRT_RESIZER_TIMING: True
-RUN_POST_GRT_DESIGN_REPAIR: True
+RUN_POST_GRT_DESIGN_REPAIR: False
 DESIGN_REPAIR_MAX_SLEW_PCT: 20
 GRT_DESIGN_REPAIR_MAX_SLEW_PCT: 20
 # Fix setup violations
@@ -724,40 +725,40 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x64_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[3].data_sram.genblk1.data_sram.gen_cut[1].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*0", 200]
+        location: ["expr::500+1300*0", 200]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[3].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*1", 200]
+        location: ["expr::500+1300*1", 200]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[3].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*2", 200]
+        location: ["expr::500+1300*2", 200]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[2].data_sram.genblk1.data_sram.gen_cut[1].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*3", 200]
+        location: ["expr::500+1300*3", 200]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[2].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*4", 200]
+        location: ["expr::500+1300*4", 200]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[2].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*5", 200]
+        location: ["expr::500+1300*5", 200]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[1].data_sram.genblk1.data_sram.gen_cut[1].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*0", 500]
+        location: ["expr::500+1300*0", 500]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[1].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*1", 500]
+        location: ["expr::500+1300*1", 500]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[1].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*2", 500]
+        location: ["expr::500+1300*2", 500]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[0].data_sram.genblk1.data_sram.gen_cut[1].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*3", 500]
+        location: ["expr::500+1300*3", 500]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[0].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*4", 500]
+        location: ["expr::500+1300*4", 500]
         orientation: S
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_cva6_icache/gen_sram[0].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram/gen_256x64xBx1.i_cut:
-        location: ["expr::800+1300*5", 500]
+        location: ["expr::500+1300*5", 500]
         orientation: S
 
   RM_IHPSG13_1P_256x48_c2_bm_bist:
@@ -777,28 +778,28 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x48_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[0].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*0+420", 4300]
+        location: ["expr::1050*0+300", 4300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[1].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*1+420", 4300]
+        location: ["expr::1050*1+300", 4300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[2].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*2+420", 4300]
+        location: ["expr::1050*2+300", 4300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[3].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*3+420", 4300]
+        location: ["expr::1050*3+300", 4300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[4].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*4+420", 4300]
+        location: ["expr::1050*4+300", 4300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[5].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*5+420", 4300]
+        location: ["expr::1050*5+300", 4300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[6].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*6+420", 4300]
+        location: ["expr::1050*6+300", 4300]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_dir_sram[7].dir_sram.ram_i.i_tc_sram/gen_256x48xBx1.i_cut:
-        location: ["expr::1050*7+420", 4300]
+        location: ["expr::1050*7+300", 4300]
         orientation: N
 
   RM_IHPSG13_1P_512x64_c2_bm_bist:
@@ -818,28 +819,28 @@ MACROS:
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x64_c2_bm_bist_slow_1p08V_125C.lib
     instances:
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[0].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_0:
-        location: ["expr::1050*0+350", 4650]
+        location: ["expr::1050*0+170", 4650]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[0].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_1:
-        location: ["expr::1050*1+350", 4650]
+        location: ["expr::1050*1+170", 4650]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[1].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_0:
-        location: ["expr::1050*2+350", 4650]        
+        location: ["expr::1050*2+170", 4650]        
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[1].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_1:
-        location: ["expr::1050*3+350", 4650]
+        location: ["expr::1050*3+170", 4650]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[2].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_0:
-        location: ["expr::1050*4+350", 4650]
+        location: ["expr::1050*4+170", 4650]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[2].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_1:
-        location: ["expr::1050*5+350", 4650]
+        location: ["expr::1050*5+170", 4650]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[3].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_0:
-        location: ["expr::1050*6+350", 4650]
+        location: ["expr::1050*6+170", 4650]
         orientation: N
       i_cheshire_soc/gen_cva6_cores[0].gen_cva6_core.i_core_cva6/gen_cache_hpd.i_cache_subsystem/i_dcache/i_hpdcache.hpdcache_ctrl_i/hpdcache_memctrl_i/gen_data_sram_row[3].gen_data_sram_col[0].gen_data_sram_wbyteenable.data_sram.ram_i.i_tc_sram/gen_512x128xBx1.i_cut_1:
-        location: ["expr::1050*7+350", 4650]
+        location: ["expr::1050*7+170", 4650]
         orientation: N
 
 # This is an alternative method compared to
