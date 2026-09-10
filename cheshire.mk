@@ -9,6 +9,9 @@
 BENDER ?= bender
 VLOGAN ?= vlogan
 
+VCS    :=  vcs
+FCM    :=  vc_fcm
+
 # Caution: Questasim requires this to point to the *actual* compiler install path
 CXX_PATH := $(shell which $(CXX))
 
@@ -16,7 +19,7 @@ VLOG_ARGS   ?= -suppress 2583 -suppress 13314 -timescale 1ns/1ps
 VLOGAN_ARGS ?= -kdb -nc -assert svaext +v2k -timescale=1ns/1ps
 
 # Common Bender flags for Cheshire RTL
-CHS_BENDER_RTL_FLAGS ?= -t rtl -t cva6
+CHS_BENDER_RTL_FLAGS ?= -t rtl -t cva6 
 
 CVA6_TARGET ?=
 ifeq ($(CVA6_TARGET), "pulp")
@@ -103,11 +106,6 @@ CHS_PEAKRDL_DEFINES  := -D CHS_DRAM
 
 include $(CHS_ROOT)/sw/sw.mk
 
-##############
-# Build ZOIX #
-##############
-
-include $(CHS_ROOT)/target/zoix/zoix.mk
 
 ###############
 # Generate HW #
@@ -122,7 +120,7 @@ $(CHS_ROOT)/hw/cheshire_addrmap_pkg.sv: $(CHS_ROOT)/hw/cheshire.rdl $(CHS_SLINK_
 	$(PEAKRDL) raw-header $< --format svpkg --no-prefix $(CHS_PEAKRDL_INCLUDES) $(CHS_PEAKRDL_PARAMS) $(CHS_PEAKRDL_DEFINES) --license-str $$'Copyright 2025 ETH Zurich and University of Bologna.\nSolderpad Hardware License, Version 0.51, see LICENSE for details.\nSPDX-License-Identifier: SHL-0.51' -o $@
 
 # CLINT
-CLINTCORES ?= 2
+CLINTCORES ?= 1
 include $(CLINTROOT)/clint.mk
 $(CLINTROOT)/.generated:
 	flock -x $@ $(MAKE) clint && touch $@
@@ -205,6 +203,46 @@ CHS_SIM_ALL += $(CHS_ROOT)/target/sim/models/s25fs512s.v
 CHS_SIM_ALL += $(CHS_ROOT)/target/sim/models/24FC1025.v
 CHS_SIM_ALL += $(CHS_ROOT)/target/sim/vsim/compile.cheshire_soc.tcl
 CHS_SIM_ALL += $(CHS_ROOT)/target/sim/vcs/compile.cheshire_soc.sh
+
+##############
+# Z01X FLOW  #
+##############
+ZOIX_DIR  := $(CHS_ROOT)/target/zoix
+FAULTSIM_TB := tb_cheshire_soc
+
+NUM_FAULT_SIM := 100
+FAULT_START_CYCLE := 5000
+FAULT_END_CYCLE   := 2250725
+
+ZOIX_BINARY=$(CHS_ROOT)/sw/tests/helloworld.spm.elf
+ZOIX_BOOTMODE=0
+ZOIX_PRELMODE=1
+
+
+$(CHS_ROOT)/target/sim/vcs/compile_zoix.cheshire_soc.sh: $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock
+	$(BENDER) script vcs -t sim -t test $(CHS_BENDER_RTL_FLAGS) -D VC_Z01X  --vlog-arg="$(VLOGAN_ARGS)" --vlogan-bin="$(VLOGAN)" > $@
+	chmod +x $@
+
+build-zoix: $(CHS_ROOT)/target/sim/vcs/compile_zoix.cheshire_soc.sh
+	cd $(ZOIX_DIR); $(CHS_ROOT)/target/sim/vcs/compile_zoix.cheshire_soc.sh; export ZOIX=1;	export CHS_ROOT=$(CHS_ROOT);				\
+	$(CHS_ROOT)/target/sim/vcs/start.cheshire_soc.sh;
+ 
+simulate:
+	cd $(ZOIX_DIR); \
+	./simv +fsdb+all=on  +BINARY=${ZOIX_BINARY} -l simulate.log
+
+tb_cheshire_soc.sff: $(ZOIX_DIR)/tb_cheshire_soc.sff
+$(ZOIX_DIR)/tb_cheshire_soc.sff: $(ZOIX_DIR)/fault.sff 
+	@cp -f $< $@
+#transient faults
+	sed -i "s|#faults|NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.**\" }\n    #faults|" $@
+
+#stuck-at faults
+#  NA [0,1] { PORT "tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.**" }
+
+# Exclude from fault injection
+#	sed -i "s|#faults|Exclude\n    {\n    NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_soc.fix.dut.i_core_wrap.i_core_relcva6.gen_cva6_core[0].i_cva6_core.gen_cache_hpd.**\" }\n    }\n    #faults|" $@
+
 
 ###########
 # DRAMSys #
