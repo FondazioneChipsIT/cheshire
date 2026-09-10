@@ -231,6 +231,13 @@ simulate:
 	cd $(ZOIX_DIR); \
 	./simv +fsdb+all=on  +BINARY=${ZOIX_BINARY} -l simulate.log
 
+faultsim: $(ZOIX_DIR)/tb_cheshire_soc.sff $(ZOIX_DIR)/simv $(ZOIX_DIR)/fcm.tcl $(ZOIX_DIR)/states.sff
+	cd $(ZOIX_DIR); export FAULTSIM_TB=$(FAULTSIM_TB); export NUM_FAULT_SIM=$(NUM_FAULT_SIM); export BINARY=$(ZOIX_BINARY); export BOOTMODE=$(ZOIX_BOOTMODE); export PRELMODE=$(ZOIX_PRELMODE); $(FCM) -connect -tcl_script fcm.tcl
+
+clean-zoix:
+	cd $(ZOIX_DIR); \
+	rm -rf AN.DB sim.* .envs .vcsCmd work.lib++ *.log ucli* csrc fdb* simv* *.rpt fcm_tsim_fsdb vc_hdrs.h fc1_report.sff fcm.dir *h
+
 tb_cheshire_soc.sff: $(ZOIX_DIR)/tb_cheshire_soc.sff
 $(ZOIX_DIR)/tb_cheshire_soc.sff: $(ZOIX_DIR)/fault.sff 
 	@cp -f $< $@
