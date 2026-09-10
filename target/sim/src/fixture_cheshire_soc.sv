@@ -145,6 +145,13 @@ module fixture_cheshire_soc #(
     .usb_dp_oe_o        ( )
   );
 
+
+//Zoix strobe file, for vc_zoix fault injection simulation.
+//At rtl-level it is necessary to expose manually the signals to see how the faults propagates in the system
+`ifdef VC_Z01X
+   `include "strobe.sv"
+`endif
+
   ////////////////////////
   //  Tristate Adapter  //
   ////////////////////////
