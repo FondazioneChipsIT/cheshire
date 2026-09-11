@@ -193,70 +193,39 @@
     localparam ICACHE_DATA_WIDTH = CVA6Cfg.ICACHE_LINE_WIDTH;
 
     // Check for Instruction Cache  SRAM
-   // int cmp_icache_data_sram0, cmp_icache_data_sram0_c1;
     int cmp_icache_data_sram0;
     logic [ICACHE_DATA_WIDTH -1:0] icache_data_sram0 [ICACHE_NUM_WORDS-1:0];
-   // logic [ICACHE_DATA_WIDTH -1:0] icache_data_sram0_c1 [ICACHE_NUM_WORDS-1:0];
-
     assign icache_data_sram0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.gen_sram[0].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram.sram;
-  //  assign icache_data_sram0_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.gen_cache_hpd.i_cache_subsystem.i_cva6_icache.gen_sram[0].data_sram.genblk1.data_sram.i_tc_sram.sram;
-
 
     int cmp_icache_data_sram1;
-   // int cmp_icache_data_sram1_c1;
     logic [ICACHE_DATA_WIDTH -1:0] icache_data_sram1 [ICACHE_NUM_WORDS-1:0];
-   // logic [ICACHE_DATA_WIDTH -1:0] icache_data_sram1_c1 [ICACHE_NUM_WORDS-1:0];
-
     assign icache_data_sram1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.gen_sram[1].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram.sram;
-    //assign icache_data_sram1_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.gen_cache_hpd.i_cache_subsystem.i_cva6_icache.gen_sram[1].data_sram.genblk1.data_sram.i_tc_sram.sram;
 
-
-    //int cmp_icache_data_sram2, cmp_icache_data_sram2_c1;
     int cmp_icache_data_sram2;
     logic [ICACHE_DATA_WIDTH -1:0] icache_data_sram2 [ICACHE_NUM_WORDS-1:0];
-   // logic [ICACHE_DATA_WIDTH -1:0] icache_data_sram2_c1 [ICACHE_NUM_WORDS-1:0];
-
     assign icache_data_sram2 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.gen_sram[2].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram.sram;
-    //assign icache_data_sram2_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.gen_cache_hpd.i_cache_subsystem.i_cva6_icache.gen_sram[2].data_sram.genblk1.data_sram.i_tc_sram.sram;
 
 
     int cmp_icache_data_sram3;
     logic [ICACHE_DATA_WIDTH -1:0] icache_data_sram3 [ICACHE_NUM_WORDS-1:0];
-   // logic [ICACHE_DATA_WIDTH -1:0] icache_data_sram3_c1 [ICACHE_NUM_WORDS-1:0];
-
     assign icache_data_sram3 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.gen_sram[3].data_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram.sram;
-    //assign icache_data_sram3_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.gen_cache_hpd.i_cache_subsystem.i_cva6_icache.gen_sram[3].data_sram.genblk1.data_sram.i_tc_sram.sram;
 
 
     int cmp_icache_tag_sram0;
     logic [ICACHE_TAG_WIDTH -1:0] icache_tag_sram0 [ICACHE_NUM_WORDS-1:0];
-    //logic [ICACHE_TAG_WIDTH -1:0] icache_tag_sram0_c1 [ICACHE_NUM_WORDS-1:0];
-
     assign icache_tag_sram0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.gen_sram[0].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram.sram;
-   // assign icache_tag_sram0_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.gen_cache_hpd.i_cache_subsystem.i_cva6_icache.gen_sram[0].tag_sram.genblk1.data_sram.i_tc_sram.sram;
-
 
     int cmp_icache_tag_sram1_c0;
     logic [ICACHE_TAG_WIDTH -1:0] icache_tag_sram1_c0 [ICACHE_NUM_WORDS-1:0];
-    //logic [ICACHE_TAG_WIDTH -1:0] icache_tag_sram1_c1 [ICACHE_NUM_WORDS-1:0];
-
     assign icache_tag_sram1_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.gen_sram[1].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram.sram;
-    //assign icache_tag_sram1_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.gen_cache_hpd.i_cache_subsystem.i_cva6_icache.gen_sram[1].tag_sram.genblk1.data_sram.i_tc_sram.sram;
-
 
     int cmp_icache_tag_sram2_c0;
     logic [ICACHE_TAG_WIDTH -1:0] icache_tag_sram2_c0 [ICACHE_NUM_WORDS-1:0];
-    //logic [ICACHE_TAG_WIDTH -1:0] icache_tag_sram2_c1 [ICACHE_NUM_WORDS-1:0];
-
     assign icache_tag_sram2_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.gen_sram[2].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram.sram;
-   // assign icache_tag_sram2_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.gen_cache_hpd.i_cache_subsystem.i_cva6_icache.gen_sram[2].tag_sram.genblk1.data_sram.i_tc_sram.sram;
 
     int cmp_icache_tag_sram3_c0;
     logic [ICACHE_TAG_WIDTH -1:0] icache_tag_sram3_c0 [ICACHE_NUM_WORDS-1:0];
-    //logic [ICACHE_TAG_WIDTH -1:0] icache_tag_sram3_c1 [ICACHE_NUM_WORDS-1:0];
-
     assign icache_tag_sram3_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.gen_sram[3].tag_sram.genblk1.data_sram.gen_cut[0].i_tc_sram_wrapper.i_tc_sram.sram;
-   // assign icache_tag_sram3_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.gen_cache_hpd.i_cache_subsystem.i_cva6_icache.gen_sram[3].tag_sram.genblk1.data_sram.i_tc_sram.sram;
 
 
 
@@ -286,22 +255,14 @@
 
         // Compare for instruction sram
         cmp_icache_data_sram0 = $fs_compare(icache_data_sram0);
-       // cmp_icache_data_sram0_c1 = $fs_compare(icache_data_sram0_c1);
         cmp_icache_data_sram1 = $fs_compare(icache_data_sram1);
-        //cmp_icache_data_sram1_c1 = $fs_compare(icache_data_sram1_c1);
         cmp_icache_data_sram2 = $fs_compare(icache_data_sram2);
-        //cmp_icache_data_sram2_c1 = $fs_compare(icache_data_sram2_c1);
         cmp_icache_data_sram3 = $fs_compare(icache_data_sram3);
-        //cmp_icache_data_sram3_c1 = $fs_compare(icache_data_sram3_c1);
 
         cmp_icache_tag_sram0 = $fs_compare(icache_tag_sram0);
-        //cmp_icache_tag_sram0_c1 = $fs_compare(icache_tag_sram0_c1);
         cmp_icache_tag_sram1_c0 = $fs_compare(icache_tag_sram1_c0);
-        //cmp_icache_tag_sram1_c1 = $fs_compare(icache_tag_sram1_c1);
         cmp_icache_tag_sram2_c0 = $fs_compare(icache_tag_sram2_c0);
-        //cmp_icache_tag_sram2_c1 = $fs_compare(icache_tag_sram2_c1);
         cmp_icache_tag_sram3_c0 = $fs_compare(icache_tag_sram3_c0);
-        //cmp_icache_tag_sram3_c1 = $fs_compare(icache_tag_sram3_c1);
 
        // cmp_dcache_data_sram0_c0 = $fs_compare(dcache_data_sram0_c0);
        // //cmp_dcache_data_sram0_c1 = $fs_compare(dcache_data_sram0_c1);
@@ -347,22 +308,14 @@
 
             // Latent error in instruction cache
             if (cmp_icache_data_sram0 != 0) $fs_drop_status("LI", icache_data_sram0);
-           // if (cmp_icache_data_sram0_c1 != 0) $fs_drop_status("LI", icache_data_sram0_c1);
             if (cmp_icache_data_sram1 != 0) $fs_drop_status("LI", icache_data_sram1);
-            //if (cmp_icache_data_sram1_c1 != 0) $fs_drop_status("LI", icache_data_sram1_c1);
             if (cmp_icache_data_sram2 != 0) $fs_drop_status("LI", icache_data_sram2);
-            //if (cmp_icache_data_sram2_c1 != 0) $fs_drop_status("LI", icache_data_sram2_c1);
             if (cmp_icache_data_sram3 != 0) $fs_drop_status("LI", icache_data_sram3);
-            //if (cmp_icache_data_sram3_c1 != 0) $fs_drop_status("LI", icache_data_sram3_c1);
             
             if (cmp_icache_tag_sram0 != 0) $fs_drop_status("LI", icache_tag_sram0);
-            //if (cmp_icache_tag_sram0_c1 != 0) $fs_drop_status("LI", icache_tag_sram0_c1);
             if (cmp_icache_tag_sram1_c0 != 0) $fs_drop_status("LI", icache_tag_sram1_c0);
-            //if (cmp_icache_tag_sram1_c1 != 0) $fs_drop_status("LI", icache_tag_sram1_c1);
             if (cmp_icache_tag_sram2_c0 != 0) $fs_drop_status("LI", icache_tag_sram2_c0);
-            //if (cmp_icache_tag_sram2_c1 != 0) $fs_drop_status("LI", icache_tag_sram2_c1);
             if (cmp_icache_tag_sram3_c0 != 0) $fs_drop_status("LI", icache_tag_sram3_c0);
-            //if (cmp_icache_tag_sram3_c1 != 0) $fs_drop_status("LI", icache_tag_sram3_c1);
 
             // Latent error in data cache
             //if (cmp_dcache_data_sram0_c0 != 0) $fs_drop_status("LD", dcache_data_sram0_c0);
@@ -461,17 +414,6 @@
     assign mie_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.mie_q;
     assign mie_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.mie_q;
 
-    //int cmp_mintstatus_c0, cmp_mintstatus_c1;
-    //riscv::intstatus_rv_t mintstatus_q_c0, mintstatus_q_c1;
-    //assign mintstatus_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.mintstatus_q;
-    //assign mintstatus_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.mintstatus_q;
-    
-
-    //int cmp_mintthresh_c0, cmp_mintthresh_c1;
-    //riscv::intthresh_rv_t mintthresh_q_c0, mintthresh_q_c1;
-    //assign mintthresh_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.mintthresh_q;
-    //assign mintthresh_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.mintthresh_q;
-
     int cmp_mepc_c0, cmp_mepc_c1;
     logic [CVA6Cfg.XLEN-1:0] mepc_q_c0, mepc_q_c1;
     assign mepc_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.mepc_q;
@@ -486,11 +428,6 @@
     logic [CVA6Cfg.XLEN-1:0] mcounteren_q_c0, mcounteren_q_c1;
     assign mcounteren_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.mcounteren_q;
     assign mcounteren_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.mcounteren_q;
-
-    //int cmp_mtvt_c0, cmp_mtvt_c1;
-    //logic [CVA6Cfg.XLEN-1:0] mtvt_q_c0, mtvt_q_c1;
-    //assign mtvt_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.mtvt_q;
-    //assign mtvt_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.mtvt_q;
 
     int cmp_mscratch_c0, cmp_mscratch_c1;
     logic [CVA6Cfg.XLEN-1:0] mscratch_q_c0, mscratch_q_c1;
@@ -526,21 +463,6 @@
     logic [CVA6Cfg.XLEN-1:0] acc_cons_q_c0, acc_cons_q_c1;
     assign acc_cons_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.acc_cons_q;
     assign acc_cons_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.acc_cons_q;
-
-   // int cmp_fence_t_pad_c0, cmp_fence_t_pad_c1;  
-   // logic [CVA6Cfg.XLEN-1:0] fence_t_pad_q_c0, fence_t_pad_q_c1; 
-   // assign fence_t_pad_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.fence_t_pad_q;
-   // assign fence_t_pad_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.fence_t_pad_q;
-
-   // int cmp_fence_t_sel_c0, cmp_fence_t_sel_c1;
-   // logic [CVA6Cfg.XLEN-1:0] fence_t_sel_q_c0, fence_t_sel_q_c1;
-   // assign fence_t_sel_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.fence_t_sel_q;
-   // assign fence_t_sel_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.fence_t_sel_q;
-
-   // int cmp_fence_t_ceil_c0, cmp_fence_t_ceil_c1; 
-   // logic [CVA6Cfg.XLEN-1:0] fence_t_ceil_q_c0, fence_t_ceil_q_c1;
-   // assign fence_t_ceil_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.fence_t_ceil_q;
-   // assign fence_t_ceil_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.fence_t_ceil_q;
 
     // supervisor mode registers
     int cmp_medeleg_c0, cmp_medeleg_c1;
@@ -588,16 +510,6 @@
     assign satp_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.satp_q;
     assign satp_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.satp_q;
 
-    //int cmp_stvt_c0, cmp_stvt_c1;   
-   // logic [CVA6Cfg.XLEN-1:0] stvt_q_c0, stvt_q_c1;
-    //assign stvt_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.stvt_q;
-    //assign stvt_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.stvt_q;
-
-   // int cmp_sintthresh_c0, cmp_sintthresh_c1;
-   // riscv::intthresh_rv_t sintthresh_q_c0, sintthresh_q_c1;
-   // assign sintthresh_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.sintthresh_q;
-   // assign sintthresh_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.sintthresh_q;
-
     int cmp_v_c0, cmp_v_c1;
     logic v_q_c1, v_q_c0;
     assign v_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.v_q;
@@ -612,11 +524,6 @@
     logic [CVA6Cfg.XLEN-1:0] mtinst_q_c0, mtinst_q_c1;
     assign mtinst_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.mtinst_q;
     assign mtinst_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.mtinst_q;
-
-   // int cmp_hstatus_c0, cmp_hstatus_c1;
-   // riscv::hstatus_rv_t hstatus_q_c0, hstatus_q_c1;
-   // assign hstatus_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.hstatus_q;
-   // assign hstatus_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.hstatus_q;
 
     int cmp_hedeleg_c0, cmp_hedeleg_c1;   
     logic [CVA6Cfg.XLEN-1:0] hedeleg_q_c0, hedeleg_q_c1;
@@ -653,11 +560,6 @@
     assign htinst_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.htinst_q;
     assign htinst_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.htinst_q;
 
-  //  int cmp_vsstatus_c0, cmp_vsstatus_c1; 
-   // riscv::mstatus_rv_t vsstatus_q_c0, vsstatus_q_c1;
-   // assign vsstatus_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.vsstatus_q;
-   // assign vsstatus_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.vsstatus_q;
-
     int cmp_vsepc_c0, cmp_vsepc_c1;
     logic [CVA6Cfg.XLEN-1:0] vsepc_q_c0, vsepc_q_c1;
     assign vsepc_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.vsepc_q;
@@ -692,16 +594,6 @@
     logic en_ld_st_g_translation_q_c0, en_ld_st_g_translation_q_c1;
     assign en_ld_st_g_translation_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.en_ld_st_g_translation_q;
     assign en_ld_st_g_translation_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.en_ld_st_g_translation_q;
-
-   // int cmp_vstvt_c0, cmp_vstvt_c1;
-   // logic [CVA6Cfg.XLEN-1:0] vstvt_q_c0, vstvt_q_c1;
-   // assign vstvt_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.vstvt_q;
-   // assign vstvt_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.vstvt_q;
-
-   // int cmp_vsintthresh_c0, cmp_vsintthresh_c1;
-   // riscv::intthresh_rv_t vsintthresh_q_c0, vsintthresh_q_c1;
-    //assign vsintthresh_q_c0 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[0].i_cva6.csr_regfile_i.vsintthresh_q;
-    //assign vsintthresh_q_c1 = tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_cva6_core[1].i_cva6.csr_regfile_i.vsintthresh_q;
 
     // timer and counters
     int cmp_cycle_c0, cmp_cycle_c1;
@@ -771,24 +663,18 @@
         cmp_mtvec_c0 = $fs_compare(mtvec_q_c0);          
         cmp_mip_c0 = $fs_compare(mip_q_c0);            
         cmp_mie_c0 = $fs_compare(mie_q_c0);            
-        //cmp_mintstatus_c0 = $fs_compare(mintstatus_q_c0);     
-       // cmp_mintthresh_c0 = $fs_compare(mintthresh_q_c0);    
         cmp_mepc_c0 = $fs_compare(mepc_q_c0);           
         cmp_mcause_c0 = $fs_compare(mcause_q_c0);         
         cmp_mcounteren_c0 = $fs_compare(mcounteren_q_c0);     
-       // cmp_mtvt_c0 = $fs_compare(mtvt_q_c0);           
         cmp_mscratch_c0 = $fs_compare(mscratch_q_c0);    
 
         cmp_mtvec_rst_load_c1 = $fs_compare(mtvec_rst_load_q_c1);
         cmp_mtvec_c1 = $fs_compare(mtvec_q_c1);          
         cmp_mip_c1 = $fs_compare(mip_q_c1);            
-        cmp_mie_c1 = $fs_compare(mie_q_c1);            
-        //cmp_mintstatus_c1 = $fs_compare(mintstatus_q_c1);     
-        //cmp_mintthresh_c1 = $fs_compare(mintthresh_q_c1);    
+        cmp_mie_c1 = $fs_compare(mie_q_c1);               
         cmp_mepc_c1 = $fs_compare(mepc_q_c1);           
         cmp_mcause_c1 = $fs_compare(mcause_q_c1);         
-        cmp_mcounteren_c1 = $fs_compare(mcounteren_q_c1);     
-       // cmp_mtvt_c1 = $fs_compare(mtvt_q_c1);           
+        cmp_mcounteren_c1 = $fs_compare(mcounteren_q_c1);          
         cmp_mscratch_c1 = $fs_compare(mscratch_q_c1);        
         if (CVA6Cfg.TvalEn) begin
             cmp_mtval_c0 = $fs_compare(mtval_q_c0);
@@ -800,18 +686,12 @@
         cmp_icache_c0 = $fs_compare(icache_q_c0);        
         cmp_mcountinhibit_c0 = $fs_compare(mcountinhibit_q_c0); 
         cmp_acc_cons_c0 = $fs_compare(acc_cons_q_c0);    
-       // cmp_fence_t_pad_c0 = $fs_compare(fence_t_pad_q_c0);   
-       // cmp_fence_t_sel_c0 = $fs_compare(fence_t_sel_q_c0);   
-       // cmp_fence_t_ceil_c0 = $fs_compare(fence_t_ceil_q_c0); 
-
         cmp_fiom_c1 = $fs_compare(fiom_q_c1);          
         cmp_dcache_c1 = $fs_compare(dcache_q_c1);        
         cmp_icache_c1 = $fs_compare(icache_q_c1);        
         cmp_mcountinhibit_c1 = $fs_compare(mcountinhibit_q_c1); 
         cmp_acc_cons_c1 = $fs_compare(acc_cons_q_c1);    
-        //cmp_fence_t_pad_c1 = $fs_compare(fence_t_pad_q_c1);   
-        //cmp_fence_t_sel_c1 = $fs_compare(fence_t_sel_q_c1);   
-        //cmp_fence_t_ceil_c1 = $fs_compare(fence_t_ceil_q_c1);  
+ 
         //// supervisor mode registers
         if (CVA6Cfg.RVS) begin
             cmp_medeleg_c0 = $fs_compare(medeleg_q_c0);    
@@ -833,20 +713,12 @@
             cmp_sscratch_c1 = $fs_compare(sscratch_q_c1);   
             cmp_stval_c1 = $fs_compare(stval_q_c1);      
             cmp_satp_c1 = $fs_compare(satp_q_c1);  
-            //if (CVA6Cfg.RVSCLIC) begin
-            //   cmp_stvt_c0 = $fs_compare(stvt_q_c0);
-            //   // cmp_sintthresh_c0 = $fs_compare(sintthresh_q_c0);
-//
-            //    cmp_stvt_c1 = $fs_compare(stvt_q_c1);
-            //    //cmp_sintthresh_c1 = $fs_compare(sintthresh_q_c1);
-            //end
         end
 
         if (CVA6Cfg.RVH) begin
             cmp_v_c0 = $fs_compare(v_q_c0);                      
             cmp_mtval2_c0 = $fs_compare(mtval2_q_c0);           
-            cmp_mtinst_c0 = $fs_compare(mtinst_q_c0);            
-            //cmp_hstatus_c0 = $fs_compare(hstatus_q_c0);          
+            cmp_mtinst_c0 = $fs_compare(mtinst_q_c0);                   
             cmp_hedeleg_c0 = $fs_compare(hedeleg_q_c0);          
             cmp_hideleg_c0 = $fs_compare(hideleg_q_c0);          
             cmp_hgeie_c0 = $fs_compare(hgeie_q_c0);             
@@ -857,8 +729,7 @@
 
             cmp_v_c1 = $fs_compare(v_q_c1);                      
             cmp_mtval2_c1 = $fs_compare(mtval2_q_c1);           
-            cmp_mtinst_c1 = $fs_compare(mtinst_q_c1);            
-            //cmp_hstatus_c1 = $fs_compare(hstatus_q_c1);          
+            cmp_mtinst_c1 = $fs_compare(mtinst_q_c1);                  
             cmp_hedeleg_c1 = $fs_compare(hedeleg_q_c1);          
             cmp_hideleg_c1 = $fs_compare(hideleg_q_c1);          
             cmp_hgeie_c1 = $fs_compare(hgeie_q_c1);             
@@ -867,7 +738,7 @@
             cmp_htval_c1 = $fs_compare(htval_q_c1);              
             cmp_htinst_c1 = $fs_compare(htinst_q_c1);              
             // virtual supervisor mode registers
-            //cmp_vsstatus_c0 = $fs_compare(vsstatus_q_c0);           
+ 
             cmp_vsepc_c0 = $fs_compare(vsepc_q_c0);                  
             cmp_vscause_c0 = $fs_compare(vscause_q_c0);              
             cmp_vstvec_c0 = $fs_compare(vstvec_q_c0);                
@@ -875,8 +746,7 @@
             cmp_vstval_c0 = $fs_compare(vstval_q_c0);                
             cmp_vsatp_c0 = $fs_compare(vsatp_q_c0);                  
             cmp_en_ld_st_g_translation_c0 = $fs_compare(en_ld_st_g_translation_q_c0);
-
-           // cmp_vsstatus_c1 = $fs_compare(vsstatus_q_c1);           
+        
             cmp_vsepc_c1 = $fs_compare(vsepc_q_c1);                  
             cmp_vscause_c1 = $fs_compare(vscause_q_c1);              
             cmp_vstvec_c1 = $fs_compare(vstvec_q_c1);                
@@ -884,13 +754,6 @@
             cmp_vstval_c1 = $fs_compare(vstval_q_c1);                
             cmp_vsatp_c1 = $fs_compare(vsatp_q_c1);                  
             cmp_en_ld_st_g_translation_c1 = $fs_compare(en_ld_st_g_translation_q_c1);
-            //if (CVA6Cfg.RVXHCLIC) begin
-            //    cmp_vstvt_c0 = $fs_compare(vstvt_q_c0);
-            //    //cmp_vsintthresh_c0 = $fs_compare(vsintthresh_q_c0);
-//
-            //    cmp_vstvt_c1 = $fs_compare(vstvt_q_c1);
-            //  //  cmp_vsintthresh_c1 = $fs_compare(vsintthresh_q_c1);
-            //end
         end
         // timer and counters
         cmp_cycle_c0 = $fs_compare(cycle_q_c0);
@@ -942,29 +805,22 @@
             // machine mode registers
             if (cmp_mstatus_c0 != 0) $fs_drop_status("LC", mstatus_q_c0); 
             if (cmp_mstatus_c1 != 0) $fs_drop_status("LC", mstatus_q_c1);   
-            // set to boot address + direct mode + 4 byte offset which is the initial trap
             if (cmp_mtvec_rst_load_c0 != 0) $fs_drop_status("LC", mtvec_rst_load_q_c0);
             if (cmp_mtvec_c0 != 0) $fs_drop_status("LC", mtvec_q_c0);          
             if (cmp_mip_c0 != 0) $fs_drop_status("LC", mip_q_c0);            
             if (cmp_mie_c0 != 0) $fs_drop_status("LC", mie_q_c0);            
-           // if (cmp_mintstatus_c0 != 0) $fs_drop_status("LC", mintstatus_q_c0);     
-           // if (cmp_mintthresh_c0 != 0) $fs_drop_status("LC", mintthresh_q_c0);    
             if (cmp_mepc_c0 != 0) $fs_drop_status("LC", mepc_q_c0);           
             if (cmp_mcause_c0 != 0) $fs_drop_status("LC", mcause_q_c0);         
             if (cmp_mcounteren_c0 != 0) $fs_drop_status("LC", mcounteren_q_c0);     
-            //if (cmp_mtvt_c0 != 0) $fs_drop_status("LC", mtvt_q_c0);           
             if (cmp_mscratch_c0 != 0) $fs_drop_status("LC", mscratch_q_c0);    
 
             if (cmp_mtvec_rst_load_c1 != 0) $fs_drop_status("LC", mtvec_rst_load_q_c1);
             if (cmp_mtvec_c1 != 0) $fs_drop_status("LC", mtvec_q_c1);          
             if (cmp_mip_c1 != 0) $fs_drop_status("LC", mip_q_c1);            
             if (cmp_mie_c1 != 0) $fs_drop_status("LC", mie_q_c1);            
-           // if (cmp_mintstatus_c1 != 0) $fs_drop_status("LC", mintstatus_q_c1);     
-           // if (cmp_mintthresh_c1 != 0) $fs_drop_status("LC", mintthresh_q_c1);    
             if (cmp_mepc_c1 != 0) $fs_drop_status("LC", mepc_q_c1);           
             if (cmp_mcause_c1 != 0) $fs_drop_status("LC", mcause_q_c1);         
             if (cmp_mcounteren_c1 != 0) $fs_drop_status("LC", mcounteren_q_c1);     
-            //if (cmp_mtvt_c1 != 0) $fs_drop_status("LC", mtvt_q_c1);           
             if (cmp_mscratch_c1 != 0) $fs_drop_status("LC", mscratch_q_c1);        
             if (CVA6Cfg.TvalEn) begin
                 if (cmp_mtval_c0 != 0) $fs_drop_status("LC", mtval_q_c0);
@@ -975,19 +831,14 @@
             if (cmp_dcache_c0 != 0) $fs_drop_status("LC", dcache_q_c0);        
             if (cmp_icache_c0 != 0) $fs_drop_status("LC", icache_q_c0);        
             if (cmp_mcountinhibit_c0 != 0) $fs_drop_status("LC", mcountinhibit_q_c0); 
-            if (cmp_acc_cons_c0 != 0) $fs_drop_status("LC", acc_cons_q_c0);    
-           // if (cmp_fence_t_pad_c0 != 0) $fs_drop_status("LC", fence_t_pad_q_c0);   
-           // if (cmp_fence_t_sel_c0 != 0) $fs_drop_status("LC", fence_t_sel_q_c0);   
-           // if (cmp_fence_t_ceil_c0 != 0) $fs_drop_status("LC", fence_t_ceil_q_c0); 
+            if (cmp_acc_cons_c0 != 0) $fs_drop_status("LC", acc_cons_q_c0);
 
             if (cmp_fiom_c1 != 0) $fs_drop_status("LC",fiom_q_c1);          
             if (cmp_dcache_c1 != 0) $fs_drop_status("LC",dcache_q_c1);        
             if (cmp_icache_c1 != 0) $fs_drop_status("LC",icache_q_c1);        
             if (cmp_mcountinhibit_c1 != 0) $fs_drop_status("LC",mcountinhibit_q_c1); 
             if (cmp_acc_cons_c1 != 0) $fs_drop_status("LC",acc_cons_q_c1);    
-            //if (cmp_fence_t_pad_c1 != 0) $fs_drop_status("LC",fence_t_pad_q_c1);   
-            //if (cmp_fence_t_sel_c1 != 0) $fs_drop_status("LC",fence_t_sel_q_c1);   
-            //if (cmp_fence_t_ceil_c1 != 0) $fs_drop_status("LC",fence_t_ceil_q_c1);  
+ 
             // supervisor mode registers
             if (CVA6Cfg.RVS) begin
                 if (cmp_medeleg_c0 != 0) $fs_drop_status("LC", medeleg_q_c0);    
@@ -1009,20 +860,12 @@
                 if (cmp_sscratch_c1 != 0) $fs_drop_status("LC", sscratch_q_c1);   
                 if (cmp_stval_c1 != 0) $fs_drop_status("LC", stval_q_c1);      
                 if (cmp_satp_c1 != 0) $fs_drop_status("LC", satp_q_c1);  
-                //if (CVA6Cfg.RVSCLIC) begin
-                //    if (cmp_stvt_c0 != 0) $fs_drop_status("LC", stvt_q_c0);
-                //    //if (cmp_sintthresh_c0 != 0) $fs_drop_status("LC", sintthresh_q_c0);
-//
-                //    if (cmp_stvt_c1 != 0) $fs_drop_status("LC", stvt_q_c1);
-                //    //if (cmp_sintthresh_c != 0) $fs_drop_status("LC", sintthresh_q_c1);
-                //end
             end
 
             if (CVA6Cfg.RVH) begin
                 if (cmp_v_c0 != 0) $fs_drop_status("LC", v_q_c0);                      
                 if (cmp_mtval2_c0 != 0) $fs_drop_status("LC", mtval2_q_c0);           
                 if (cmp_mtinst_c0 != 0) $fs_drop_status("LC", mtinst_q_c0);            
-                //if (cmp_hstatus_c0 != 0) $fs_drop_status("LC", hstatus_q_c0);          
                 if (cmp_hedeleg_c0 != 0) $fs_drop_status("LC", hedeleg_q_c0);          
                 if (cmp_hideleg_c0 != 0) $fs_drop_status("LC", hideleg_q_c0);          
                 if (cmp_hgeie_c0 != 0) $fs_drop_status("LC", hgeie_q_c0);             
@@ -1034,7 +877,6 @@
                 if (cmp_v_c1 != 0) $fs_drop_status("LC", v_q_c1);                      
                 if (cmp_mtval2_c1 != 0) $fs_drop_status("LC", mtval2_q_c1);           
                 if (cmp_mtinst_c1 != 0) $fs_drop_status("LC", mtinst_q_c1);            
-                //if (cmp_hstatus_c1 != 0) $fs_drop_status("LC", hstatus_q_c1);          
                 if (cmp_hedeleg_c1 != 0) $fs_drop_status("LC", hedeleg_q_c1);          
                 if (cmp_hideleg_c1 != 0) $fs_drop_status("LC", hideleg_q_c1);          
                 if (cmp_hgeie_c1 != 0) $fs_drop_status("LC", hgeie_q_c1);             
@@ -1043,7 +885,6 @@
                 if (cmp_htval_c1 != 0) $fs_drop_status("LC", htval_q_c1);              
                 if (cmp_htinst_c1 != 0) $fs_drop_status("LC", htinst_q_c1);              
                 // virtual supervisor mode registers
-                //if (cmp_vsstatus_c0 != 0) $fs_drop_status("LC", vsstatus_q_c0);           
                 if (cmp_vsepc_c0 != 0) $fs_drop_status("LC", vsepc_q_c0);                  
                 if (cmp_vscause_c0 != 0) $fs_drop_status("LC", vscause_q_c0);              
                 if (cmp_vstvec_c0 != 0) $fs_drop_status("LC", vstvec_q_c0);                
@@ -1052,7 +893,6 @@
                 if (cmp_vsatp_c0 != 0) $fs_drop_status("LC", vsatp_q_c0);                  
                 if (cmp_en_ld_st_g_translation_c0 != 0) $fs_drop_status("LC", en_ld_st_g_translation_q_c0);
 
-                //if (cmp_vsstatus_c1 != 0) $fs_drop_status("LC", vsstatus_q_c1);           
                 if (cmp_vsepc_c1 != 0) $fs_drop_status("LC", vsepc_q_c1);                  
                 if (cmp_vscause_c1 != 0) $fs_drop_status("LC", vscause_q_c1);              
                 if (cmp_vstvec_c1 != 0) $fs_drop_status("LC", vstvec_q_c1);                
@@ -1060,13 +900,6 @@
                 if (cmp_vstval_c1 != 0) $fs_drop_status("LC", vstval_q_c1);                
                 if (cmp_vsatp_c1 != 0) $fs_drop_status("LC", vsatp_q_c1);                  
                 if (cmp_en_ld_st_g_translation_c1 != 0) $fs_drop_status("LC", en_ld_st_g_translation_q_c1);
-                //if (CVA6Cfg.RVXHCLIC) begin
-                //    if (cmp_vstvt_c0 != 0) $fs_drop_status("LC", vstvt_q_c0);
-                //    //if (cmp_vsintthresh_c0 != 0) $fs_drop_status("LC", vsintthresh_q_c0);
-//
-                //    if (cmp_vstvt_c1 != 0) $fs_drop_status("LC", vstvt_q_c1);
-                //    //if (cmp_vsintthresh_c1 != 0) $fs_drop_status("LC", vsintthresh_q_c1);
-                //end
             end
             // timer and counters
             if (cmp_cycle_c0 != 0) $fs_drop_status("LC", cycle_q_c0);
