@@ -30,6 +30,9 @@ function automatic cheshire_pkg::cheshire_cfg_t gen_cheshire_cfg(int unsigned se
       ret.Core = cheshire_pkg::CVA6;
     end
   endcase
+`ifdef TARGET_POSTPNR
+      ret.LlcNotBypass = 0;
+`endif
   return ret;
 endfunction
 
@@ -119,6 +122,7 @@ module cheshire_soc_wrapper # (
   logic [SlinkNumChan-1:0][SlinkNumLanes-1:0] slink_i;
   logic [SlinkNumChan-1:0][SlinkNumLanes-1:0] slink_o;
 
+`ifndef TARGET_POSTPNR
   cheshire_soc #(
     .Cfg                ( DutCfg ),
     .ExtHartinfo        ( '0 ),
@@ -130,6 +134,9 @@ module cheshire_soc_wrapper # (
     .axi_ext_slv_rsp_t  ( axi_slv_rsp_t ),
     .reg_ext_req_t      ( reg_req_t ),
     .reg_ext_rsp_t      ( reg_rsp_t )
+`else
+  cheshire_wrap #(
+`endif
   ) i_dut (
     .clk_i              ( clk_i     ),
     .rst_ni             ( rst_ni    ),

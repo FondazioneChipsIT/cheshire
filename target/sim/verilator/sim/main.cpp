@@ -5,8 +5,10 @@
 #include <verilated.h> // common Verilator routines
 #if VM_TRACE_FST
 #include <verilated_fst_c.h> // trace to FST
-#elif VM_TRACE
+#elif VM_TRACE_VCD
 #include <verilated_vcd_c.h> // trace to VCD
+#elif VM_TRACE_SAIF
+#include <verilated_saif_c.h>
 #endif
 
 #include "Vcheshire_soc_wrapper.h" // Verilated model
@@ -21,6 +23,13 @@
 #define RST_CYCLES 5
 
 #define SIMULATION_RATE_CHUNK 50000
+
+// Bypass LLC SPM for post pnr simulation
+#if VM_TRACE_SAIF
+#define LLC_BYPASS 1
+#else
+#define LLC_BYPASS 0
+#endif
 
 // #define BENCHMARK
 
@@ -264,10 +273,14 @@ int main(int argc, char** argv) {
     const auto trace = std::make_unique<VerilatedFstC>();
     topp->trace(trace.get(), 5);
     trace->open("dump.fst");
-#else
+#elif VM_TRACE_VCD
     const auto trace = std::make_unique<VerilatedVcdC>();
     topp->trace(trace.get(), 5);
     trace->open("dump.vcd");
+#elif VM_TRACE_SAIF
+    const auto trace = std::make_unique<VerilatedSaifC>();
+    topp->trace(trace.get(), 5);
+    trace->open("dump.saif");
 #endif
 #endif
 
@@ -357,7 +370,7 @@ int main(int argc, char** argv) {
             if (maybe_response) {
               llc_poll_inflight = false;
               uint64_t val = maybe_response->data;
-              if (val & 0x1ULL) {
+              if ((val & 0x1ULL) | (LLC_BYPASS)) {
                 VL_PRINTF("[LLC] SPM configured at cycle %lu, starting ELF preload\n", cycle);
                 llc_ready = true;
                 if (is_firmware) {

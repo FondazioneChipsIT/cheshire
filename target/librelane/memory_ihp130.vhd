@@ -131,7 +131,7 @@ begin
   end generate;
 
 -- pragma translate_off
-  a_to_high : if (abits /= 6) or (abits /= 7) or (abits /= 9) or (dbits > 32) generate
+  a_to_high : if ((abits /= 6) and (abits /= 7) and (abits /= 9)) or (dbits > 32) generate
     x : process
     begin
       assert false

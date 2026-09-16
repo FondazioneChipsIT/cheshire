@@ -24,7 +24,7 @@ entity noelv_chs_wrap is
         manf      : integer range 0 to 2047 := 1753;
         part      : integer range 0 to 65535 := 50661;
         ver       : integer range 0 to 15 := 1;
-        tech      : integer range 0 to 69 := 0
+        tech      : integer range 0 to 69 := 64
     );
     port (
         clk_i       : in std_ulogic;
@@ -328,12 +328,12 @@ begin
     axi_nv_rsp.w.ready <= axi_chs_rsp_w_ready;
     axi_nv_rsp.b.valid <= axi_chs_rsp_b_valid;
     axi_nv_rsp.b.id <= axi_chs_rsp_b_id;
-    axi_nv_rsp.b.resp <= axi_chs_rsp_b_resp;
+    axi_nv_rsp.b.resp <= "00" when (axi_chs_rsp_b_resp = "11") else axi_chs_rsp_b_resp; -- mask errors
     --(others => '0') <= axi_chs_rsp_b_user;
     axi_nv_rsp.r.valid <= axi_chs_rsp_r_valid;
     axi_nv_rsp.r.id <= axi_chs_rsp_r_id;
     axi_nv_rsp.r.data <= axi_chs_rsp_r_data;
-    axi_nv_rsp.r.resp <= "00" when (axi_chs_rsp_r_resp = "10") else axi_chs_rsp_r_resp; -- mask resp if SLVERR
+    axi_nv_rsp.r.resp <= "00" when (axi_chs_rsp_r_resp = "10" or axi_chs_rsp_r_resp = "11") else axi_chs_rsp_r_resp; -- mask errors
     axi_nv_rsp.r.last <= axi_chs_rsp_r_last;
     --(others => '0') <= axi_chs_rsp_r_user;
 

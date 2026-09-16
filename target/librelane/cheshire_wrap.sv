@@ -521,7 +521,7 @@ localparam carfield_domain_idx_t CarfieldDomainIdx = gen_domain_idx(CarfieldIsla
 * Carfield package starts here *
 *******************************/
 localparam int unsigned CheshireNumInternalHarts = 1;
-localparam bit CheshireSerialLinkEnable = 0;
+localparam bit CheshireSerialLinkEnable = 1;
 localparam int unsigned CarfieldNumExtIntrs           = 32; // Number of external interrupts
 localparam int unsigned CarfieldNumInterruptibleHarts = 0;  // Spatz (2 Snitch cores)
 localparam int unsigned CarfieldNumRouterTargets      = 1;  // Safety Island
@@ -678,7 +678,15 @@ localparam dw_bt AxiUserAmoMsb = carfield_get_axi_user_amo_msb(CarfieldIslandsCf
 // verilog_lint: waive-start line-length
 // Cheshire configuration
 localparam cheshire_pkg::cheshire_cfg_t CarfieldCfgDefault = '{
+`ifdef TARGET_NOELV
+  Core             : NOELV,
+`elsif TARGET_C910
+  Core             : C910,
+`elsif TARGET_SARGANTANA
+  Core             : SARGANTANA,
+`else
   Core             : CVA6,
+`endif
   Tech             : GF22,
   // CVA6 parameters
   Cva6RASDepth      : cva6_config_pkg::cva6_cfg.RASDepth,
@@ -707,17 +715,24 @@ localparam cheshire_pkg::cheshire_cfg_t CarfieldCfgDefault = '{
   // ClicNumVsCtxts    : 2, // TODO: choose appropriately
   NumExtIntrSyncs   : SyncStages,
   // Interconnect
+`ifdef TARGET_C910
+  AddrWidth         : 40,
+  AxiDataWidth      : 64,
+  AxiUserWidth      : 2,
+  AxiMstIdWidth     : 8,
+  AxiMaxMstTrans    : 76,
+`else
   AddrWidth         : 48,
   AxiDataWidth      : 64,
-  AxiUserWidth      : 10,  // {CACHE_PARTITIONING(5[9:5]), ECC_ERROR(1[4:4]), ATOPS(4[3:0])}
+  AxiUserWidth      : 2,
   AxiMstIdWidth     : 2,
-  // TFLenWidth        : 32, // ?
-  AxiMaxMstTrans    : 64,
-  AxiMaxSlvTrans    : 64,
-  AxiUserAmoMsb     : AxiUserAmoMsb, // A0:0001, A1:0011, SF:0101, FP:0111, SL:1XXX, none: '0
+  AxiMaxMstTrans    : 24,
+`endif
+  AxiMaxSlvTrans    : 24,
+  AxiUserAmoMsb     : 1, // A0:0001, A1:0011, SF:0101, FP:0111, SL:1XXX, none: '0
   AxiUserAmoLsb     : 0,             // A0:0001, A1:0011, SF:0101, FP:0111, SL:1XXX, none: '0
-  AxiUserErrBits    : 1,
-  AxiUserErrLsb     : 4,
+  AxiUserErrBits    : 0,
+  AxiUserErrLsb     : 0,
   RegMaxReadTxns    : 8,
   RegMaxWriteTxns   : 8,
   // CorePostCut       : 1, // ?
@@ -741,7 +756,7 @@ localparam cheshire_pkg::cheshire_cfg_t CarfieldCfgDefault = '{
   RegExtRegionStart : CarfieldRegBusMap.RegBusStart,
   RegExtRegionEnd   : CarfieldRegBusMap.RegBusEnd,
   // RTC
-  RtcFreq           : 1000000, // FIXME
+  RtcFreq           : 32768, // FIXME
   // Features
   Bootrom           : 1,
   Uart              : 1,
@@ -781,7 +796,7 @@ localparam cheshire_pkg::cheshire_cfg_t CarfieldCfgDefault = '{
   LlcMaxWriteTxns   : 32,
   LlcAmoNumCuts     : 1,
   LlcAmoPostCut     : 1,
-  LlcOutConnect     : 0,
+  LlcOutConnect     : 1,
   LlcOutRegionStart : 'h8000_0000,
   LlcOutRegionEnd   : 'h1_0000_0000,
   // LlcUserMsb        : 9,

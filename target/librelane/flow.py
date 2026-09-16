@@ -79,7 +79,6 @@ class CheshireFlow(Classic):
         Odb.CustomIOPlacement,
 
         Odb.ApplyDEFTemplate,
-#        OpenROAD.GlobalPlacement,
         CustomGlobalPlacement,
         Odb.WriteVerilogHeader,
         Checker.PowerGridViolations,
@@ -92,7 +91,6 @@ class CheshireFlow(Classic):
         OpenROAD.STAMidPNR,
         OpenROAD.GlobalRouting,
         OpenROAD.CheckAntennas,
-        OpenROAD.RepairDesignPostGRT,
         Odb.DiodesOnPorts,
         Odb.HeuristicDiodeInsertion,
         OpenROAD.RepairAntennas,
@@ -139,6 +137,7 @@ def main():
 
     flow = CheshireFlow(
         args.config_path,
+        pdk_root   = "./pdk",
         design_dir = ".",
     )
 
@@ -146,10 +145,14 @@ def main():
     flow.start()
 
     # start flow from previous step
+    # CVA6
+    # flow.start(with_initial_state=State.loads(Path("/foss/designs/cheshire_oc/cheshire/target/librelane/runs/RUN_2026-09-01_14-44-11/27-odb-applydeftemplate/state_out.json").read_text()), tag="RUN_2026-09-01_14-44-11")
+    # SARGANTANA
+    # flow.start(with_initial_state=State.loads(Path("/foss/designs/cheshire_oc/cheshire/target/librelane/runs/SARG_2026-08-10_11-54-54/27-odb-applydeftemplate/state_out.json").read_text()), tag="SARG_2026-08-10_11-54-54")
     # C910
-    # flow.start(with_initial_state=State.loads(Path("/foss/designs/cheshire_oc/cheshire/target/librelane/runs/RUN_2026-07-29_22-05-40/27-odb-applydeftemplate/state_in.json").read_text()), tag="RUN_2026-07-29_22-05-40")
-    # Sargantana
-    # flow.start(with_initial_state=State.loads(Path("/foss/designs/cheshire_oc/cheshire/target/librelane/runs/RUN_2026-07-31_09-21-00/28-odb-applydeftemplate/state_in.json").read_text()), tag="RUN_2026-07-31_09-21-00")
+    # flow.start(with_initial_state=State.loads(Path("/foss/designs/cheshire_oc/cheshire/target/librelane/runs/C910_2026-08-28_10-29-29/51-openroad-fillinsertion/state_out.json").read_text()), tag="C910_2026-08-28_10-29-29")
+    # NOELV
+    # flow.start(with_initial_state=State.loads(Path("/foss/designs/cheshire_oc/cheshire/target/librelane/runs/NOEL_2026-08-07_09-01-04/27-odb-applydeftemplate/state_out.json").read_text()), tag="NOEL_2026-08-07_09-01-04")
 
 
 if __name__ == "__main__":

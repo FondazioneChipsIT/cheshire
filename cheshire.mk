@@ -43,6 +43,7 @@ DRAM_RTL_SIM_ROOT := $(shell $(BENDER) path dram_rtl_sim)
 PULP_C910_ROOT    := $(shell $(BENDER) path pulp-c910)
 CVA6_ROOT         := $(shell $(BENDER) path cva6)
 SARG_ROOT		  := $(shell $(BENDER) path core_tile)
+AXI_LLC_ROOT      := $(shell $(BENDER) path axi_llc)
 
 REGTOOL ?= $(CHS_REG_DIR)/vendor/lowrisc_opentitan/util/regtool.py
 
@@ -56,6 +57,7 @@ BENDER_ROOT ?= $(CHS_ROOT)/.bender
 $(BENDER_ROOT)/.chs_deps:
 	$(BENDER) checkout
 	cd $(CHS_ROOT) && git submodule update --init --recursive sw/deps/printf
+	cd $(CHS_ROOT) && git submodule update --init --recursive target/librelane/pdk
 	@touch $@
 
 # Make sure dependencies are more up-to-date than any targets run
@@ -240,10 +242,22 @@ $(SARG_ROOT)/.patched: $(CHS_ROOT)/target/librelane/sargantana.patch
 	cd $(SARG_ROOT) && git apply $<
 	touch $@
 
+$(CHS_ROOT)/target/librelane/pdk/.patched: \
+	$(CHS_ROOT)/target/librelane/verilator_memory.patch \
+    $(CHS_ROOT)/target/librelane/verilator_stdcell.patch
+	cd $(CHS_ROOT)/target/librelane/pdk && git apply $^
+	touch $@
+
+$(AXI_LLC_ROOT)/.patched: $(CHS_ROOT)/target/librelane/axi_llc.patch
+	cd $(AXI_LLC_ROOT) && git apply $<
+	touch $@
+
 CHS_LIBRELANE_ALL += $(CHS_ROOT)/target/librelane/rtl_files.flist
 CHS_LIBRELANE_ALL += $(CVA6_ROOT)/.patched
 CHS_LIBRELANE_ALL += $(OTPROOT)/.patched
 CHS_LIBRELANE_ALL += $(SARG_ROOT)/.patched
+CHS_LIBRELANE_ALL += $(AXI_LLC_ROOT)/.patched
+CHS_LIBRELANE_ALL += $(CHS_ROOT)/target/librelane/pdk/.patched
 
 #################################
 # Phonies (KEEP AT END OF FILE) #

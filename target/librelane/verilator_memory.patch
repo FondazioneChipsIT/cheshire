@@ -1,0 +1,29 @@
+diff --git a/ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_2P_core_behavioral_bm_bist_ideal.v b/ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_2P_core_behavioral_bm_bist_ideal.v
+index 2f374f74..599efcea 100644
+--- a/ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_2P_core_behavioral_bm_bist_ideal.v
++++ b/ihp-sg13g2/libs.ref/sg13g2_sram/verilog/RM_IHPSG13_2P_core_behavioral_bm_bist_ideal.v
+@@ -123,8 +123,6 @@ input                    B_BIST_CLK;
+ //memory array
+ reg [P_DATA_WIDTH-1:0]    mem_arr [0:P_ADDR_COUNT-1];
+ 
+-real time_a;
+-real time_b;
+ 
+ reg [P_DATA_WIDTH-1:0] dr_a_r;
+ reg [P_DATA_WIDTH-1:0] dr_b_r;
+@@ -165,7 +163,6 @@ assign B_CLK_MUX=(B_BIST_EN==1'b1)?B_BIST_CLK:B_CLK;
+ 
+ 
+ always @(posedge A_CLK_MUX) begin
+-    time_a=$realtime;
+     if(A_MEN_MUX==1'b1 && A_WEN_MUX==1'b1) begin
+         mem_arr[A_ADDR_MUX] <= (mem_arr[A_ADDR_MUX] & ~A_BM_MUX) | (A_DIN_MUX & A_BM_MUX);
+         if (A_REN_MUX==1'b1) begin
+@@ -179,7 +176,6 @@ end
+ 
+ 
+ always @(posedge B_CLK_MUX) begin
+-    time_b=$realtime;
+     if(B_MEN_MUX==1'b1 && B_WEN_MUX==1'b1) begin
+         mem_arr[B_ADDR_MUX] <= (mem_arr[B_ADDR_MUX] & ~B_BM_MUX) | (B_DIN_MUX & B_BM_MUX);
+         if (B_REN_MUX==1'b1) begin

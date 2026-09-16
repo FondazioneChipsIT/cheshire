@@ -483,36 +483,6 @@ ERROR_ON_SYNTH_CHECKS: False
 USE_SLANG: True
 SLANG_ARGUMENTS: ['--keep-hierarchy','--allow-use-before-declare','--ignore-unknown-modules','--ignore-assertions', '--ignore-timing']
 
-SYNTH_KEEP_HIERARCHY_MODULES: [
-    'cheshire_soc$*',
-    'c910_axi_wrap$*',
-    'noelv_chs_axi_wrap$*',
-    'sargantana_soc_axi_wrap$*',
-    'cva6$*', 
-    'cva6_hpdcache_subsystem$*',
-    'dmi_jtag$*',
-    'dm_top$*',
-    'gpio$*',
-    'clint$*',
-    'cheshire_bootrom$*',
-    'reg_uart_wrap$*',
-    'i2c$*',
-    'i2c_fsm$*',
-    'spi_host$*',
-    'spi_host_fsm$*',
-    'serial_link$*',
-    'noelvcpu*$*',
-    'ahbctrl*$*',
-    'ahb2axi4b*$*',
-    'dmnv*$*',
-    'ahbjtagrv*$*',
-    'cctrl5nv*$*',
-    'iunv*$*',
-    'gf22fdx_syncram*$*',
-    'gf22fdx_syncram_2p*$*',
-    'RM_IHPSG13*$*',
-]
-
 # Valid values are AREA 0-3 and DELAY 0-4
 # DELAY 4 = fastest, but largest area
 # AREA 3 = slowest, but smallest area
@@ -607,28 +577,28 @@ MACROS:
       "*_slow_1p08V_125C":
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x32_c2_bm_bist_slow_1p08V_125C.lib
     instances:
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.smem1.dtagconf02_dtagloop_3__dtagsmem.gf22x_x0/d32_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.smem1.dtagconf02_dtagloop_3__dtagsmem.gf22x_x0.d32_a7d32_id0:
         location: ["expr::200+1050*0", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.smem1.dtagconf02_dtagloop_2__dtagsmem.gf22x_x0/d32_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.smem1.dtagconf02_dtagloop_2__dtagsmem.gf22x_x0.d32_a7d32_id0:
         location: ["expr::200+1050*1", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.smem1.dtagconf02_dtagloop_1__dtagsmem.gf22x_x0/d32_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.smem1.dtagconf02_dtagloop_1__dtagsmem.gf22x_x0.d32_a7d32_id0:
         location: ["expr::200+1050*2", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.smem1.dtagconf02_dtagloop_0__dtagsmem.gf22x_x0/d32_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.smem1.dtagconf02_dtagloop_0__dtagsmem.gf22x_x0.d32_a7d32_id0:
         location: ["expr::200+1050*3", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.itagloop_3__itagmem.gf22x_x0/d32_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.itagloop_3__itagmem.gf22x_x0.d32_a7d32_id0:
         location: ["expr::200+1050*4", 1200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.itagloop_2__itagmem.gf22x_x0/d32_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.itagloop_2__itagmem.gf22x_x0.d32_a7d32_id0:
         location: ["expr::200+1050*5", 1200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.itagloop_1__itagmem.gf22x_x0/d32_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.itagloop_1__itagmem.gf22x_x0.d32_a7d32_id0:
         location: ["expr::200+1050*6", 1200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.itagloop_0__itagmem.gf22x_x0/d32_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.itagloop_0__itagmem.gf22x_x0.d32_a7d32_id0:
         location: ["expr::200+1050*7", 1200]
         orientation: S
 
@@ -649,22 +619,22 @@ MACROS:
       "*_slow_1p08V_125C":
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_2P_256x32_c2_bm_bist_slow_1p08V_125C.lib
     instances:
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.dtagconf0_dtagloop_3__dtagcmem.gf22x_x0/d32_2p_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.dtagconf0_dtagloop_3__dtagcmem.gf22x_x0.d32_2p_a7d32_id0:
         location: ["expr::200+1050*4", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.dtagconf0_dtagloop_2__dtagcmem.gf22x_x0/d32_2p_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.dtagconf0_dtagloop_2__dtagcmem.gf22x_x0.d32_2p_a7d32_id0:
         location: ["expr::200+1050*5", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.dtagconf0_dtagloop_1__dtagcmem.gf22x_x0/d32_2p_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.dtagconf0_dtagloop_1__dtagcmem.gf22x_x0.d32_2p_a7d32_id0:
         location: ["expr::200+1050*6", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.dtagconf0_dtagloop_0__dtagcmem.gf22x_x0/d32_2p_a7d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.dtagconf0_dtagloop_0__dtagcmem.gf22x_x0.d32_2p_a7d32_id0:
         location: ["expr::200+1050*7", 200]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.bht0.phtable.gf22x_x0/d64_2p_a7d40_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.bht0.phtable.gf22x_x0.d64_2p_a7d40_id0:
         location: ["expr::200+1050*5", 4100]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.bht0.phtable.gf22x_x0/d64_2p_a7d40_id1:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.bht0.phtable.gf22x_x0.d64_2p_a7d40_id1:
         location: ["expr::200+1050*6", 4100]
         orientation: N
 
@@ -685,52 +655,52 @@ MACROS:
       "*_slow_1p08V_125C":
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_512x32_c2_bm_bist_slow_1p08V_125C.lib
     instances:
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_3__idatameml.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.idataloop_3__idatameml.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*0", 850]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_3__idatamemh.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.idataloop_3__idatamemh.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*1", 850]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_2__idatameml.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.idataloop_2__idatameml.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*2", 850]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_2__idatamemh.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.idataloop_2__idatamemh.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*3", 850]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_1__idatameml.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.idataloop_1__idatameml.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*4", 850]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_1__idatamemh.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.idataloop_1__idatamemh.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*5", 850]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_0__idatameml.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.idataloop_0__idatameml.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*6", 850]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.idataloop_0__idatamemh.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.idataloop_0__idatamemh.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*7", 850]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_3__ddatameml.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.ddnobw_ddataloop_3__ddatameml.genimpl_s0.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*0", 500]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_3__ddatamemh.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.ddnobw_ddataloop_3__ddatamemh.genimpl_s0.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*1", 500]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_2__ddatameml.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.ddnobw_ddataloop_2__ddatameml.genimpl_s0.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*2", 500]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_2__ddatamemh.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.ddnobw_ddataloop_2__ddatamemh.genimpl_s0.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*3", 500]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_1__ddatameml.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.ddnobw_ddataloop_1__ddatameml.genimpl_s0.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*4", 500]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_1__ddatamemh.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.ddnobw_ddataloop_1__ddatamemh.genimpl_s0.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*5", 500]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_0__ddatameml.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.ddnobw_ddataloop_0__ddatameml.genimpl_s0.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*6", 500]
         orientation: S
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.cmem1.ddnobw_ddataloop_0__ddatamemh.genimpl_s0.gf22x_x0/d32_a9d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.cmem1.ddnobw_ddataloop_0__ddatamemh.genimpl_s0.gf22x_x0.d32_a9d32_id0:
         location: ["expr::200+1050*7", 500]
         orientation: S
 
@@ -751,67 +721,67 @@ MACROS:
       "*_slow_1p08V_125C":
         - pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_64x64_c2_bm_bist_slow_1p08V_125C.lib
     instances:
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_7__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_7__ram0.nopar_nos64_x1.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*0", 4700]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_7__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_7__ram0.nopar_nos64_x0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*1", 4700]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_6__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_6__ram0.nopar_nos64_x1.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*2", 4700]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_6__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_6__ram0.nopar_nos64_x0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*3", 4700]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_5__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_5__ram0.nopar_nos64_x1.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*4", 4700]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_5__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_5__ram0.nopar_nos64_x0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*5", 4700]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_4__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_4__ram0.nopar_nos64_x1.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*6", 4700]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_4__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_4__ram0.nopar_nos64_x0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*7", 4700]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_3__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_3__ram0.nopar_nos64_x1.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*0", 4400]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_3__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_3__ram0.nopar_nos64_x0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*1", 4400]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_2__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_2__ram0.nopar_nos64_x1.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*2", 4400]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_2__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_2__ram0.nopar_nos64_x0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*3", 4400]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_1__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_1__ram0.nopar_nos64_x1.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*4", 4400]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_1__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_1__ram0.nopar_nos64_x0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*5", 4400]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_0__ram0.nopar_nos64_x1.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_0__ram0.nopar_nos64_x1.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*6", 4400]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.core/u0.c0.c0.tbmem_gen_tbmem0.mem64_0__ram0.nopar_nos64_x0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.core.u0.c0.c0.tbmem_gen_tbmem0.mem64_0__ram0.nopar_nos64_x0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*7", 4400]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_4__ram0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.dm0.bus_trace.tb0_atmem0.mbus_trace_mem_0__mem64_4__ram0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*0", 4100]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_3__ram0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.dm0.bus_trace.tb0_atmem0.mbus_trace_mem_0__mem64_3__ram0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*1", 4100]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_2__ram0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.dm0.bus_trace.tb0_atmem0.mbus_trace_mem_0__mem64_2__ram0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*2", 4100]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_1__ram0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.dm0.bus_trace.tb0_atmem0.mbus_trace_mem_0__mem64_1__ram0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*3", 4100]
         orientation: N
-      i_cheshire_soc/gen_cva6_cores[0].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.dm0/bus_trace/tb0_atmem0.mbus_trace_mem_0__mem64_0__ram0.gf22x_x0/d32_a6d32_id0:
+      i_cheshire_soc.gen_cva6_cores[0].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.dm0.bus_trace.tb0_atmem0.mbus_trace_mem_0__mem64_0__ram0.gf22x_x0.d32_a6d32_id0:
         location: ["expr::200+1050*4", 4100]
         orientation: N
 
@@ -819,7 +789,7 @@ MACROS:
 # This is an alternative method compared to
 # specifying the power connections in the RTL
 PDN_MACRO_CONNECTIONS:
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.*gf22x_x0.*_id0 VDD VSS VDDARRAY! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.*gf22x_x0.*_id0 VDD VSS VDD! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.*gf22x_x0.*_id1 VDD VSS VDDARRAY! VSS!
-- i_cheshire_soc/gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv/i_noelv_chs_wrap.*gf22x_x0.*_id1 VDD VSS VDD! VSS!
+- i_cheshire_soc.gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.*gf22x_x0.*_id0 VDD VSS VDDARRAY! VSS!
+- i_cheshire_soc.gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.*gf22x_x0.*_id0 VDD VSS VDD! VSS!
+- i_cheshire_soc.gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.*gf22x_x0.*_id1 VDD VSS VDDARRAY! VSS!
+- i_cheshire_soc.gen_cva6_cores\\\[0\\].gen_noelv_core.i_core_noelv.i_noelv_chs_wrap.*gf22x_x0.*_id1 VDD VSS VDD! VSS!

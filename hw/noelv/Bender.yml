@@ -3,10 +3,6 @@ package:
   authors:
     - Frontgrade Gaisler
 
-targets:
-  sim:
-    default_tool: vsim
-
 sources:
   - files:
       - grlib-gpl-2025.2-b4298/lib/grlib/stdlib/version.vhd

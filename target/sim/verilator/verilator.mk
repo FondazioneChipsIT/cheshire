@@ -5,12 +5,14 @@
 # Max Wipfli <mwipfli@student.ethz.ch>
 # Paul Scheffler <paulsc@iis.ee.ethz.ch>
 
-BINARY ?= ./sw/tests/helloworld.spm.elf
+BINARY ?= ./sw/tests/helloworld.dram.elf
 
 CHS_VERILATOR_DIR ?= $(CHS_ROOT)/target/sim/verilator
 RISCV_DBG_DIR = $(shell bender path riscv-dbg)
 
 VERILATOR        ?= verilator
+
+POST_PNR ?= 0
 
 CHS_VERILATOR_THREADS   ?= 4
 CHS_VERILATOR_UART_BAUD ?= 115200
@@ -36,6 +38,10 @@ else ifeq ($(CHS_CORE),NOELV)
   	CHS_BENDER_EXTRA_FLAGS += -t noelv
 endif
 
+ifeq ($(POST_PNR),1)
+	CHS_BENDER_EXTRA_FLAGS += -t postpnr
+endif
+
 # UART baud rate
 VERILATOR_ARGS += -GUartBaudRate=$(CHS_VERILATOR_UART_BAUD)
 
@@ -49,7 +55,7 @@ VERILATOR_ARGS += -DASSERTS_OFF
 VERILATOR_ARGS += --threads $(CHS_VERILATOR_THREADS)
 
 # C++ Compiler Optimization
-VERILATOR_ARGS += -CFLAGS "-O3" -CFLAGS "-march=native" -CFLAGS "-mtune=native"
+VERILATOR_ARGS += -CFLAGS "-O3" -CFLAGS "-march=native" -CFLAGS "-mtune=native" -CFLAGS "-std=c++20"
 
 # Use Clang (faster simulation than GCC)
 VERILATOR_ARGS += --compiler clang -MAKEFLAGS "CC=clang" -MAKEFLAGS "CXX=clang++" -MAKEFLAGS "LINK=clang++"
@@ -72,8 +78,10 @@ VERILATOR_ARGS +=
 # Tracing (FST): enabled for all cores except NOELV (SELCFG=5), which is VHDL-based
 # and cannot be traced through this Verilator flow.
 CHS_VERILATOR_TRACE_DEPTH ?= 5
-ifneq ($(CHS_CORE),NOELV)
-	VERILATOR_ARGS += --trace-fst --trace-structs --trace-depth $(CHS_VERILATOR_TRACE_DEPTH)
+ifeq ($(POST_PNR),1)
+   VERILATOR_ARGS += --trace-saif --no-trace-params
+else ifneq ($(CHS_CORE),NOELV)
+   VERILATOR_ARGS += --trace-fst --no-trace-params --trace-depth $(CHS_VERILATOR_TRACE_DEPTH)
 endif
 
 VERILATOR_CXX_SRCS = $(CHS_VERILATOR_DIR)/sim/main.cpp \
@@ -85,6 +93,12 @@ VERILATOR_CONFIG = $(CHS_VERILATOR_DIR)/config.vlt
 
 $(CHS_VERILATOR_DIR)/cheshire_soc.flist: $(CHS_ROOT)/Bender.yml
 	$(BENDER) script verilator $(CHS_BENDER_RTL_FLAGS) $(CHS_BENDER_EXTRA_FLAGS) > $@
+
+ifeq ($(POST_PNR),1) # Change this path to the desired post-PnR netlist
+	echo '$(realpath $(CHS_ROOT))/target/librelane/final/nl/cheshire_wrap.nl.v' >> $@
+else ifeq ($(CHS_CORE),NOELV) # GHDL translation must be performed before simulating with NOEL-V
+	echo '$(realpath $(CHS_ROOT))/target/librelane/vhdl/synth/noelv_chs_wrap_post.v' >> $@
+endif
 
 $(CHS_ROOT)/target/sim/verilator/obj_dir/Vcheshire_soc_wrapper: $(CHS_ROOT)/target/sim/verilator/cheshire_soc.flist $(VERILATOR_CXX_SRCS) $(VERILATOR_CONFIG)
 	+cd $(CHS_VERILATOR_DIR) && stdbuf -oL $(VERILATOR) $(VERILATOR_ARGS) \
@@ -101,7 +115,7 @@ $(CHS_ROOT)/target/sim/verilator/cheshire_soc.vlt: $(CHS_ROOT)/target/sim/verila
 	@echo 'taskset -c 0-$(shell expr $(CHS_VERILATOR_THREADS) - 1) ./obj_dir/Vcheshire_soc_wrapper "$$@"' >> $@
 	@chmod +x $@
 
-chs-generate-flist: $(CHS_VERILATOR_DIR)/cheshire_soc.flist
+chs-verilator-flist: $(CHS_VERILATOR_DIR)/cheshire_soc.flist
 chs-verilator-build: $(CHS_ROOT)/target/sim/verilator/obj_dir/Vcheshire_soc_wrapper
 
 CHS_VERILATOR_ALL += $(CHS_VERILATOR_DIR)/cheshire_soc.flist
@@ -110,4 +124,4 @@ CHS_VERILATOR_ALL += chs-verilator-run
 
 chs-verilator-all: $(CHS_VERILATOR_ALL)
 
-CHS_PHONY += chs-verilator-all chs-verilator-build chs-verilator-run
+CHS_PHONY += chs-verilator-all chs-verilator-build chs-verilator-run chs-verilator-flist
