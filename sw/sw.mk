@@ -14,8 +14,8 @@ CHS_SW_AR      := $(CHS_SW_GCC_BINROOT)/riscv64-unknown-elf-ar
 CHS_SW_CC      := $(CHS_SW_GCC_BINROOT)/riscv64-unknown-elf-gcc
 CHS_SW_OBJCOPY := $(CHS_SW_GCC_BINROOT)/riscv64-unknown-elf-objcopy
 CHS_SW_OBJDUMP := $(CHS_SW_GCC_BINROOT)/riscv64-unknown-elf-objdump
-CHS_SW_LTOPLUG := $(shell find $(shell dirname $(CHS_SW_GCC_BINROOT))/libexec/gcc/riscv64-unknown-elf/**/liblto_plugin.so)
-
+CHS_SW_LTOPLUG := $(or $(shell find $(shell dirname $(CHS_SW_GCC_BINROOT))/libexec/gcc/riscv64-unknown-elf -name liblto_plugin.so -print -quit), \
+					$(shell find /foss/tools/riscv-gnu-toolchain/libexec/gcc/riscv64-unknown-elf -name liblto_plugin.so -print -quit))
 CHS_SW_DIR       ?= $(CHS_ROOT)/sw
 CHS_SW_LD_DIR    ?= $(CHS_SW_DIR)/link
 CHS_SW_ZSL_TGUID := 0269B26A-FD95-4CE4-98CF-941401412C62
@@ -27,6 +27,10 @@ CHS_SW_FLAGS   ?= -DOT_PLATFORM_RV32 -march=rv64imafd_zifencei -mabi=lp64d -mstr
 CHS_SW_CCFLAGS ?= $(CHS_SW_FLAGS) -ggdb -mcmodel=medany -mexplicit-relocs -fno-builtin -fverbose-asm -pipe -nostdlib -lgcc
 CHS_SW_LDFLAGS ?= $(CHS_SW_FLAGS) -nostartfiles -Wl,--gc-sections -Wl,-L$(CHS_SW_LD_DIR)
 CHS_SW_ARFLAGS ?= --plugin=$(CHS_SW_LTOPLUG)
+
+CHS_SW_DHRYSTONE_FLAGS   ?= -DOT_PLATFORM_RV32 -O3 -march=rv64imafdc -mabi=lp64d -Wall -Wextra -fno-builtin-printf -funroll-all-loops -funswitch-loops -fgcse-after-reload -fpredictive-commoning \
+					 -finline-functions -fipa-cp-clone -falign-functions=8 -falign-jumps=8 -falign-loops=8 --param max-inline-insns-auto=20 -flto
+CHS_SW_DHRYSTONE_CCFLAGS ?= $(CHS_SW_DHRYSTONE_FLAGS) -ggdb -mcmodel=medany -mexplicit-relocs -fverbose-asm -pipe -nostdlib -lgcc
 
 CHS_SW_ALL += $(CHS_SW_LIBS) $(CHS_SW_GEN_HDRS) $(CHS_SW_TESTS) $(CHS_SW_TOOLS)
 
@@ -99,6 +103,13 @@ CHS_SW_GEN_HDRS += $(OTPROOT)/.generated
 
 %.o: %.S $(CHS_SW_GEN_HDRS)
 	$(CHS_SW_CC) $(CHS_SW_INCLUDES) $(CHS_SW_CCFLAGS) -c $< -o $@
+
+# Dhrystone uses a separate compilation flag set.
+$(CHS_SW_DIR)/deps/dhrystone/%.o: $(CHS_SW_DIR)/deps/dhrystone/%.c $(CHS_SW_GEN_HDRS)
+	$(CHS_SW_CC) $(CHS_SW_INCLUDES) $(CHS_SW_DHRYSTONE_CCFLAGS) -c $< -o $@
+
+$(CHS_SW_DIR)/deps/dhrystone/%.o: $(CHS_SW_DIR)/deps/dhrystone/%.S $(CHS_SW_GEN_HDRS)
+	$(CHS_SW_CC) $(CHS_SW_INCLUDES) $(CHS_SW_DHRYSTONE_CCFLAGS) -c $< -o $@
 
 # Programs may specify a linking mode in their name, e.g. `helloworld.spm.c`.
 # Tests with such infixes are built only for one linking mode, tests without them for all
@@ -186,11 +197,37 @@ $(foreach link,$(CHS_SW_LINK_MODES),$(eval $(call chs_sw_tests_add_rule,$(link),
 # Collect mode-agnostic tests, which should be build for all modes, and their .dump targets
 CHS_SW_TEST_C_LALL = $(filter-out $(CHS_SW_TEST_LONE), $(wildcard $(CHS_SW_DIR)/tests/*.c))
 CHS_SW_TEST_S_LALL = $(filter-out $(CHS_SW_TEST_LONE), $(wildcard $(CHS_SW_DIR)/tests/*.S))
-$(foreach link,$(CHS_SW_LINK_MODES),$(eval CHS_SW_TEST_DUMP += $(CHS_SW_TEST_C_LALL:.c=.$(link).dump) $(CHS_SW_TEST_S_LALL:.S=.$(link).dump)))
+CHS_SW_DHRYSTONE_C = $(wildcard $(CHS_SW_DIR)/deps/dhrystone/*.c)
+CHS_SW_DHRYSTONE_S = $(wildcard $(CHS_SW_DIR)/deps/dhrystone/*.S)
+$(foreach link,$(CHS_SW_LINK_MODES),$(eval CHS_SW_TEST_DUMP += \
+    $(CHS_SW_TEST_C_LALL:.c=.$(link).dump) \
+    $(CHS_SW_TEST_S_LALL:.S=.$(link).dump) \
+    $(CHS_SW_DHRYSTONE_C:.c=.$(link).dump) \
+    $(CHS_SW_DHRYSTONE_S:.S=.$(link).dump)))
 
 # Generate .memh targets for ROM-linked tests
 CHS_SW_TEST_ROM_DUMP = $(filter %.rom.dump,$(CHS_SW_TEST_DUMP))
-CHS_SW_TESTS += $(CHS_SW_TEST_ROM_DUMP:.rom.dump=.rom.memh) $(CHS_SW_TEST_ROM_DUMP:.rom.dump=.gpt.memh)
+CHS_SW_GPT += $(CHS_SW_TEST_ROM_DUMP:.rom.dump=.rom.memh) $(CHS_SW_TEST_ROM_DUMP:.rom.dump=.gpt.memh)
+chs-sw-gpt: $(CHS_SW_GPT)
+.PHONY: chs-sw-gpt
 
 # Add all dumps to test build
 CHS_SW_TESTS += $(CHS_SW_TEST_DUMP)
+
+# Build only the Dhrystone benchmark for every link mode.
+CHS_SW_DHRYSTONE_TESTS = $(foreach link,$(CHS_SW_LINK_MODES), \
+    $(CHS_SW_DHRYSTONE_C:.c=.$(link).dump) \
+    $(CHS_SW_DHRYSTONE_S:.S=.$(link).dump))
+
+chs-dhrystone: $(CHS_SW_DHRYSTONE_TESTS)
+.PHONY: chs-dhrystone
+
+# Build CoreMark benchmark
+chs-coremark:
+	cd $(CHS_SW_DIR)/deps/coremark && make clean && make PORT_DIR=cheshire ITERATIONS=4 XCFLAGS="-DCLOCKS_PER_SEC=200000000"
+.PHONY: chs-coremark
+
+# Build Embench-iot benchmarks
+chs-embench-iot:
+	cd $(CHS_SW_DIR)/deps/embench-iot && ./build_all.py --arch riscv32 --chip generic --board cheshire
+.PHONY: chs-embench-iot

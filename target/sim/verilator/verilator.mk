@@ -13,6 +13,8 @@ RISCV_DBG_DIR = $(shell bender path riscv-dbg)
 VERILATOR        ?= verilator
 
 POST_PNR ?= 0
+# Change this path to the desired post-PnR netlist
+NETLIST_PATH ?= target/librelane/runs/CVA6F_2026-09-07_15-40-41/34-openroad-cts/cheshire_wrap.nl.v
 
 CHS_VERILATOR_THREADS   ?= 4
 CHS_VERILATOR_UART_BAUD ?= 115200
@@ -58,7 +60,7 @@ VERILATOR_ARGS += --threads $(CHS_VERILATOR_THREADS)
 VERILATOR_ARGS += -CFLAGS "-O3" -CFLAGS "-march=native" -CFLAGS "-mtune=native" -CFLAGS "-std=c++20"
 
 # Use Clang (faster simulation than GCC)
-VERILATOR_ARGS += --compiler clang -MAKEFLAGS "CC=clang" -MAKEFLAGS "CXX=clang++" -MAKEFLAGS "LINK=clang++"
+# VERILATOR_ARGS += --compiler clang -MAKEFLAGS "CC=clang" -MAKEFLAGS "CXX=clang++" -MAKEFLAGS "LINK=clang++"
 
 # Link Time Optimization (LTO)
 VERILATOR_ARGS += 
@@ -94,8 +96,8 @@ VERILATOR_CONFIG = $(CHS_VERILATOR_DIR)/config.vlt
 $(CHS_VERILATOR_DIR)/cheshire_soc.flist: $(CHS_ROOT)/Bender.yml
 	$(BENDER) script verilator $(CHS_BENDER_RTL_FLAGS) $(CHS_BENDER_EXTRA_FLAGS) > $@
 
-ifeq ($(POST_PNR),1) # Change this path to the desired post-PnR netlist
-	echo '$(realpath $(CHS_ROOT))/target/librelane/final/nl/cheshire_wrap.nl.v' >> $@
+ifeq ($(POST_PNR),1)
+	echo '$(realpath $(CHS_ROOT))/$(NETLIST_PATH)' >> $@
 else ifeq ($(CHS_CORE),NOELV) # GHDL translation must be performed before simulating with NOEL-V
 	echo '$(realpath $(CHS_ROOT))/target/librelane/vhdl/synth/noelv_chs_wrap_post.v' >> $@
 endif

@@ -123,13 +123,16 @@ class CheshireFlow(Classic):
         Misc.ReportManufacturability
     ]
 
+# For IIC-OSIC-TOOLS container make OpenROAD-Librelane the default OpenROAD.
+os.environ["PATH"] = "/tmp/librelane-bin:" + os.environ["PATH"]
+
 # usage: python3 flow.py config_c910.yaml
 def main():
     parser = argparse.ArgumentParser(description="Start the Cheshire librelane flow")
     parser.add_argument(
         "config_path",
         nargs="?",
-        default="./config_cva6_custom.yaml",
+        default="./config_cva6.yaml",
         help="Path to the config YAML file to use for the flow",
     )
     args = parser.parse_args()

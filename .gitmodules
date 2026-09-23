@@ -9,3 +9,9 @@
 [submodule "target/librelane/pdk"]
 	path = target/librelane/pdk
 	url = https://github.com/IHP-GmbH/IHP-Open-PDK
+[submodule "sw/deps/coremark"]
+	path = sw/deps/coremark
+	url = https://github.com/ricted98/coremark
+[submodule "sw/deps/embench-iot"]
+	path = sw/deps/embench-iot
+	url = https://github.com/ricted98/embench-iot

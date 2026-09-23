@@ -58,6 +58,8 @@ $(BENDER_ROOT)/.chs_deps:
 	$(BENDER) checkout
 	cd $(CHS_ROOT) && git submodule update --init --recursive sw/deps/printf
 	cd $(CHS_ROOT) && git submodule update --init --recursive target/librelane/pdk
+	cd $(CHS_ROOT) && git submodule update --init --recursive sw/deps/coremark
+	cd $(CHS_ROOT) && git submodule update --init --recursive sw/deps/embench-iot
 	@touch $@
 
 # Make sure dependencies are more up-to-date than any targets run
@@ -132,7 +134,7 @@ $(CHS_SLINK_DIR)/.generated: $(CHS_ROOT)/hw/serial_link.hjson
 include $(IDMA_ROOT)/idma.mk
 
 # Patch C910 with Verilator fix
-$(PULP_C910_ROOT)/.patched: $(CHS_ROOT)/target/librelane/c910_lint.patch
+$(PULP_C910_ROOT)/.patched: $(CHS_ROOT)/target/librelane/patches/c910_lint.patch
 	cd $(PULP_C910_ROOT) && git apply $<
 	touch $@
 
@@ -229,35 +231,37 @@ $(CHS_ROOT)/target/librelane/rtl_files.flist: $(CHS_ROOT)/Bender.yml $(CHS_ROOT)
 	$(BENDER) script flist > $@
 
 $(CVA6_ROOT)/.patched: \
-    $(CHS_ROOT)/target/librelane/cva6_fifo.patch \
-    $(CHS_ROOT)/target/librelane/amo_cut.patch
+    $(CHS_ROOT)/target/librelane/patches/cva6_fifo.patch \
+    $(CHS_ROOT)/target/librelane/patches/amo_cut.patch
 	cd $(CVA6_ROOT) && git apply $^
 	touch $@
 
-$(OTPROOT)/.patched: $(CHS_ROOT)/target/librelane/prim_fifo.patch
+$(OTPROOT)/.patched: $(CHS_ROOT)/target/librelane/patches/prim_fifo.patch
 	cd $(OTPROOT) && git apply $<
 	touch $@
 
-$(SARG_ROOT)/.patched: $(CHS_ROOT)/target/librelane/sargantana.patch
+$(SARG_ROOT)/.patched: $(CHS_ROOT)/target/librelane/patches/sargantana.patch
 	cd $(SARG_ROOT) && git apply $<
 	touch $@
 
 $(CHS_ROOT)/target/librelane/pdk/.patched: \
-	$(CHS_ROOT)/target/librelane/verilator_memory.patch \
-    $(CHS_ROOT)/target/librelane/verilator_stdcell.patch
+	$(CHS_ROOT)/target/librelane/patches/verilator_memory.patch \
+    $(CHS_ROOT)/target/librelane/patches/verilator_stdcell.patch
 	cd $(CHS_ROOT)/target/librelane/pdk && git apply $^
 	touch $@
 
-$(AXI_LLC_ROOT)/.patched: $(CHS_ROOT)/target/librelane/axi_llc.patch
+$(AXI_LLC_ROOT)/.patched: $(CHS_ROOT)/target/librelane/patches/axi_llc.patch
 	cd $(AXI_LLC_ROOT) && git apply $<
 	touch $@
 
-CHS_LIBRELANE_ALL += $(CHS_ROOT)/target/librelane/rtl_files.flist
-CHS_LIBRELANE_ALL += $(CVA6_ROOT)/.patched
-CHS_LIBRELANE_ALL += $(OTPROOT)/.patched
-CHS_LIBRELANE_ALL += $(SARG_ROOT)/.patched
-CHS_LIBRELANE_ALL += $(AXI_LLC_ROOT)/.patched
-CHS_LIBRELANE_ALL += $(CHS_ROOT)/target/librelane/pdk/.patched
+CHS_LIBRELANE_INIT += $(CHS_ROOT)/target/librelane/rtl_files.flist
+CHS_LIBRELANE_INIT += $(CVA6_ROOT)/.patched
+CHS_LIBRELANE_INIT += $(OTPROOT)/.patched
+CHS_LIBRELANE_INIT += $(SARG_ROOT)/.patched
+CHS_LIBRELANE_INIT += $(AXI_LLC_ROOT)/.patched
+CHS_LIBRELANE_INIT += $(CHS_ROOT)/target/librelane/pdk/.patched
+
+include $(CHS_ROOT)/target/librelane/librelane.mk
 
 #################################
 # Phonies (KEEP AT END OF FILE) #
@@ -272,8 +276,8 @@ chs-bootrom-all: $(CHS_BOOTROM_ALL)
 chs-sim-all:     $(CHS_SIM_ALL)
 chs-dramsys-all: $(CHS_DRAMSYS_ALL)
 chs-xilinx-all:  $(CHS_XILINX_ALL)
-chs-librelane-all: $(CHS_LIBRELANE_ALL)
+chs-librelane-init: $(CHS_LIBRELANE_INIT)
 
-CHS_PHONY += chs-all chs-sw-all chs-hw-all chs-bootrom-all chs-sim-all chs-dramsys-all chs-xilinx-all chs-librelane-all
+CHS_PHONY += chs-all chs-sw-all chs-hw-all chs-bootrom-all chs-sim-all chs-dramsys-all chs-xilinx-all chs-librelane-init
 
 .PHONY: $(CHS_PHONY)

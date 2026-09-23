@@ -64,3 +64,8 @@ verilator*.log
 *.vcd
 *.dasm
 *.fst
+*.saif
+*.hier
+
+# Librelane generated files
+target/librelane/runs
