@@ -65,6 +65,18 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
   inout  wire   i2c_sda_io,
 `endif
 
+`ifdef USE_ETHERNET
+  input  wire        eth_rxck,
+  input  wire [3:0]  eth_rxd,
+  input  wire        eth_rxctl,
+  output wire        eth_txck,
+  output wire [3:0]  eth_txd,
+  output wire        eth_txctl,
+  output wire        eth_rst_n,
+  output wire        eth_mdc,
+  inout  wire        eth_mdio,
+`endif
+
 `ifdef USE_SD
   input  logic        sd_cd_i,
   output logic        sd_cmd_o,
@@ -160,6 +172,10 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
   wire soc_clk;
   wire usb_clk;
 
+  logic eth_clk_125;
+  logic eth_clk_90;
+  logic eth_clk_200;
+  
   IBUFDS #(
     .IBUF_LOW_PWR ("FALSE")
   ) i_bufds_sys_clk (
@@ -173,9 +189,9 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
     .reset    ( '0 ),
     .locked   ( ),
     .clk_50   ( soc_clk ),
-    .clk_48   ( usb_clk ),
-    .clk_20   ( ),
-    .clk_10   ( )
+    .clk_200      ( eth_clk_200 ),
+    .clk_125      ( eth_clk_125 ),
+    .clk_125_90   ( eth_clk_90  )
   );
 
   /////////////////////
@@ -291,6 +307,28 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
   );
 `endif
 
+  ///////////////////////
+  // Ethernet Adaption //
+  //////////////////////
+  logic eth_mdio_i;
+  logic eth_mdio_o;
+  logic eth_mdio_oe;
+
+  //`ifdef USE_ETHERNET
+
+  IOBUF #(
+    .DRIVE        ( 12          ), // Specify the output drive strength
+    .IBUF_LOW_PWR ( "FALSE"     ), // Low Power - "TRUE", High Performance = "FALSE"
+    .IOSTANDARD   ( "DEFAULT"   ), // Specify the I/O standard
+    .SLEW         ( "FAST"      ) // Specify the output slew rate
+  ) i_md_iobuf (
+    .O   ( eth_mdio_i   ),   // Buffer output
+    .IO  ( eth_mdio     ),   // Buffer inout port (connect directly to top-level port)
+    .I   ( eth_mdio_o   ),   // Buffer input
+    .T   ( ~eth_mdio_oe )    // 3-state enable input, high=input, low=output
+  );
+
+  //`endif
   ///////////////
   // SPI to SD //
   ///////////////
@@ -665,6 +703,21 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
     // TODO: connect to the tdo pad
     .jtag_tdo_oe_o      ( ),
 `endif
+    .eth_clk125_i       ( eth_clk_125 ),
+    .eth_clk125q_i      ( eth_clk_90  ),
+    .eth_clk200_i       ( eth_clk_200 ),
+    .eth_rxck_i         ( eth_rxck    ),
+    .eth_rxd_i          ( eth_rxd     ),
+    .eth_rxctl_i        ( eth_rxctl   ),
+    .eth_txck_o         ( eth_txck    ),
+    .eth_txd_o          ( eth_txd     ),
+    .eth_txctl_o        ( eth_txctl   ),
+    .eth_rstn_o         ( eth_rst_n    ),
+    .eth_mdio_i         ( eth_mdio_i  ),
+    .eth_mdio_o         ( eth_mdio_o  ),
+    .eth_mdio_oe        ( eth_mdio_oe ),
+    .eth_mdc_o          ( eth_mdc     ),
+
     .i2c_sda_o          ( i2c_sda_soc_out ),
     .i2c_sda_i          ( i2c_sda_soc_in  ),
     .i2c_sda_en_o       ( i2c_sda_en      ),
@@ -687,7 +740,7 @@ module cheshire_top_xilinx import cheshire_pkg::*; #(
 `endif
     .uart_tx_o,
     .uart_rx_i,
-    .usb_clk_i          ( usb_clk ),
+    .usb_clk_i          ( eth_clk_125 ),
     .usb_rst_ni         ( rst_n ), // Technically should sync to `usb_clk`, but pulse is long enough
     .usb_dm_i,
     .usb_dm_o,

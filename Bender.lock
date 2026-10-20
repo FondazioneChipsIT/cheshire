@@ -178,6 +178,18 @@ packages:
     - common_cells
     - register_interface
     - tech_cells_generic
+  pulp-ethernet:
+    revision: 136e4ba1406a81e903ca060e1860332d2ffd0495
+    version: null
+    source:
+      Git: https://github.com/pulp-platform/pulp-ethernet.git
+    dependencies:
+    - axi
+    - axi_stream
+    - common_cells
+    - common_verification
+    - idma
+    - register_interface  
   register_interface:
     revision: 5daa85d164cf6b54ad061ea1e4c6f3624556e467
     version: 0.4.5

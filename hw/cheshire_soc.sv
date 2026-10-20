@@ -28,6 +28,10 @@ module cheshire_soc import cheshire_pkg::*; #(
   input  logic        test_mode_i,
   input  logic [1:0]  boot_mode_i,
   input  logic        rtc_i,
+  // Eth clocks
+  input  logic        eth_clk125_i,
+  input  logic        eth_clk125q_i,
+  input  logic        eth_clk200_i,
   // External AXI LLC (DRAM) port
   output axi_ext_llc_req_t axi_llc_mst_req_o,
   input  axi_ext_llc_rsp_t axi_llc_mst_rsp_i,
@@ -74,6 +78,18 @@ module cheshire_soc import cheshire_pkg::*; #(
   output logic  i2c_scl_o,
   input  logic  i2c_scl_i,
   output logic  i2c_scl_en_o,
+  // ETHERNET interface
+  input  logic        eth_rxck_i,
+  input  logic [3:0]  eth_rxd_i,
+  input  logic        eth_rxctl_i,
+  output logic        eth_txck_o,
+  output logic [3:0]  eth_txd_o,
+  output logic        eth_txctl_o,
+  output logic        eth_rstn_o,
+  input  logic        eth_mdio_i,
+  output logic        eth_mdio_o,
+  output logic        eth_mdio_oe,
+  output logic        eth_mdc_o,
   // SPI host interface
   output logic                  spih_sck_o,
   output logic                  spih_sck_en_o,
@@ -1306,6 +1322,74 @@ module cheshire_soc import cheshire_pkg::*; #(
 
   end
 
+  ////////////////
+  //  ETHERNET  //
+  ////////////////
+  if (Cfg.Ethernet) begin : gen_ethernet
+    logic eth_rx_irq, eth_rx_irq_o;
+    eth_idma_wrap#(
+      .DataWidth           ( Cfg.AxiDataWidth  ),
+      .AddrWidth           ( Cfg.AddrWidth     ),
+      .UserWidth           ( Cfg.AxiUserWidth  ),
+      .AxiIdWidth          ( Cfg.AxiMstIdWidth ),
+      .NumAxInFlight       ( 32'd10            ), //16
+      .BufferDepth         ( 32'd3             ),
+      .TFLenWidth          ( 32'd12            ),
+      .MemSysDepth         ( 32'd0             ),
+      .TxFifoLogDepth      ( 32'd6             ),
+      .RxFifoLogDepth      ( 32'd9             ),
+      .axi_req_t           ( axi_mst_req_t     ),
+      .axi_rsp_t           ( axi_mst_rsp_t     ),
+      .reg_req_t           ( reg_req_t         ),
+      .reg_rsp_t           ( reg_rsp_t         )
+    ) i_tx_eth_idma_wrap (
+      .clk_i,
+      .rst_ni,
+      .eth_clk125_i        ( eth_clk125_i ),
+      .eth_clk125q_i       ( eth_clk125q_i),
+      .eth_clk200_i        ( eth_clk200_i ),
+      .phy_rx_clk_i        ( eth_rxck_i   ),
+      .phy_rxd_i           ( eth_rxd_i    ),
+      .phy_rx_ctl_i        ( eth_rxctl_i  ),
+      .phy_tx_clk_o        ( eth_txck_o   ),
+      .phy_txd_o           ( eth_txd_o    ),
+      .phy_tx_ctl_o        ( eth_txctl_o  ),
+      .phy_resetn_o        ( eth_rstn_o   ),
+      .phy_intn_i          ( 1'b1         ),
+      .phy_pme_i           ( 1'b1         ),
+      .phy_mdio_i          ( eth_mdio_i   ),
+      .phy_mdio_o          ( eth_mdio_o   ),
+      .phy_mdio_oe         ( eth_mdio_oe  ),
+      .phy_mdc_o           ( eth_mdc_o    ),
+      .testmode_i          ( test_mode_i  ),
+      .axi_req_o           ( axi_in_req[AxiIn.eth]        ),
+      .axi_rsp_i           ( axi_in_rsp[AxiIn.eth]        ),
+      .reg_req_i           ( reg_out_req[RegOut.ethernet] ),
+      .reg_rsp_o           ( reg_out_rsp[RegOut.ethernet] ),
+      .eth_rx_irq_o        ( eth_rx_irq                   )
+    );
+
+    // interrupt sync
+    sync #(
+      .STAGES     ( 32'd3      ),
+      .ResetValue ( 1'b0       )
+    ) i_rx_irq_sync (
+      .clk_i,
+      .rst_ni   ( rst_ni        ),
+      .serial_i ( eth_rx_irq    ),
+      .serial_o ( eth_rx_irq_o  )
+    );
+
+    assign intr.intn.ethernet = eth_rx_irq_o;
+
+  end else begin : gen_no_ethernet
+      assign intr.intn.ethernet = 1'b0;
+      assign eth_txck_o  = 1'b0;
+      assign eth_rstn_o  = 1'b0;
+      assign eth_txctl_o = 1'b0;
+      assign eth_txd_o   = 4'b0;
+  end
+  
   ////////////////
   //  SPI Host  //
   ////////////////

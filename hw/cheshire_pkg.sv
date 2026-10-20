@@ -128,6 +128,7 @@ package cheshire_pkg;
     bit     Bootrom;
     bit     Uart;
     bit     I2c;
+    bit     Ethernet;
     bit     SpiHost;
     bit     Gpio;
     bit     Dma;
@@ -223,6 +224,7 @@ package cheshire_pkg;
   typedef struct packed {
     cheshire_bus_err_intr_t bus_err;
     logic [31:0] gpio;
+    logic ethernet;
     logic usb;
     logic spih_spi_event;
     logic spih_error;
@@ -306,6 +308,7 @@ package cheshire_pkg;
     aw_bt usb;
     aw_bt ext_base;
     aw_bt num_in;
+    aw_bt eth;
   } axi_in_t;
 
   function automatic axi_in_t gen_axi_in(cheshire_cfg_t cfg);
@@ -317,6 +320,7 @@ package cheshire_pkg;
     if (cfg.SerialLink) begin i++; ret.slink = i; end
     if (cfg.Vga)        begin i++; ret.vga   = i; end
     if (cfg.Usb)        begin i++; ret.usb   = i; end
+    if (cfg.Ethernet)   begin i++; ret.eth   = i; end
     i++;
     ret.ext_base = i;
     ret.num_in = i + cfg.AxiExtNumMst;
@@ -394,6 +398,7 @@ package cheshire_pkg;
     aw_bt llc;
     aw_bt uart;
     aw_bt i2c;
+    aw_bt ethernet;
     aw_bt spi_host;
     aw_bt gpio;
     aw_bt slink;
@@ -426,6 +431,7 @@ package cheshire_pkg;
     if (cfg.Usb)          begin i++; ret.usb        = i; r++; ret.map[r] = '{i, 'h0300_8000, 'h0300_9000}; end
     if (cfg.IrqRouter)    begin i++; ret.irq_router = i; r++; ret.map[r] = '{i, 'h0208_0000, 'h020c_0000}; end
     if (cfg.AxiRt)        begin i++; ret.axirt      = i; r++; ret.map[r] = '{i, 'h020c_0000, 'h0210_0000}; end
+    if (cfg.Ethernet)     begin i++; ret.ethernet   = i; r++; ret.map[r] = '{i, 'h0300_c000, 'h0300_d000}; end
     if (cfg.Clic) for (int j = 0; j < cfg.NumCores; j++) begin
       i++; ret.clic[j]    = i; r++; ret.map[r] = '{i, AmClic + j*'h40000, AmClic + (j+1)*'h40000};
     end
@@ -578,6 +584,7 @@ package cheshire_pkg;
     Bootrom           : 1,
     Uart              : 1,
     I2c               : 1,
+    Ethernet          : 1,
     SpiHost           : 1,
     Gpio              : 1,
     Dma               : 1,

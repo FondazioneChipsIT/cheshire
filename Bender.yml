@@ -31,7 +31,8 @@ dependencies:
   serial_link:              { git: "https://github.com/pulp-platform/serial_link.git",            version: 1.1.1  }
   unbent:                   { git: "https://github.com/pulp-platform/unbent.git",                 version: 0.1.6  }
   dram_rtl_sim:             { git: "https://github.com/pulp-platform/dram_rtl_sim.git",           version: 0.1.1  }
-
+  pulp-ethernet:            { git: "https://github.com/pulp-platform/pulp-ethernet.git",          rev: "14bab5f"  }
+  
 export_include_dirs:
   - hw/include
 
