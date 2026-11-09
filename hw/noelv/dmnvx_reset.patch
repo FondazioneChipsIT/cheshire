@@ -1,0 +1,27 @@
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/dm/dmnvx.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/dm/dmnvx.vhd
+@@ -1255,19 +1255,12 @@
+ 
+   regs : process(clk, rin, rstn)
+   begin
+-    if rising_edge(clk) then
++    if rstn = '0' then
++      r <= RES_T;
++      r.hgroups(0) <= (others => '1');
++      r.rgroups(0) <= (others => '1');
++    elsif rising_edge(clk) then
+       r <= rin;
+-      if rstn = '0' then
+-        r <= RES_T;
+-        r.hgroups(0) <= (others => '1');
+-        r.rgroups(0) <= (others => '1');
+-        for i in 0 to NHARTS-1 loop
+-          r.haltonrst(i) <= r.dsubr(2);
+-        end loop;
+-        -- sync regs
+-        r.dsubr <= rin.dsubr;
+-        r.dsuen <= rin.dsuen;
+-      end if;
+     end if;
+   end process;
+ 

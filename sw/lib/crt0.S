@@ -12,8 +12,59 @@
 .global _start
 .align 4
 _start:
+    // Zero all GPRs except ra/sp/gp (x1-x3), which may carry the caller's
+    // context and are saved below / restored in _exit. The C910 physical
+    // register file has no reset, and its compressed-instruction decoder
+    // reads rd's (still unwritten) physical register as a source operand for
+    // immediate-only ops such as c.li; in gate-level simulation that X can
+    // leak into the result. Use the 32-bit `addi xN, x0, 0` form (norvc) so
+    // the only source read is the hard-wired zero register.
+    .option push
+    .option norvc
+    addi x4,  x0, 0
+    addi x5,  x0, 0
+    addi x6,  x0, 0
+    addi x7,  x0, 0
+    addi x8,  x0, 0
+    addi x9,  x0, 0
+    addi x10, x0, 0
+    addi x11, x0, 0
+    addi x12, x0, 0
+    addi x13, x0, 0
+    addi x14, x0, 0
+    addi x15, x0, 0
+    addi x16, x0, 0
+    addi x17, x0, 0
+    addi x18, x0, 0
+    addi x19, x0, 0
+    addi x20, x0, 0
+    addi x21, x0, 0
+    addi x22, x0, 0
+    addi x23, x0, 0
+    addi x24, x0, 0
+    addi x25, x0, 0
+    addi x26, x0, 0
+    addi x27, x0, 0
+    addi x28, x0, 0
+    addi x29, x0, 0
+    addi x30, x0, 0
+    addi x31, x0, 0
+    .option pop
+
     // Globally disable Machine and Supervisor interrupts
     csrrc x0, mstatus, 10
+
+    // NOEL-V (Gaisler, mvendorid 0x324): enable the L1 caches. The core resets
+    // with them off and expects software to turn them on; GRLIB's RTL only
+    // enables them at reset under `pragma translate_off`, so without this the
+    // netlist runs uncached while RTL runs cached. Value = dsnoop | dcs | ics
+    // (CSR 0x7c1 cctrl), i.e. the state RTL already has, so RTL is unaffected.
+    csrr t0, mvendorid
+    li   t1, 0x324
+    bne  t0, t1, 1f
+    li   t0, 0x10f
+    csrs 0x7c1, t0
+1:
 
     // Park SMP harts
     csrr t0, mhartid

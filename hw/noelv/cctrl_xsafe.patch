@@ -1,0 +1,27 @@
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cctrl5nv.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/noelv/core/cctrl5nv.vhd
+@@ -3706,9 +3706,11 @@
+           ihit := '1';
+         end if;
+         -- There is no point in making iway depend on whether there was a TLB hit.
+-        iway := iway or std_logic_vector(to_unsigned(i,2));
++        if r.i1ten = '1' then
++          iway := iway or std_logic_vector(to_unsigned(i,2));
++        end if;
+       end if;
+-      ivalidv(i) := cramo.itagdout(i)(0);
++      ivalidv(i) := cramo.itagdout(i)(0) and r.i1ten;
+     end loop;
+     ivalid := ivalidv(to_integer(unsigned(iway)));
+     -- Note: ihit is AND:ed with ivalid, but ihitv is _not_ AND:ed with ivalidv
+@@ -3801,6 +3803,10 @@
+       oico.data(0) := oico.data(to_integer(unsigned(oico.way)));
+       oico.way := "00";
+     end if;
++    if ihit = '0' then
++      oico.data := (others => x"0001001300010013");
++      oico.way  := "00";
++    end if;
+ 
+     if r.imisspend='1' and r.i2tcmhit='0' then
+       oico.mds := '0';

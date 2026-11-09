@@ -1,0 +1,23 @@
+--- a/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_ic_busport.vhd
++++ b/hw/noelv/grlib-gpl-2025.2-b4298/lib/gaisler/l5nv/shared/dmnv_ic_busport.vhd
+@@ -445,16 +445,12 @@
+     icbd <= oicbd;
+   end process;
+ 
+-  regs: process(clk)
++  regs: process(clk, rstn)
+   begin
+-    if rising_edge(clk) then
++    if rstn = '0' then
++      br <= RES_DM_IC_BIF;
++    elsif rising_edge(clk) then
+       br <= nbr;
+-      if rstn = '0' then
+-        br.bs      <= RES_DM_IC_BIF.bs;
+-        br.hbusreq <= RES_DM_IC_BIF.hbusreq;
+-        br.htrans  <= RES_DM_IC_BIF.htrans;
+-        br.mstgnt  <= RES_DM_IC_BIF.mstgnt;
+-      end if;
+     end if;
+   end process;
+ end;
