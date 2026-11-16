@@ -23,7 +23,8 @@ dependencies:
   clint:                    { git: "https://github.com/pulp-platform/clint.git",                  version: 0.2.0  }
   common_cells:             { git: "https://github.com/pulp-platform/common_cells.git",           version: 1.38.0 }
   common_verification:      { git: "https://github.com/pulp-platform/common_verification.git",    version: 0.2.3  }
-  cva6-dcls:                { git: "https://github.com/FondazioneChipsIT/cva6-dcls.git",          rev: 33be97b2718aff85895717699338c11e13f75ce6    } # branch: az/devel
+  cva6-dcls:                { git: "https://github.com/FondazioneChipsIT/cva6-dcls.git",          rev: 82d65176e578636b7ff3e2971185f74a71b34685   } # branch: az/devel
+ # snooper:                  { git: "https://github.com/FondazioneChipsIT/cfi-snooper.git",        rev: 7047209765b8d5d7fce5e1a468db8109b31a2ef3 }
   iDMA:                     { git: "https://github.com/pulp-platform/iDMA.git",                   version: 0.6.4  }
   irq_router:               { git: "https://github.com/pulp-platform/irq_router.git",             version: 0.0.1-beta.1 }
   opentitan_peripherals:    { git: "https://github.com/pulp-platform/opentitan_peripherals.git",  version: 0.4.0  }
@@ -39,13 +40,17 @@ export_include_dirs:
 sources:
   - hw/future/UsbOhciAxi4.v
   - hw/future/spinal_usb_ohci.sv
-  - hw/bootrom/cheshire_bootrom.sv
   - hw/cheshire_addrmap_pkg.sv
   - hw/regs/cheshire_soc_regs_pkg.sv
-  - hw/regs/cheshire_soc_regs.sv
-  - hw/cheshire_idma_wrap.sv
   - hw/cheshire_pkg.sv
-  - hw/cheshire_soc.sv
+
+  # Cheshire RTL
+  - target: not(tech_sim)
+    files:
+      - hw/bootrom/cheshire_bootrom.sv
+      - hw/regs/cheshire_soc_regs.sv
+      - hw/cheshire_idma_wrap.sv
+      - hw/cheshire_soc.sv
 
   - target: any(simulation, test)
     files:
@@ -53,8 +58,18 @@ sources:
       - target/sim/models/24FC1025.v
       - target/sim/src/vip_cheshire_soc.sv
       - target/sim/src/tb_cheshire_pkg.sv
+
+  # Standard RTL testbench
+  - target: all(any(simulation, test), not(tech_sim))
+    files:
       - target/sim/src/fixture_cheshire_soc.sv
       - target/sim/src/tb_cheshire_soc.sv
+
+  # Gate-level testbench (DUT = cheshire_wrap netlist)
+  - target: all(any(simulation, test), tech_sim)
+    files:
+      - target/zoix_netlist/fixture_cheshire_wrap.sv
+      - target/zoix_netlist/tb_cheshire_wrap.sv
 
   - target: all(fpga, xilinx)
     files:
@@ -64,3 +79,43 @@ sources:
       - target/xilinx/src/regs/chs_xilinx_reg_pkg.sv
       - target/xilinx/src/regs/chs_xilinx_reg_top.sv
       - target/xilinx/src/cheshire_top_xilinx.sv
+
+  - target: gf22
+    files:
+      - target/gf22/sourcecode/tc_clk.sv
+      - target/gf22/sourcecode/tc_sram.sv
+      - target/gf22/sourcecode/cheshire_wrap.sv
+
+  - target: tech_sim
+    files:
+      - target/gf22/sourcecode/tc_clk.sv
+      - target/gf22/sourcecode/tc_sram.sv
+      - target/gf22/sourcecode/verilog/gf22nspllogl20udf116f.v
+      - target/gf22/sourcecode/verilog/gf22nspllogl20udl116f.v
+      - target/gf22/sourcecode/verilog/gf22nspvlogl20udf116f.v
+      - target/gf22/sourcecode/verilog/gf22nspvlogl20udl116f.v
+      - target/gf22/sourcecode/verilog/std_primitives.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p1024x64m4b1w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p128x48m2b1w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p128x64m2b1w1c1p0d0l0rm3sdrw11.v 
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p2048x64m4b2w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x128m2b2w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x32m2b1w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x36m2b1w1c0p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x48m2b1w1c0p0d0l0rm3sdrw11.v 
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x64m2b1w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/cheshire_wrap.v
+
+  - target: tech_sram_sim
+    files:
+      - target/gf22/sourcecode/tc_sram.sv
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p1024x64m4b1w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p128x48m2b1w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p128x64m2b1w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p2048x64m4b2w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x128m2b2w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x32m2b1w1c1p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x36m2b1w1c0p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x48m2b1w1c0p0d0l0rm3sdrw11.v
+      - target/gf22/sourcecode/verilog/saduvssd8ULTRALOW1p256x64m2b1w1c1p0d0l0rm3sdrw11.v
+
