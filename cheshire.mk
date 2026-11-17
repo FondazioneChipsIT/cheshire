@@ -12,11 +12,13 @@ VLOGAN ?= vlogan
 VCS    :=  vcs
 FCM    :=  vc_fcm
 
+CHS_MK := $(abspath $(lastword $(MAKEFILE_LIST)))
+
 # Caution: Questasim requires this to point to the *actual* compiler install path
 CXX_PATH := $(shell which $(CXX))
 
 VLOG_ARGS   ?= -suppress 2583 -suppress 13314 -timescale 1ns/1ps
-VLOGAN_ARGS ?= -kdb -nc -assert svaext +v2k -timescale=1ns/1ps
+VLOGAN_ARGS ?= -kdb -nc -assert svaext +v2k -timescale=1ns/1ps 
 
 # Common Bender flags for Cheshire RTL
 CHS_BENDER_RTL_FLAGS ?= -t rtl -t cva6 
@@ -207,39 +209,41 @@ CHS_SIM_ALL += $(CHS_ROOT)/target/sim/vcs/compile.cheshire_soc.sh
 ##############
 # Z01X FLOW  #
 ##############
-ZOIX_DIR  := $(CHS_ROOT)/target/zoix
-FAULTSIM_TB := tb_cheshire_soc
+ZOIX_RTL_DIR  	:= $(CHS_ROOT)/target/zoix
+FAULTSIM_TB 		:= tb_cheshire_soc
+ZOIX_RTL_SCRIPT := $(CHS_ROOT)/target/sim/vcs/compile_zoix.cheshire_soc.sh
 
-NUM_FAULT_SIM := 100
-FAULT_START_CYCLE := 5000
-FAULT_END_CYCLE   := 2250725
+NUM_FAULT_SIM := 10
+FAULT_START_CYCLE := 113400
+FAULT_END_CYCLE   := 400000
 
 ZOIX_BINARY=$(CHS_ROOT)/sw/tests/helloworld.spm.elf
 ZOIX_BOOTMODE=0
 ZOIX_PRELMODE=1
 
 
-$(CHS_ROOT)/target/sim/vcs/compile_zoix.cheshire_soc.sh: $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock
+$(ZOIX_RTL_SCRIPT): $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock
 	$(BENDER) script vcs -t sim -t test $(CHS_BENDER_RTL_FLAGS) -D VC_Z01X  --vlog-arg="$(VLOGAN_ARGS)" --vlogan-bin="$(VLOGAN)" > $@
 	chmod +x $@
 
-build-zoix: $(CHS_ROOT)/target/sim/vcs/compile_zoix.cheshire_soc.sh
-	cd $(ZOIX_DIR); $(CHS_ROOT)/target/sim/vcs/compile_zoix.cheshire_soc.sh; export ZOIX=1;	export CHS_ROOT=$(CHS_ROOT);				\
-	$(CHS_ROOT)/target/sim/vcs/start.cheshire_soc.sh;
+build-zoix_rtl: $(ZOIX_RTL_SCRIPT)
+	mkdir -p $(ZOIX_RTL_DIR); cd $(ZOIX_RTL_DIR); $(ZOIX_RTL_SCRIPT); \
+	export ZOIX=1; export MAKE_BUILD=1; export CHS_ROOT=$(CHS_ROOT); \
+	$(CHS_ROOT)/target/sim/vcs/start.cheshire_soc.sh
  
-simulate:
-	cd $(ZOIX_DIR); \
+simulate-zoix_rtl_fsdb:
+	cd $(ZOIX_RTL_DIR); \
 	./simv +fsdb+all=on  +BINARY=${ZOIX_BINARY} -l simulate.log
 
-faultsim: $(ZOIX_DIR)/tb_cheshire_soc.sff $(ZOIX_DIR)/simv $(ZOIX_DIR)/fcm.tcl $(ZOIX_DIR)/states.sff
-	cd $(ZOIX_DIR); export FAULTSIM_TB=$(FAULTSIM_TB); export NUM_FAULT_SIM=$(NUM_FAULT_SIM); export BINARY=$(ZOIX_BINARY); export BOOTMODE=$(ZOIX_BOOTMODE); export PRELMODE=$(ZOIX_PRELMODE); $(FCM) -connect -tcl_script fcm.tcl
+faultsim-zoix_rtl: $(ZOIX_RTL_DIR)/tb_cheshire_soc.sff $(ZOIX_RTL_DIR)/simv $(ZOIX_RTL_DIR)/fcm.tcl $(ZOIX_RTL_DIR)/states.sff
+	cd $(ZOIX_RTL_DIR); export FAULTSIM_TB=$(FAULTSIM_TB); export NUM_FAULT_SIM=$(NUM_FAULT_SIM); export BINARY=$(ZOIX_BINARY); export BOOTMODE=$(ZOIX_BOOTMODE); export PRELMODE=$(ZOIX_PRELMODE); $(FCM) -connect -tcl_script fcm.tcl
 
 clean-zoix:
-	cd $(ZOIX_DIR); \
-	rm -rf AN.DB sim.* .envs .vcsCmd work.lib++ *.log ucli* csrc fdb* simv* *.rpt fcm_tsim_fsdb vc_hdrs.h fc1_report.sff fcm.dir *h
+	cd $(ZOIX_RTL_DIR); \
+	rm -rf AN.DB sim.* .envs .vcsCmd work.lib++ *.log ucli* csrc fdb* simv* *.rpt fcm_tsim_fsdb fc1_report.sff fcm.dir *h
 
-tb_cheshire_soc.sff: $(ZOIX_DIR)/tb_cheshire_soc.sff
-$(ZOIX_DIR)/tb_cheshire_soc.sff: $(ZOIX_DIR)/fault.sff 
+tb_cheshire_soc.sff: $(ZOIX_RTL_DIR)/tb_cheshire_soc.sff $(CHS_MK)
+$(ZOIX_RTL_DIR)/tb_cheshire_soc.sff: $(ZOIX_RTL_DIR)/fault.sff 
 	@cp -f $< $@
 #transient faults
 	sed -i "s|#faults|NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.**\" }\n    #faults|" $@
@@ -250,7 +254,92 @@ $(ZOIX_DIR)/tb_cheshire_soc.sff: $(ZOIX_DIR)/fault.sff
 # Exclude from fault injection
 #	sed -i "s|#faults|Exclude\n    {\n    NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_soc.fix.dut.i_core_wrap.i_core_relcva6.gen_cva6_core[0].i_cva6_core.gen_cache_hpd.**\" }\n    }\n    #faults|" $@
 
+##############
+# Z01X FLOW - NETLIST #
+##############
+ZOIX_DIR_NET  := $(CHS_ROOT)/target/zoix_netlist
+FAULTSIM_TB_NET := tb_cheshire_wrap
+SIM_DIR_NET := $(CHS_ROOT)/target/sim_netlist
+NETLIST_SCRIPT := $(CHS_ROOT)/target/sim/vcs/compile_netlist.cheshire_soc.sh
 
+
+$(NETLIST_SCRIPT): $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock
+	$(BENDER) script vcs -t sim -t test -t tech_sim -t cv64a6_imafdc_sv39_hpdcache_wb \
+  -D INITIALIZE_MEM --vlog-arg="$(VLOGAN_ARGS)" --vlogan-bin="$(VLOGAN)" > $@
+	chmod +x $@
+
+build-simv_netlist: $(NETLIST_SCRIPT)
+	mkdir -p $(SIM_DIR_NET); cd $(SIM_DIR_NET); \
+	$(NETLIST_SCRIPT); \
+	export MAKE_BUILD=1; export CHS_ROOT=$(CHS_ROOT); export TESTBENCH=tb_cheshire_wrap; \
+	$(CHS_ROOT)/target/sim/vcs/start.cheshire_soc.sh
+
+build-simv_zoix_netlist: $(NETLIST_SCRIPT)
+	cd $(ZOIX_DIR_NET); $(NETLIST_SCRIPT); \
+	export ZOIX=1; export MAKE_BUILD=1; export CHS_ROOT=$(CHS_ROOT); \
+	export TESTBENCH=tb_cheshire_wrap; \
+	export FSIM_DUT=tb_cheshire_wrap.fix.dut.i_cheshire_soc.gen_cva6_cores_0__i_core_cva6; \
+	$(CHS_ROOT)/target/sim/vcs/start.cheshire_soc.sh
+ 
+simulate_netlist:
+	cd $(SIM_DIR_NET) && ./simv +init_mem_data=0 -no_save +BOOTMODE=$(ZOIX_BOOTMODE) +PRELMODE=$(ZOIX_PRELMODE) +BINARY=$(ZOIX_BINARY) -l simulate.log
+
+simulate_netlist_fsdb:
+	cd $(SIM_DIR_NET) && ./simv  +init_mem_data=0 +fsdb+all=on +BOOTMODE=$(ZOIX_BOOTMODE) +PRELMODE=$(ZOIX_PRELMODE) +BINARY=$(ZOIX_BINARY) -l simulate_fsdb.log
+
+faultsim_netlist: $(ZOIX_DIR_NET)/tb_cheshire_wrap.sff $(ZOIX_DIR_NET)/simv $(ZOIX_DIR_NET)/fcm.tcl $(ZOIX_DIR_NET)/states.sff
+	cd $(ZOIX_DIR_NET); export FAULTSIM_TB=$(FAULTSIM_TB_NET); export NUM_FAULT_SIM=$(NUM_FAULT_SIM); export BINARY=$(ZOIX_BINARY); export BOOTMODE=$(ZOIX_BOOTMODE); export PRELMODE=$(ZOIX_PRELMODE); $(FCM) -connect -tcl_script fcm.tcl
+
+clean-sim_netlist:
+	cd $(SIM_DIR_NET) && rm -rf AN.DB .envs .vcsCmd work.lib++ *.log ucli* csrc simv* vc_hdrs.h
+
+clean-zoix_netlist:
+	cd $(ZOIX_DIR_NET); \
+	rm -rf AN.DB sim.* .envs .vcsCmd work.lib++ *.log ucli* csrc fdb* simv* *.rpt fcm_tsim_fsdb fc1_report.sff fcm.dir *h
+
+tb_cheshire_wrap.sff: $(ZOIX_DIR_NET)/tb_cheshire_wrap.sff $(CHS_MK)
+$(ZOIX_DIR_NET)/tb_cheshire_wrap.sff: $(ZOIX_DIR_NET)/fault.sff 
+	@cp -f $< $@
+#transient faults
+	sed -i "s|#faults|NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_wrap.fix.dut.i_cheshire_soc.gen_cva6_cores_0__i_core_cva6.**\" }\n    #faults|" $@
+
+#stuck-at faults
+#  NA [0,1] { PORT "tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.**" }
+
+# Exclude from fault injection
+#	sed -i "s|#faults|Exclude\n    {\n    NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_soc.fix.dut.i_core_wrap.i_core_relcva6.gen_cva6_core[0].i_cva6_core.gen_cache_hpd.**\" }\n    }\n    #faults|" $@
+
+
+##############################
+# RTL with GF22 SRAM macros  #
+##############################
+SIM_DIR_RTLMAC     := $(CHS_ROOT)/target/sim_rtl_macros
+RTLMAC_SCRIPT      := $(CHS_ROOT)/target/sim/vcs/compile_rtl_macros.cheshire_soc.sh
+
+$(RTLMAC_SCRIPT): $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock
+	$(BENDER) script vcs -t sim -t test $(CHS_BENDER_RTL_FLAGS) -t tech_sram_sim \
+	    -t tech_cells_generic_exclude_tc_sram -t tech_cells_generic_exclude_tb_cells -D INITIALIZE_MEM \
+	    --vlog-arg="$(VLOGAN_ARGS)" --vlogan-bin="$(VLOGAN)" > $@
+	chmod +x $@
+
+build-sim_rtl_macros: $(RTLMAC_SCRIPT)
+	mkdir -p $(SIM_DIR_RTLMAC); cd $(SIM_DIR_RTLMAC); \
+	$(RTLMAC_SCRIPT); \
+	export MAKE_BUILD=1; export CHS_ROOT=$(CHS_ROOT); \
+	$(CHS_ROOT)/target/sim/vcs/start.cheshire_soc.sh
+
+simulate_rtl_macros:
+	cd $(SIM_DIR_RTLMAC) && ./simv +init_mem_data=0 -no_save +BOOTMODE=$(ZOIX_BOOTMODE) +PRELMODE=$(ZOIX_PRELMODE) \
+	    +BINARY=$(ZOIX_BINARY) -l simulate.log
+
+simulate_rtl_macros_fsdb:
+	cd $(SIM_DIR_RTLMAC) && ./simv +init_mem_data=0 -no_save +fsdb+all=on +BOOTMODE=$(ZOIX_BOOTMODE) \
+	    +PRELMODE=$(ZOIX_PRELMODE) +BINARY=$(ZOIX_BINARY) -l simulate_fsdb.log
+
+clean-sim_rtl_macros:
+	cd $(SIM_DIR_RTLMAC) && rm -rf AN.DB .envs .vcsCmd work.lib++ *.log ucli* csrc simv* vc_hdrs.h
+
+.PHONY: build-sim_rtl_macros simulate_rtl_macros simulate_rtl_macros_fsdb clean-sim_rtl_macros
 ###########
 # DRAMSys #
 ###########
