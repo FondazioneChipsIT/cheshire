@@ -1,11 +1,11 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 # Copyright 2022 ETH Zurich and University of Bologna.
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 #
 # Cyril Koenig <cykoenig@iis.ee.ethz.ch>
 
-TESTBENCH=tb_cheshire_soc
+TESTBENCH=${TESTBENCH:-tb_cheshire_soc}
 
 
 # Set full path to c++ compiler.
@@ -22,7 +22,7 @@ fi
 [[ -z "${VCS_VERSION}" ]]   && VCS_VERSION=""
 [[ -z "${VCS_BIN}" ]]       && VCS_BIN="${VCS_VERSION} vcs"
 
-flags="-full64 -kdb "
+flags="-full64 -kdb +notimingcheck "
 # Set default to fast simulation flags.
 if [ -z "${VCSARGS}" ]; then
     # Use -debug_access+all for waveform debugging
@@ -33,8 +33,10 @@ fi
 flags+="-cpp ${CXX_PATH} "
 
 if [ -n "${ZOIX}" ]; then
-    flags+="-fsim=dut:${TESTBENCH}.fix.dut.gen_cva6_cores[0].i_core_cva6 -fsim=portfaults "
+    FSIM_DUT=${FSIM_DUT:-${TESTBENCH}.fix.dut.gen_cva6_cores[0].i_core_cva6}
+    flags+="-fsim=dut:${FSIM_DUT} -fsim=portfaults "
 fi
+
 [[ -n "${SELCFG}" ]]   && flags+="-pvalue+SelectedCfg=${SELCFG} "
 
 pargs=""
@@ -57,8 +59,14 @@ fi
 COLOR_NC='\e[0m'
 COLOR_BLUE='\e[0;34m'
 
-${VCS_BIN} ${flags} ${CHS_ROOT}/target/sim/src/elfloader.cpp ${TESTBENCH} | tee elaborate.log
+if [ "${MAKE_BUILD:-0}" = "1" ]; then
+    # Makefile flows (sim_netlist, sim_rtl_macros, Z01X), simv is launched by the Makefile from its own directory
+    ${VCS_BIN} ${flags} ${CHS_ROOT}/target/sim/src/elfloader.cpp ${TESTBENCH} | tee elaborate.log
+else
+    # script runs from target/sim/vcs
+    ${VCS_BIN} ${flags} ../src/elfloader.cpp ${TESTBENCH} | tee elaborate.log
 
-# Start simulation
-#printf ${COLOR_BLUE}"${VCS_VERSION} ${VERDI_VERSION} ./simv ${pargs}"${COLOR_NC}"\n"
-# ${VCS_VERSION} ${VERDI_VERSION} ./simv ${pargs} | tee simulate.log
+    # Start simulation
+    printf ${COLOR_BLUE}"${VCS_VERSION} ${VERDI_VERSION} ./simv ${pargs}"${COLOR_NC}"\n"
+    ${VCS_VERSION} ${VERDI_VERSION} ./simv ${pargs} | tee simulate.log
+fi
