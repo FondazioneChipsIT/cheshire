@@ -206,14 +206,14 @@ CHS_SIM_ALL += $(CHS_ROOT)/target/sim/models/24FC1025.v
 CHS_SIM_ALL += $(CHS_ROOT)/target/sim/vsim/compile.cheshire_soc.tcl
 CHS_SIM_ALL += $(CHS_ROOT)/target/sim/vcs/compile.cheshire_soc.sh
 
-##############
-# Z01X FLOW  #
-##############
+##################
+# Z01X FLOW RTL  #
+##################
 ZOIX_RTL_DIR  	:= $(CHS_ROOT)/target/zoix
 FAULTSIM_TB 		:= tb_cheshire_soc
 ZOIX_RTL_SCRIPT := $(CHS_ROOT)/target/sim/vcs/compile_zoix.cheshire_soc.sh
 
-NUM_FAULT_SIM := 10
+NUM_FAULT_SIM := 200
 FAULT_START_CYCLE := 113400
 FAULT_END_CYCLE   := 400000
 
@@ -223,7 +223,7 @@ ZOIX_PRELMODE=1
 
 
 $(ZOIX_RTL_SCRIPT): $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock
-	$(BENDER) script vcs -t sim -t test $(CHS_BENDER_RTL_FLAGS) -D VC_Z01X  --vlog-arg="$(VLOGAN_ARGS)" --vlogan-bin="$(VLOGAN)" > $@
+	$(BENDER) script vcs -t sim -t test $(CHS_BENDER_RTL_FLAGS) -D VC_Z01X --vlog-arg="$(VLOGAN_ARGS) +incdir+$(ZOIX_RTL_DIR)" --vlogan-bin="$(VLOGAN)" > $@
 	chmod +x $@
 
 build-zoix_rtl: $(ZOIX_RTL_SCRIPT)
@@ -245,27 +245,26 @@ clean-zoix:
 tb_cheshire_soc.sff: $(ZOIX_RTL_DIR)/tb_cheshire_soc.sff $(CHS_MK)
 $(ZOIX_RTL_DIR)/tb_cheshire_soc.sff: $(ZOIX_RTL_DIR)/fault.sff 
 	@cp -f $< $@
-#transient faults
+#SEU
 	sed -i "s|#faults|NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.gen_icache_memwrap[0].i_icache_memwrap.**\" }\n    #faults|" $@
 
-#stuck-at faults
+#SET
 #  NA [0,1] { PORT "tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.**" }
 
 # Exclude from fault injection
 #	sed -i "s|#faults|Exclude\n    {\n    NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_soc.fix.dut.i_core_wrap.i_core_relcva6.gen_cva6_core[0].i_cva6_core.gen_cache_hpd.**\" }\n    }\n    #faults|" $@
 
-##############
-# Z01X FLOW - NETLIST #
-##############
-ZOIX_DIR_NET  := $(CHS_ROOT)/target/zoix_netlist
-FAULTSIM_TB_NET := tb_cheshire_wrap
-SIM_DIR_NET := $(CHS_ROOT)/target/sim_netlist
+############################
+#     Netlist simulation   #
+############################
+SIM_DIR_NET    := $(CHS_ROOT)/target/sim_netlist
 NETLIST_SCRIPT := $(CHS_ROOT)/target/sim/vcs/compile_netlist.cheshire_soc.sh
 
-
-$(NETLIST_SCRIPT): $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock
+# gate-level build
+$(NETLIST_SCRIPT): $(CHS_ROOT)/Bender.yml $(CHS_ROOT)/Bender.lock $(CHS_MK)
 	$(BENDER) script vcs -t sim -t test -t tech_sim -t cv64a6_imafdc_sv39_hpdcache_wb \
-  -D INITIALIZE_MEM --vlog-arg="$(VLOGAN_ARGS)" --vlogan-bin="$(VLOGAN)" > $@
+	  -D INITIALIZE_MEM \
+	  --vlog-arg="$(VLOGAN_ARGS)" --vlogan-bin="$(VLOGAN)" > $@
 	chmod +x $@
 
 build-simv_netlist: $(NETLIST_SCRIPT)
@@ -274,41 +273,62 @@ build-simv_netlist: $(NETLIST_SCRIPT)
 	export MAKE_BUILD=1; export CHS_ROOT=$(CHS_ROOT); export TESTBENCH=tb_cheshire_wrap; \
 	$(CHS_ROOT)/target/sim/vcs/start.cheshire_soc.sh
 
-build-simv_zoix_netlist: $(NETLIST_SCRIPT)
-	cd $(ZOIX_DIR_NET); $(NETLIST_SCRIPT); \
-	export ZOIX=1; export MAKE_BUILD=1; export CHS_ROOT=$(CHS_ROOT); \
-	export TESTBENCH=tb_cheshire_wrap; \
-	export FSIM_DUT=tb_cheshire_wrap.fix.dut.i_cheshire_soc.gen_cva6_cores_0__i_core_cva6; \
-	$(CHS_ROOT)/target/sim/vcs/start.cheshire_soc.sh
- 
 simulate_netlist:
-	cd $(SIM_DIR_NET) && ./simv +init_mem_data=0 -no_save +BOOTMODE=$(ZOIX_BOOTMODE) +PRELMODE=$(ZOIX_PRELMODE) +BINARY=$(ZOIX_BINARY) -l simulate.log
+	cd $(SIM_DIR_NET) && ./simv +init_mem_data=0 -no_save +BOOTMODE=$(ZOIX_BOOTMODE) \
+	  +PRELMODE=$(ZOIX_PRELMODE) +BINARY=$(ZOIX_BINARY) -l simulate.log
 
 simulate_netlist_fsdb:
-	cd $(SIM_DIR_NET) && ./simv  +init_mem_data=0 +fsdb+all=on +BOOTMODE=$(ZOIX_BOOTMODE) +PRELMODE=$(ZOIX_PRELMODE) +BINARY=$(ZOIX_BINARY) -l simulate_fsdb.log
-
-faultsim_netlist: $(ZOIX_DIR_NET)/tb_cheshire_wrap.sff $(ZOIX_DIR_NET)/simv $(ZOIX_DIR_NET)/fcm.tcl $(ZOIX_DIR_NET)/states.sff
-	cd $(ZOIX_DIR_NET); export FAULTSIM_TB=$(FAULTSIM_TB_NET); export NUM_FAULT_SIM=$(NUM_FAULT_SIM); export BINARY=$(ZOIX_BINARY); export BOOTMODE=$(ZOIX_BOOTMODE); export PRELMODE=$(ZOIX_PRELMODE); $(FCM) -connect -tcl_script fcm.tcl
+	cd $(SIM_DIR_NET) && ./simv +init_mem_data=0 -no_save +fsdb+all=on +BOOTMODE=$(ZOIX_BOOTMODE) \
+	  +PRELMODE=$(ZOIX_PRELMODE) +BINARY=$(ZOIX_BINARY) -l simulate_fsdb.log
 
 clean-sim_netlist:
 	cd $(SIM_DIR_NET) && rm -rf AN.DB .envs .vcsCmd work.lib++ *.log ucli* csrc simv* vc_hdrs.h
 
-clean-zoix_netlist:
-	cd $(ZOIX_DIR_NET); \
-	rm -rf AN.DB sim.* .envs .vcsCmd work.lib++ *.log ucli* csrc fdb* simv* *.rpt fcm_tsim_fsdb fc1_report.sff fcm.dir *h
+.PHONY: build-simv_netlist simulate_netlist simulate_netlist_fsdb clean-sim_netlist
 
-tb_cheshire_wrap.sff: $(ZOIX_DIR_NET)/tb_cheshire_wrap.sff $(CHS_MK)
-$(ZOIX_DIR_NET)/tb_cheshire_wrap.sff: $(ZOIX_DIR_NET)/fault.sff 
+############################
+# Z01X FLOW GATE LEVEL     #
+############################
+ZOIX_DIR_NET        := $(CHS_ROOT)/target/zoix_netlist
+FAULTSIM_TB_NET     := tb_cheshire_wrap
+NETLIST_ZOIX_SCRIPT := $(CHS_ROOT)/target/sim/vcs/compile_zoix_netlist.cheshire_soc.sh
+NETLIST_FILE := $(CHS_ROOT)/target/gf22/sourcecode/cheshire_wrap.v
+
+# Latent-check vectors for structures without a named bus (scoreboard, CSRs, TLBs)
+$(ZOIX_DIR_NET)/strobe_netlist_latent.svh: $(NETLIST_FILE) $(ZOIX_DIR_NET)/latent_vectors.cfg $(ZOIX_DIR_NET)/gen_latent_vectors.py
+	cd $(ZOIX_DIR_NET) && python3 gen_latent_vectors.py --netlist $(NETLIST_FILE) \
+	  --config latent_vectors.cfg > $@.tmp && mv $@.tmp $@
+
+build-simv_zoix_netlist: $(NETLIST_ZOIX_SCRIPT) $(ZOIX_DIR_NET)/strobe_netlist.sv $(ZOIX_DIR_NET)/strobe_netlist_latent.svh
+	cd $(ZOIX_DIR_NET); $(NETLIST_ZOIX_SCRIPT); \
+	export ZOIX=1; export MAKE_BUILD=1; export CHS_ROOT=$(CHS_ROOT); \
+	export TESTBENCH=tb_cheshire_wrap; \
+	export FSIM_DUT=tb_cheshire_wrap.fix.dut.i_cheshire_soc.gen_cva6_cores_0__i_core_cva6; \
+	$(CHS_ROOT)/target/sim/vcs/start.cheshire_soc.sh
+
+
+# Fault list
+tb_cheshire_wrap.sff: $(ZOIX_DIR_NET)/tb_cheshire_wrap.sff
+$(ZOIX_DIR_NET)/tb_cheshire_wrap.sff: $(ZOIX_DIR_NET)/fault.sff $(CHS_MK)
 	@cp -f $< $@
-#transient faults
+	# transient faults (bit flips) on the flops of the core cluster
 	sed -i "s|#faults|NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_wrap.fix.dut.i_cheshire_soc.gen_cva6_cores_0__i_core_cva6.**\" }\n    #faults|" $@
 
-#stuck-at faults
-#  NA [0,1] { PORT "tb_cheshire_soc.fix.dut.gen_cva6_cores[0].i_core_cva6.**" }
+# Rebuild simv when the script, the fixture or the strobe files change
+$(ZOIX_DIR_NET)/simv: $(NETLIST_ZOIX_SCRIPT) $(ZOIX_DIR_NET)/fixture_cheshire_wrap.sv \
+                      $(ZOIX_DIR_NET)/strobe_netlist.sv $(ZOIX_DIR_NET)/strobe_netlist_latent.svh
+	$(MAKE) build-simv_zoix_netlist
 
-# Exclude from fault injection
-#	sed -i "s|#faults|Exclude\n    {\n    NA ~ (\"cycle1\" $(FAULT_START_CYCLE):$(FAULT_END_CYCLE)) { FLOP \"tb_cheshire_soc.fix.dut.i_core_wrap.i_core_relcva6.gen_cva6_core[0].i_cva6_core.gen_cache_hpd.**\" }\n    }\n    #faults|" $@
+faultsim_netlist: $(ZOIX_DIR_NET)/tb_cheshire_wrap.sff $(ZOIX_DIR_NET)/simv $(ZOIX_DIR_NET)/fcm.tcl $(ZOIX_DIR_NET)/states.sff
+	cd $(ZOIX_DIR_NET); export FAULTSIM_TB=$(FAULTSIM_TB_NET); export NUM_FAULT_SIM=$(NUM_FAULT_SIM); \
+	export BINARY=$(ZOIX_BINARY); export BOOTMODE=$(ZOIX_BOOTMODE); export PRELMODE=$(ZOIX_PRELMODE); \
+	$(FCM) -connect -tcl_script fcm.tcl
 
+clean-zoix_netlist:
+	cd $(ZOIX_DIR_NET); \
+	rm -rf AN.DB sim.* .envs .vcsCmd work.lib++ *.log ucli* csrc fdb* simv* *.rpt fcm_tsim_fsdb vc_hdrs.h fc1_report.sff fcm.dir
+
+.PHONY: build-simv_zoix_netlist faultsim_netlist clean-zoix_netlist tb_cheshire_wrap.sff
 
 ##############################
 # RTL with GF22 SRAM macros  #
